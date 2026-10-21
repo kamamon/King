@@ -238,6 +238,48 @@ table.tbl th{color:var(--fg2);font-weight:500;font-size:12px}
 .modal .btn{background:#efe2b9;color:var(--ink);border-color:#9c8350}
 .modal .btn.seal{background:var(--seal);color:#fff4e6;border-color:#a8341f}
 .modal textarea{width:100%;min-height:120px;font:13px/1.4 ui-monospace,Menlo,monospace;color:var(--ink);background:rgba(255,250,232,.8);border:1px solid #9c8350;border-radius:8px;padding:8px;box-sizing:border-box}
+.modal .seg button{background:#efe2b9;border-color:#9c8350;color:var(--ink)}
+.modal .seg button.on{background:#2e4a3f;color:#f3ead2;border-color:#1f3a30}
+/* 出世の道・爵位の一覧 */
+.ladder{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.lrow{border:1px solid #9c8350;border-radius:8px;padding:8px 12px;background:rgba(255,250,232,.5);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:baseline}
+.lrow b{font-family:var(--font-head);font-weight:400;font-size:17px}
+.lrow .num{font-size:13px;color:#5b4b31}
+.lrow small{grid-column:1/-1;color:#5b4b31;font-size:12px;line-height:1.5}
+.lrow.done{opacity:.55}
+.lrow.cur{background:#2e4a3f;color:#f3ead2;border-color:#1f3a30}
+.lrow.cur small,.lrow.cur .num{color:#cfe0d5}
+.lrow .gr{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.lrow .gr span{font-size:11px;border:1px solid currentColor;border-radius:999px;padding:0 7px;opacity:.65}
+.lrow .gr span.on{opacity:1;background:var(--bronze);color:#1e160a;border-color:var(--bronze)}
+/* 昇進の条件 */
+.conds{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--fg2)}
+.conds li{display:flex;align-items:baseline;gap:3px}
+.conds li i{font-style:normal}
+.conds li.ok{color:var(--good)}
+.conds li small{font-size:12px;color:var(--fg2)}
+.epi{font-family:var(--font-display);color:var(--bronze);font-size:18px;line-height:1.3;margin:2px 0}
+/* 異名・武名（天下に轟く） */
+.mwrap.fame-wrap{background:radial-gradient(ellipse at 50% 38%,rgba(120,32,18,.5),rgba(3,4,4,.93) 72%);align-items:center}
+.modal.fame{background:radial-gradient(ellipse at 50% 0%,#40190f,#130d0a 72%);color:#f1e4c2;text-align:center;border:1px solid #6b4a1f;border-radius:12px;padding-top:30px;max-width:520px;width:calc(100% - 24px);animation:fameIn .5s cubic-bezier(.2,.8,.2,1)}
+.modal.fame::before,.modal.fame::after{background:repeating-linear-gradient(90deg,var(--bronze) 0 10px,transparent 10px 28px);opacity:.45}
+.modal.fame.tenka{border-color:var(--bronze);box-shadow:0 0 0 1px #000,0 0 60px rgba(201,161,74,.35)}
+.fame-k{font-family:var(--font-head);letter-spacing:.45em;text-indent:.45em;color:var(--bronze);font-size:15px}
+.fame-lead{margin:12px auto 0;max-width:30em;font-size:14.5px;line-height:1.8;color:#e6d8b6;text-wrap:pretty}
+.fame-ep{font-family:var(--font-display);font-size:clamp(32px,9.5vw,56px);line-height:1.2;margin:16px 0 4px;color:#f6e1a0;text-shadow:0 0 18px rgba(201,161,74,.55),0 2px 0 #000;animation:fameEp 1.2s .15s both cubic-bezier(.2,.7,.2,1);overflow-wrap:anywhere}
+.modal.fame.tenka .fame-ep{font-size:clamp(36px,11vw,64px)}
+.fame-name{font-family:var(--font-head);font-size:16px;color:#cdb98a;letter-spacing:.25em;text-indent:.25em}
+.fame-note{margin:12px auto 0;max-width:30em;font-size:12.5px;line-height:1.7;color:#bba77a}
+.fame-lines{display:flex;flex-direction:column;gap:8px;margin:20px 0 0;text-align:left}
+.fame-line{display:flex;gap:10px;align-items:center;font-size:13.5px;line-height:1.6;color:#e5d9bc;animation:fameLine .55s both}
+.fame-line .cseal{flex:none}
+.fame-line b{font-family:var(--font-head);font-weight:400;color:var(--bronze);flex:none;min-width:3.5em}
+.modal.fame .btn{background:#2a1a12;color:#f1e4c2;border-color:#6b4a1f}
+.modal.fame .btn.seal{background:var(--seal);color:#fff4e6;border-color:#e27560}
+@keyframes fameIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+@keyframes fameEp{0%{opacity:0;transform:scale(1.3);filter:blur(6px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none}}
+@keyframes fameLine{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.modal.fame,.fame-ep,.fame-line{animation:none}}
 #toast-root{position:fixed;left:0;right:0;top:calc(10px + env(safe-area-inset-top,0px));z-index:70;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;padding:0 16px}
 .toast{background:rgba(21,33,29,.95);border:1px solid var(--line);color:var(--fg);padding:8px 14px;border-radius:999px;font-size:13.5px;max-width:92vw;box-shadow:0 6px 20px rgba(0,0,0,.4);animation:fade .2s}
 
@@ -659,66 +701,131 @@ D.MAPDECO = {
 
 /* ---------- 官職 ---------- */
 // track: mil(武官) civ(文官) staff(軍師) top(丞相・君主)
+// tier: 立場の格（1〜10。経済・事件・合戦の規模の目安）。m: その官職に就くのに要る功績（累計）
+// 同じ官職の中にも三等→二等→一等の等級がある（D.GRADES）。昇進は一段ずつで、一段ごとに在任期間が要る（D.STEP_MONTHS）
+// tmax / mfull: 功績に応じて率いる兵が増える官職（m のとき troops、mfull で tmax）
+// req: 昇進の条件（fame 名声・wins 勝利・battles 合戦・renown 武名の段階・favor [君主との絆, 名声] のどちらか）
 D.RANKS = {
-  goch:   { name: '伍長',   track: 'mil', tier: 1, troops: 5,      ap: 3, pay: 300,    up: 'hyak', desc: '伍（五人組）の長。四人の仲間と最前線で戦う。上官の命に従い、伍を鍛え、功を立てよ。' },
-  hyak:   { name: '百将',   track: 'mil', tier: 2, troops: 100,    ap: 3, pay: 900,    up: 'gohy', desc: '百人隊を率いる。伍長たちを束ね、戦場で小隊を指揮する。' },
-  gohy:   { name: '五百将', track: 'mil', tier: 3, troops: 500,    ap: 3, pay: 2200,   up: 'senn', desc: '五百人を率いる。隊を分けて助攻や挟撃ができるようになる。' },
-  senn:   { name: '千人将', track: 'mil', tier: 4, troops: 1000,   ap: 4, pay: 4500,   up: 'sanz', desc: '千人隊の長。弓兵や騎兵を編成し、兵種を組み合わせて戦う。' },
-  sanz:   { name: '三千将', track: 'mil', tier: 5, troops: 3000,   ap: 4, pay: 9000,   up: 'goz',  desc: '三千の兵を率いる将。独立した戦術単位として動ける。' },
-  goz:    { name: '五千将', track: 'mil', tier: 6, troops: 5000,   ap: 4, pay: 15000,  up: 'shog', desc: '将軍の一歩手前。五千の兵と副官を擁する。' },
-  shog:   { name: '将軍',   track: 'mil', tier: 7, troops: 20000,  ap: 5, pay: 30000,  up: 'dais', desc: '一軍の将。軍議を開き戦術を準備できる。許可なく小規模の戦闘を起こせる。戦争には上奏が必要。' },
-  dais:   { name: '大将軍', track: 'mil', tier: 8, troops: 100000, ap: 5, pay: 60000,  up: null,   desc: '国軍の頂点。数十万の大軍を率いる。小規模戦闘は自由だが、戦争には君主の許可が要る。' },
-  gunshi: { name: '軍師',   track: 'staff', tier: 7, troops: 1000, ap: 5, pay: 30000,  up: 'josh', desc: '戦術を管理し、軍議で策を練る。合戦では総軍師として全軍に指示を出せる。直属隊を持つ。' },
-  ritei:  { name: '里典',   track: 'civ', tier: 1, troops: 5,      ap: 3, pay: 300,    up: 'teic', desc: '里（村）の長。戸籍と連坐を管理し、里の暮らしを守る。' },
-  teic:   { name: '亭長',   track: 'civ', tier: 2, troops: 12,     ap: 3, pay: 900,    up: 'kyos', desc: '亭の長。治安を守り盗賊を捕らえる。亭卒を率いて戦うこともある。' },
-  kyos:   { name: '郷嗇夫', track: 'civ', tier: 3, troops: 50,     ap: 3, pay: 2200,   up: 'kenj', desc: '郷の長官。徴税・訴訟・賦役を司る。' },
-  kenj:   { name: '県丞',   track: 'civ', tier: 4, troops: 200,    ap: 4, pay: 4500,   up: 'kenr', desc: '県の副長官。文書・倉・司法を扱う。' },
-  kenr:   { name: '県令',   track: 'civ', tier: 5, troops: 1000,   ap: 4, pay: 9000,   up: 'guns', desc: '県の長官。県全体の内政と県兵を預かる。' },
-  guns:   { name: '郡守',   track: 'civ', tier: 6, troops: 5000,   ap: 4, pay: 15000,  up: 'daij', desc: '郡（一つの地域）の長官。内政と郡兵を指揮し、敵の侵攻に備える。' },
-  daij:   { name: '大臣',   track: 'civ', tier: 7, troops: 1000,   ap: 5, pay: 30000,  up: 'gyos', desc: '九卿の一つを司る。担当分野の国政を動かす。' },
-  gyos:   { name: '御史大夫', track: 'civ', tier: 8, troops: 2000, ap: 5, pay: 60000,  up: 'josh', desc: '副丞相。百官を監察し、弾劾し、法案を上奏する。' },
-  josh:   { name: '丞相',   track: 'top', tier: 9, troops: 5000,   ap: 6, pay: 100000, up: null,   desc: '百官の長。国法を定め、外交を行い、戦争を決める。自ら軍を率いることもできる。' },
-  kuns:   { name: '君主',   track: 'top', tier: 10, troops: 10000, ap: 6, pay: 0,      up: null,   desc: '一国の王。すべてを決める。親征して自ら大軍を率いることもできる。' },
+  goch:   { name: '伍長',   track: 'mil', tier: 1, troops: 5,      ap: 3, pay: 300,    m: 0,      up: 'shic', desc: '伍（五人組）の長。四人の仲間と最前線で戦う。上官の命に従い、伍を鍛え、功を立てよ。' },
+  shic:   { name: '什長',   track: 'mil', tier: 1, troops: 10,     ap: 3, pay: 450,    m: 120,    up: 'tonc', desc: '二つの伍、十人を束ねる。乱戦でも隊を崩さず、伍長たちに目を配る。' },
+  tonc:   { name: '屯長',   track: 'mil', tier: 2, troops: 50,     ap: 3, pay: 650,    m: 300,    up: 'hyak', desc: '五十人の屯を率いる。百将の下で一隊を任される。' },
+  hyak:   { name: '百将',   track: 'mil', tier: 2, troops: 100,    ap: 3, pay: 900,    m: 600,    up: 'sanb', desc: '百人隊を率いる。伍長たちを束ね、戦場で小隊を指揮する。' },
+  sanb:   { name: '三百将', track: 'mil', tier: 3, troops: 300,    ap: 3, pay: 1500,   m: 1100,   up: 'gohy', desc: '三百の兵を率いる。いくつもの百人隊を一つの塊として動かす。' },
+  gohy:   { name: '五百将', track: 'mil', tier: 3, troops: 500,    ap: 3, pay: 2200,   m: 1800,   up: 'senn', desc: '五百人を率いる。隊を分けて助攻や挟撃ができるようになる。' },
+  senn:   { name: '千人将', track: 'mil', tier: 4, troops: 1000,   ap: 4, pay: 4500,   m: 2600,   up: 'sanz', desc: '千人隊の長。弓兵や騎兵を編成し、兵種を組み合わせて戦う。' },
+  sanz:   { name: '三千将', track: 'mil', tier: 5, troops: 3000,   ap: 4, pay: 9000,   m: 4200,   up: 'goz',  desc: '三千の兵を率いる将。独立した戦術単位として動ける。' },
+  goz:    { name: '五千将', track: 'mil', tier: 6, troops: 5000,   ap: 4, pay: 15000,  m: 11000,  up: 'shog', desc: '将軍の一歩手前。五千の兵と副官を擁する。' },
+  shog:   { name: '将軍',   track: 'mil', tier: 7, troops: 20000,  ap: 5, pay: 30000,  m: 24000,  up: 'dais', tmax: 100000, mfull: 68000, req: { wins: 5 }, desc: '一軍の将。軍議を開き戦術を準備できる。功績に応じて率いる兵が増える（最大十万）。許可なく小規模の戦闘を起こせる。戦争には上奏が必要。' },
+  dais:   { name: '大将軍', track: 'mil', tier: 8, troops: 100000, ap: 5, pay: 60000,  m: 68000,  up: 'tenka', tmax: 500000, mfull: 250000, req: { fame: 350, wins: 15 }, desc: '国軍の頂点。功績に応じて率いる兵が増える（最大五十万）。小規模戦闘は自由だが、戦争には君主の許可が要る。' },
+  tenka:  { name: '天下の大将軍', track: 'mil', tier: 9, troops: 500000, ap: 6, pay: 100000, m: 250000, up: null, nograde: true, req: { fame: 900, wins: 40, renown: 4 }, desc: '武の頂点。その名は七国に轟き、敵は旗を見ただけで怯む。比類なき武名を挙げた大将軍だけが、天下にこう呼ばれる。' },
+  gunri:  { name: '軍吏',   track: 'staff', tier: 3, troops: 20,   ap: 3, pay: 1600,   m: 1800,   up: 'sanbo', desc: '将軍府の書記官。陣立てや兵站の文書を扱いながら軍略を学ぶ。合戦では護衛を率いて将の軍で戦う。' },
+  sanbo:  { name: '参謀',   track: 'staff', tier: 4, troops: 50,   ap: 4, pay: 4000,   m: 2600,   up: 'gshib', desc: '将の幕僚として軍議に加わり、策を献じる。' },
+  gshib:  { name: '軍司馬', track: 'staff', tier: 5, troops: 200,  ap: 4, pay: 8000,   m: 4200,   up: 'chosh', desc: '軍の実務を預かる幕僚。兵站と軍法を司り、二百の護衛隊を持つ。' },
+  chosh:  { name: '長史',   track: 'staff', tier: 6, troops: 500,  ap: 4, pay: 14000,  m: 11000,  up: 'gunshi', desc: '将軍府の幕僚の長。大軍の作戦を練り、将軍に次ぐ発言力を持つ。' },
+  gunshi: { name: '軍師',   track: 'staff', tier: 7, troops: 1000, ap: 5, pay: 30000,  m: 22000,  up: 'dgun', req: { fame: 150, battles: 5 }, desc: '戦術を管理し、軍議で策を練る。合戦では総軍師として全軍に指示を出せる。直属隊を持つ。' },
+  dgun:   { name: '大軍師', track: 'staff', tier: 8, troops: 2000, ap: 5, pay: 55000,  m: 50000,  up: 'josh', req: { fame: 300, battles: 12 }, desc: '国の軍略の頂点。全軍の作戦を立て、合戦では総軍師として采配を振るう。' },
+  ritei:  { name: '里典',   track: 'civ', tier: 1, troops: 5,      ap: 3, pay: 300,    m: 0,      up: 'teic', desc: '里（村）の長。戸籍と連坐を管理し、里の暮らしを守る。' },
+  teic:   { name: '亭長',   track: 'civ', tier: 2, troops: 12,     ap: 3, pay: 900,    m: 300,    up: 'kyosa', desc: '亭の長。治安を守り盗賊を捕らえる。亭卒を率いて戦うこともある。' },
+  kyosa:  { name: '郷佐',   track: 'civ', tier: 2, troops: 25,     ap: 3, pay: 1400,   m: 900,    up: 'kyos', desc: '郷嗇夫の補佐。郷の戸籍と徴税を手伝い、村々を回る。' },
+  kyos:   { name: '郷嗇夫', track: 'civ', tier: 3, troops: 50,     ap: 3, pay: 2200,   m: 1500,   up: 'reis', desc: '郷の長官。徴税・訴訟・賦役を司る。' },
+  reis:   { name: '令史',   track: 'civ', tier: 3, troops: 100,    ap: 3, pay: 3000,   m: 2300,   up: 'kenj', desc: '県の役所の書記官。文書と裁判を扱い、県令の目と耳となる。' },
+  kenj:   { name: '県丞',   track: 'civ', tier: 4, troops: 200,    ap: 4, pay: 4500,   m: 3500,   up: 'kenr', desc: '県の副長官。文書・倉・司法を扱う。' },
+  kenr:   { name: '県令',   track: 'civ', tier: 5, troops: 1000,   ap: 4, pay: 9000,   m: 7900,   up: 'gunj', desc: '県の長官。県全体の内政と県兵を預かる。' },
+  gunj:   { name: '郡丞',   track: 'civ', tier: 6, troops: 2000,   ap: 4, pay: 12000,  m: 14000,  up: 'guns', desc: '郡の副長官。郡守を助けて一郡の政務を見る。' },
+  guns:   { name: '郡守',   track: 'civ', tier: 6, troops: 5000,   ap: 4, pay: 15000,  m: 22000,  up: 'daij', desc: '郡（一つの地域）の長官。内政と郡兵を指揮し、敵の侵攻に備える。' },
+  daij:   { name: '大臣',   track: 'civ', tier: 7, troops: 1000,   ap: 5, pay: 30000,  m: 34000,  up: 'gyos', req: { fame: 150 }, desc: '九卿の一つを司る。担当分野の国政を動かす。' },
+  gyos:   { name: '御史大夫', track: 'civ', tier: 8, troops: 2000, ap: 5, pay: 60000,  m: 59000,  up: 'josh', req: { fame: 250 }, desc: '副丞相。百官を監察し、弾劾し、法案を上奏する。' },
+  josh:   { name: '丞相',   track: 'top', tier: 9, troops: 5000,   ap: 6, pay: 100000, m: 90000,  up: null, req: { favor: [30, 450] }, desc: '百官の長。国法を定め、外交を行い、戦争を決める。自ら軍を率いることもできる。' },
+  kuns:   { name: '君主',   track: 'top', tier: 10, troops: 10000, ap: 6, pay: 0,      m: 0,      up: null,   desc: '一国の王。すべてを決める。親征して自ら大軍を率いることもできる。' },
 };
+// 出世の道（下から順）
+D.LADDER = {
+  mil: ['goch', 'shic', 'tonc', 'hyak', 'sanb', 'gohy', 'senn', 'sanz', 'goz', 'shog', 'dais', 'tenka'],
+  staff: ['gunri', 'sanbo', 'gshib', 'chosh', 'gunshi', 'dgun'],
+  civ: ['ritei', 'teic', 'kyosa', 'kyos', 'reis', 'kenj', 'kenr', 'gunj', 'guns', 'daij', 'gyos'],
+};
+D.LADDER_NAME = { mil: '武官', staff: '軍師', civ: '文官', top: '宰相と王' };
+// 格ごとの代表の官職（AIの武将や部下を作るとき）
 D.RANK_ORDER_MIL = ['goch', 'hyak', 'gohy', 'senn', 'sanz', 'goz', 'shog', 'dais'];
 D.RANK_ORDER_CIV = ['ritei', 'teic', 'kyos', 'kenj', 'kenr', 'guns', 'daij', 'gyos'];
-D.SELECTABLE = ['kuns', 'josh', 'daij', 'dais', 'gunshi', 'shog', 'goz', 'sanz', 'senn', 'gohy', 'hyak', 'goch', 'gyos', 'guns', 'kenr', 'kenj', 'kyos', 'teic', 'ritei'];
-// 功績（累計）の昇進基準 tier → 次へ
-D.MERIT_TIER = [0, 0, 120, 500, 1500, 3500, 7000, 13000, 25000, 50000, 999999999];
+D.SELECTABLE = ['kuns', 'josh',
+  'dais', 'shog', 'goz', 'sanz', 'senn', 'gohy', 'sanb', 'hyak', 'tonc', 'shic', 'goch',
+  'dgun', 'gunshi', 'chosh', 'gshib', 'sanbo', 'gunri',
+  'gyos', 'daij', 'guns', 'gunj', 'kenr', 'kenj', 'reis', 'kyos', 'kyosa', 'teic', 'ritei'];
+// 官職の中の等級（下から）
+D.GRADES = ['三等', '二等', '一等'];
+// 一段（等級か官職）上がるのに要る在任期間（か月）。格ごと
+D.STEP_MONTHS = [0, 2, 2, 3, 3, 4, 4, 6, 6, 8, 8];
+// AIの人物の功績の目安（格ごと）
+D.MERIT_TIER = [0, 0, 300, 1100, 2600, 4200, 11000, 24000, 68000, 90000, 999999999];
 
 /* ---------- 二十等爵 ---------- */
-// ha: 田（頃）, hh: 食邑（戸）, m: 必要功績
+// ha: 田（頃）, hh: 食邑（戸）, m: 必要功績, t: 要る官職の格, fame: 要る名声
+// 一つの爵の中も下・中・上の三段に分かれ、一か月に一段ずつしか上がらない
 D.JUE = [
-  { n: '士伍',   ha: 1,   hh: 0,     m: -1 },
-  { n: '公士',   ha: 1.5, hh: 0,     m: 0 },
-  { n: '上造',   ha: 2,   hh: 0,     m: 60 },
-  { n: '簪裊',   ha: 3,   hh: 0,     m: 150 },
-  { n: '不更',   ha: 4,   hh: 0,     m: 320 },
-  { n: '大夫',   ha: 5,   hh: 0,     m: 620 },
-  { n: '官大夫', ha: 7,   hh: 0,     m: 1000 },
-  { n: '公大夫', ha: 9,   hh: 0,     m: 1600 },
-  { n: '公乗',   ha: 20,  hh: 0,     m: 2500 },
-  { n: '五大夫', ha: 25,  hh: 300,   m: 4000 },
-  { n: '左庶長', ha: 74,  hh: 500,   m: 6000 },
-  { n: '右庶長', ha: 76,  hh: 600,   m: 8500 },
-  { n: '左更',   ha: 78,  hh: 700,   m: 11500 },
-  { n: '中更',   ha: 80,  hh: 800,   m: 15000 },
-  { n: '右更',   ha: 82,  hh: 900,   m: 19000 },
-  { n: '少上造', ha: 84,  hh: 1000,  m: 24000 },
-  { n: '大上造', ha: 86,  hh: 1200,  m: 30000 },
-  { n: '駟車庶長', ha: 88, hh: 1500, m: 38000 },
-  { n: '大庶長', ha: 90,  hh: 2000,  m: 48000 },
-  { n: '関内侯', ha: 95,  hh: 3000,  m: 60000 },
-  { n: '徹侯',   ha: 105, hh: 10000, m: 80000 },
+  { n: '士伍',   ha: 1,   hh: 0,     m: -1,     t: 0 },
+  { n: '公士',   ha: 1.5, hh: 0,     m: 0,      t: 0 },
+  { n: '上造',   ha: 2,   hh: 0,     m: 100,    t: 0 },
+  { n: '簪裊',   ha: 3,   hh: 0,     m: 250,    t: 0 },
+  { n: '不更',   ha: 4,   hh: 0,     m: 500,    t: 0 },
+  { n: '大夫',   ha: 5,   hh: 0,     m: 900,    t: 2 },
+  { n: '官大夫', ha: 7,   hh: 0,     m: 1500,   t: 2 },
+  { n: '公大夫', ha: 9,   hh: 0,     m: 2400,   t: 3 },
+  { n: '公乗',   ha: 20,  hh: 0,     m: 3600,   t: 3 },
+  { n: '五大夫', ha: 25,  hh: 300,   m: 5500,   t: 4 },
+  { n: '左庶長', ha: 74,  hh: 500,   m: 8000,   t: 4 },
+  { n: '右庶長', ha: 76,  hh: 600,   m: 11000,  t: 5 },
+  { n: '左更',   ha: 78,  hh: 700,   m: 15000,  t: 5 },
+  { n: '中更',   ha: 80,  hh: 800,   m: 20000,  t: 6 },
+  { n: '右更',   ha: 82,  hh: 900,   m: 26000,  t: 6 },
+  { n: '少上造', ha: 84,  hh: 1000,  m: 33000,  t: 7 },
+  { n: '大上造', ha: 86,  hh: 1200,  m: 42000,  t: 7 },
+  { n: '駟車庶長', ha: 88, hh: 1500, m: 54000,  t: 7 },
+  { n: '大庶長', ha: 90,  hh: 2000,  m: 68000,  t: 8 },
+  { n: '関内侯', ha: 95,  hh: 3000,  m: 85000,  t: 8 },
+  { n: '徹侯',   ha: 105, hh: 10000, m: 120000, t: 8, fame: 600 },
 ];
+D.JUE_SUB = ['下', '中', '上'];
+// 徹侯の上の段の目安
+D.JUE_TOP = { ha: 120, hh: 15000, m: 170000 };
+
+/* ---------- 武名と異名 ---------- */
+// 武名：大きな戦で活躍すると上がる。段階が上がると天下に名が知れ、合戦で敵がひるむ
+D.RENOWN = [
+  { m: 0,    n: '無名',           say: '{n}の名を知る者はまだいない。' },
+  { m: 60,   n: '郷里に知られる', say: '{n}の名が郷里で語られはじめた。' },
+  { m: 250,  n: '国中に知られる', say: '{n}の名は{c}の国中に知れ渡った。' },
+  { m: 700,  n: '諸国に聞こえる', say: '{n}の名は諸国にまで聞こえた。' },
+  { m: 1800, n: '天下に轟く',     say: '{n}の名は天下に轟いた！' },
+  { m: 4500, n: '生ける伝説',     say: '{n}は生ける伝説となった。' },
+];
+// 異名のひな形：{p} 戦場の地名、{c} 国の名、{m} 主人公の名
+D.EPITHET = {
+  duel:   { n: '一騎打ち',     t: ['{p}の剣鬼', '一騎当千の{m}', '{c}の無双', '{p}の猛虎'] },
+  slayer: { n: '敵将を討つ',   t: ['{p}の鬼神', '将斬りの{m}', '{c}の戦鬼', '{p}の修羅'] },
+  few:    { n: '寡兵で勝つ',   t: ['不敗の{m}', '{p}の奇才', '寡兵の{m}', '{c}の鬼謀'] },
+  siege:  { n: '城を落とす',   t: ['{p}の城落とし', '城喰らいの{m}', '{c}の破城槌'] },
+  wall:   { n: '守り抜く',     t: ['{p}の鉄壁', '{c}の盾', '不動の{m}', '{p}の守護神'] },
+  rear:   { n: '殿を務める',   t: ['{p}の殿', '不退の{m}'] },
+  cav:    { n: '騎兵で駆ける', t: ['{c}の飛将', '疾風の{m}', '{p}の迅雷', '{c}の騎神'] },
+  arch:   { n: '弓で射抜く',   t: ['{p}の神弓', '天弓の{m}'] },
+  nomad:  { n: '匈奴を退ける', t: ['北辺の狼', '胡狩りの{m}', '{c}の長城'] },
+  big:    { n: '大軍を率いて勝つ', t: ['{c}の軍神', '{p}の名将', '{c}の大黒柱'] },
+  brave:  { n: '先陣で戦う',   t: ['{p}の猛将', '{c}の豪傑', '猛虎の{m}'] },
+  bandit: { n: '盗賊を討つ',   t: ['{p}の捕り手', '盗賊殺しの{m}'] },
+};
 
 /* ---------- 管轄（文官の担当地域） ---------- */
+// share: 管轄での働きが郡の数字に効く割合、perk: 管轄から入る役得の割合、deputy: 副官（長官は別にいる）
 D.JUR = {
   ritei: { lv: 'li',    n: '里', hh: 100,   share: 0.004 },
   teic:  { lv: 'ting',  n: '亭', hh: 1000,  share: 0.03 },
+  kyosa: { lv: 'xiang', n: '郷', hh: 5000,  share: 0.07, deputy: true, perk: 0.5 },
   kyos:  { lv: 'xiang', n: '郷', hh: 5000,  share: 0.12 },
+  reis:  { lv: 'xian',  n: '県', hh: 15000, share: 0.15, deputy: true, perk: 0.5 },
   kenj:  { lv: 'xian',  n: '県', hh: 15000, share: 0.25, deputy: true },
   kenr:  { lv: 'xian',  n: '県', hh: 15000, share: 0.35 },
+  gunj:  { lv: 'jun',   n: '郡', hh: 0,     share: 0.5, deputy: true, perk: 0.3 },
   guns:  { lv: 'jun',   n: '郡', hh: 0,     share: 1 },
 };
 D.XIANG_NAMES = ['安平', '長楽', '高陽', '新城', '平陽', '陽城', '武陵', '宜陽', '安邑', '修武', '曲沃', '臨晋', '高陵', '藍田', '杜', '雍', '櫟陽', '頻陽', '美陽', '鄠', '鄭', '下邽', '重泉', '華陰', '蒲阪', '陽周', '定陽', '膚施', '平周', '中都', '鄔', '屯留', '長子', '壺関', '涅', '銅鞮', '襄垣', '武安', '番吾', '柏人', '房子', '元氏', '石邑', '扶柳', '信都', '観津', '繁陽', '酸棗', '燕', '長垣', '虚', '桃人', '雍丘', '襄邑', '外黄', '陽武', '巻', '苑陵', '陽翟', '郟', '舞陽', '召陵', '項', '新蔡', '下蔡', '居巣', '当塗', '烏程', '呉', '銭塘', '臨湘', '羅', '益陽', '安陸', '竟陵', '鄢', '宛', '穣', '葉', '魯陽', '下邑', '蕭', '留', '沛', '豊', '安陽', '即墨', '莒', '高密', '平度', '博', '盧', '阿', '鄄', '聊城', '涿', '方城', '易', '武遂', '徐無', '無終', '襄平', '令支'];
@@ -3350,6 +3457,9 @@ S.dateStr = (y = G.year, m = G.month) => `前${-y}年 ${m}月`;
 S.isTop = () => ['kuns', 'josh'].includes(G.me.rank);
 S.isMil = () => D.RANKS[G.me.rank].track === 'mil';
 S.isCiv = () => D.RANKS[G.me.rank].track === 'civ';
+S.isStaff = () => D.RANKS[G.me.rank].track === 'staff';
+// 武官か軍師（兵を率いて合戦に出る）
+S.isMilLike = () => S.isMil() || S.isStaff();
 
 S.dipKey = (a, b) => a < b ? a + '|' + b : b + '|' + a;
 S.dip = (a, b) => {
@@ -3513,7 +3623,7 @@ S.genTactics = (o, n) => {
   for (const t of U.shuffle(pool.slice())) { if (out.length >= n) break; const T = D.TACTICS[t]; if ((T.cat === 'siegeA' || T.cat === 'siegeD') && out.filter(x => D.TACTICS[x].cat === T.cat).length >= 2) continue; out.push(t); }
   return out;
 };
-S.roleOf = (r) => { const rk = D.RANKS[r]; if (!rk) return 'mil'; if (rk.track === 'top') return 'top'; if (r === 'gunshi') return 'staff'; return rk.track; };
+S.roleOf = (r) => { const rk = D.RANKS[r]; if (!rk) return 'mil'; return rk.track; };
 // 官職ティアに応じた能力の目安
 S.genOfficer = (c, r, opt = {}) => {
   const rk = D.RANKS[r] || D.RANKS.hyak;
@@ -3526,7 +3636,7 @@ S.genOfficer = (c, r, opt = {}) => {
     id: S.newId(), n: nm.n, sei: nm.sei, mei: nm.mei, c, r,
     bu: roll(), tou: roll(), chi: roll(), pol: roll(), mi: roll(),
     tr: [], tac: [], st: U.pick(['ins', 'chi', 'bal', 'bal']), age: U.ri(22, 48), alive: true,
-    loy: U.ri(60, 90), bond: 0, merit: D.MERIT_TIER[tier] || 0, jue: Math.min(19, Math.max(1, tier + 1)),
+    loy: U.ri(60, 90), bond: 0, merit: rk.m ?? (D.MERIT_TIER[tier] || 0), jue: Math.min(19, Math.max(1, tier + 1)),
     loc: opt.loc || G.cty[c]?.cap || null, gen: true,
   };
   if (civ) { o.pol = U.clamp(o.pol + 12, 1, 95); o.bu = U.clamp(o.bu - 14, 5, 90); }
@@ -3547,7 +3657,9 @@ S.bestGeneral = (c, exclude = []) => {
 
 /* ---------- player helpers ---------- */
 S.armyTotal = (inclPv = true) => U.sum(G.me.army.sq.filter(s => inclPv || !s.pv), s => s.n);
-S.armyCap = () => D.RANKS[G.me.rank].troops;
+S.armyCap = () => S.rankCap(G.me.rank, G.me.merit);
+// 国軍の定員（欠員も含めた隊の大きさの合計）
+S.armyNominal = () => U.sum(G.me.army.sq.filter(s => !s.pv), s => Math.max(s.n, s.max));
 S.pvCap = () => { const L = G.me.land; return Math.round((L.fac.barracks || 0) * 60 + L.hh * 0.05 + (L.ha >= 20 ? 20 : 0)); };
 S.avgTraining = () => { const sq = G.me.army.sq; const n = U.sum(sq, s => s.n); return n ? U.sum(sq, s => s.tr * s.n) / n : 0; };
 S.squadName = s => {
@@ -3632,17 +3744,107 @@ S.setOrder = (ld, mode) => {
   A.orders = A.orders || {};
   if (!mode || mode === 'self') delete A.orders[ld]; else A.orders[ld] = mode;
 };
+
+/* ---------- 官職の等級と出世 ---------- */
+// 官職の名（等級つき）。g を省くと官職の名だけ
+S.rankName = (r, g) => { const rk = D.RANKS[r]; if (!rk) return ''; return (g == null || rk.track === 'top' || rk.nograde) ? rk.name : `${rk.name}（${D.GRADES[g] || D.GRADES[0]}）`; };
+S.rankLabel = () => S.rankName(G.me.rank, G.me.grade || 0);
+const roundMerit = (v) => v >= 1000 ? Math.round(v / 100) * 100 : Math.round(v / 10) * 10;
+// 官職 r の上の境目（次の官職に要る功績。頂点なら目安）
+S.rankTop = (r) => { const rk = D.RANKS[r]; const nx = rk.up && D.RANKS[rk.up]; return nx ? nx.m : roundMerit(rk.m * 1.6 + 1000); };
+// 官職 r の等級 g（0:三等 1:二等 2:一等）に要る功績
+S.gradeNeed = (r, g) => { const rk = D.RANKS[r]; return g ? roundMerit(rk.m + (S.rankTop(r) - rk.m) * g / 3) : rk.m; };
+S.gradeFromMerit = (r, merit) => { const rk = D.RANKS[r]; if (!rk || rk.track === 'top' || rk.nograde) return 0; let g = 0; while (g < 2 && merit >= S.gradeNeed(r, g + 1)) g++; return g; };
+S.stepMonths = (r) => D.STEP_MONTHS[D.RANKS[r]?.tier || 1] || 6;
+// 功績に応じた兵の上限（将軍は最大十万、大将軍は最大五十万）
+S.rankCap = (r, merit) => {
+  const rk = D.RANKS[r]; if (!rk) return 0;
+  if (!rk.tmax) return rk.troops;
+  const p = U.clamp((merit - rk.m) / Math.max(1, (rk.mfull || S.rankTop(r)) - rk.m), 0, 1);
+  return Math.round((rk.troops + (rk.tmax - rk.troops) * p) / 1000) * 1000;
+};
+// 昇進の条件（功績と在任期間のほか）
+S.reqList = (r) => {
+  const q = D.RANKS[r]?.req, me = G.me, out = [];
+  if (!q) return out;
+  if (q.fame) out.push({ k: 'fame', label: `名声${q.fame}`, ok: me.fame >= q.fame, have: Math.round(me.fame) });
+  if (q.wins) out.push({ k: 'wins', label: `勝利${q.wins}回`, ok: me.rec.wins >= q.wins, have: me.rec.wins });
+  if (q.battles) out.push({ k: 'battles', label: `合戦${q.battles}回`, ok: me.rec.battles >= q.battles, have: me.rec.battles });
+  if (q.renown) out.push({ k: 'renown', label: `武名「${D.RENOWN[q.renown].n}」`, ok: S.renownLv() >= q.renown, have: D.RENOWN[S.renownLv()].n });
+  if (q.favor) {
+    const ru = G.off[S.myCty().ruler], b = ru && !ru.player ? Math.round(ru.bond || 0) : 0;
+    out.push({ k: 'favor', label: `君主との絆${q.favor[0]}か名声${q.favor[1]}`, ok: b >= q.favor[0] || me.fame >= q.favor[1], have: `絆${b}・名声${Math.round(me.fame)}` });
+  }
+  return out;
+};
+// 次の一段（等級か官職）。頂点なら null
+S.nextStep = () => {
+  const me = G.me, r = me.rank, rk = D.RANKS[r];
+  if (!rk || rk.track === 'top' || rk.nograde) return null;
+  const g = me.grade || 0, mo = S.stepMonths(r);
+  if (g < 2) return { kind: 'grade', r, g: g + 1, need: S.gradeNeed(r, g + 1), mo, req: [] };
+  const nx = rk.up; if (!nx || !D.RANKS[nx]) return null;
+  return { kind: 'rank', r: nx, g: 0, need: D.RANKS[nx].m, mo, req: S.reqList(nx) };
+};
+// 在任期間があと何か月要るか
+S.stepWait = (st = S.nextStep()) => st ? Math.max(0, st.mo - (G.turn - (G.me.stepT ?? -99))) : 0;
+S.stepReady = (st = S.nextStep()) => !!st && G.me.merit >= st.need && S.stepWait(st) === 0 && st.req.every(x => x.ok);
+// その道で格 tier までの一番上の官職
+S.rankAtTier = (track, tier) => {
+  const L = D.LADDER[track] || D.LADDER.mil;
+  let best = L[0];
+  for (const r of L) if (D.RANKS[r].tier <= tier && !D.RANKS[r].nograde) best = r;
+  return best;
+};
+
+/* ---------- 爵（二十等爵。一つの爵も下・中・上の三段） ---------- */
+S.jueNeed = (j, g) => { const J = D.JUE[j]; if (!g) return J.m; const hi = (D.JUE[j + 1] || D.JUE_TOP).m; return roundMerit(J.m + (hi - J.m) * g / 3); };
+S.jueName = (j, g) => j <= 0 ? D.JUE[0].n : `${D.JUE[j].n}（${D.JUE_SUB[g || 0]}）`;
+S.jueLabel = () => S.jueName(G.me.jue, G.me.jueG || 0);
+S.jueLand = (j, g) => { const J = D.JUE[j], N = D.JUE[j + 1] || D.JUE_TOP, f = (g || 0) / 3; return { ha: Math.round((J.ha + (N.ha - J.ha) * f) * 2) / 2, hh: Math.round((J.hh + (N.hh - J.hh) * f) / 10) * 10 }; };
+// 爵 j・段 g の次の段
+S.jueStepAfter = (j, g) => {
+  if (j >= 20 && g >= 2) return null;
+  if (g < 2) return { j, g: g + 1, need: S.jueNeed(j, g + 1), t: 0, fame: 0 };
+  const J = D.JUE[j + 1];
+  return { j: j + 1, g: 0, need: J.m, t: J.t || 0, fame: J.fame || 0 };
+};
+S.jueNext = () => S.jueStepAfter(G.me.jue, G.me.jueG || 0);
+S.jueOk = (nx, merit, tier, fame) => !!nx && merit >= nx.need && tier >= nx.t && (!nx.fame || fame >= nx.fame);
+// 功績から爵を決める（始めるときなど。一か月一段の制限なし）
+S.jueFromMerit = (merit, tier, fame) => {
+  let j = 1, g = 0, nx;
+  while ((nx = S.jueStepAfter(j, g)) && S.jueOk(nx, merit, tier, fame)) { j = nx.j; g = nx.g; }
+  return { j, g };
+};
+// 一か月に一段だけ上がる。上がったら次の段を返す
 S.juePromote = () => {
-  const me = G.me; let up = false;
-  while (me.jue < 20 && me.merit >= D.JUE[me.jue + 1].m) { me.jue++; up = true; }
-  if (up) S.applyJueLand();
-  return up;
+  const me = G.me;
+  if (me.jueT === G.turn) return null;
+  const nx = S.jueNext();
+  if (!S.jueOk(nx, me.merit, S.tier(), me.fame)) return null;
+  me.jue = nx.j; me.jueG = nx.g; me.jueT = G.turn;
+  S.myOff().jue = me.jue;
+  S.applyJueLand();
+  return nx;
 };
 S.applyJueLand = () => {
-  const me = G.me, J = D.JUE[me.jue];
-  me.land.ha = Math.max(me.land.ha, J.ha);
-  me.land.hh = Math.max(me.land.hh, J.hh);
+  const me = G.me, L = S.jueLand(me.jue, me.jueG || 0);
+  me.land.ha = Math.max(me.land.ha, L.ha);
+  me.land.hh = Math.max(me.land.hh, L.hh);
 };
+
+/* ---------- 武名と異名 ---------- */
+S.renownLv = (v = G.me.renown || 0) => { let i = 0; while (i + 1 < D.RENOWN.length && v >= D.RENOWN[i + 1].m) i++; return i; };
+// 名乗っている異名（選んでいなければ一番の手柄のもの）
+S.epithet = () => {
+  const e = G.me.epi || []; if (!e.length) return '';
+  const sel = G.me.epiSel != null && e[G.me.epiSel] ? e[G.me.epiSel] : U.maxBy(e, x => x.pts || 0);
+  return sel ? sel.n : '';
+};
+// 武名による合戦の効果（近くの敵を威圧し、味方を励ます）
+S.renownFx = () => { const lv = S.renownLv(); return lv ? { fear: 0.04 * lv, aura: 0.03 * lv } : null; };
+S.playerXfx = () => { const out = S.itemFx(); const r = S.renownFx(); if (r) for (const k in r) out[k] = (out[k] || 0) + r[k]; return out; };
 
 /* ---------- new game ---------- */
 // 史実の人物を作る（late: 後から登場する時）
@@ -3652,7 +3854,7 @@ S.histOfficer = (h, late) => {
   const cc = G.cty[c];
   if (late && min && cc.mins[min] && G.off[cc.mins[min]]?.alive) min = null;
   if (late && (r === 'kuns' || r === 'josh')) r = 'daij';
-  const o = { id: S.newId(), n, sei: n.slice(0, 1), mei: n.slice(1), c, r, min: min || null, bu, tou, chi, pol, mi, tr: [...tr], st, age: late ? age + (G.year + 245) : age, alive: true, loy: 85, bond: 0, merit: D.MERIT_TIER[D.RANKS[r].tier] || 0, jue: Math.min(20, D.RANKS[r].tier * 2), loc: W.capital ? (W.capital(c) || D.COUNTRIES[c].cap) : D.COUNTRIES[c].cap, hist: true, death };
+  const o = { id: S.newId(), n, sei: n.slice(0, 1), mei: n.slice(1), c, r, min: min || null, bu, tou, chi, pol, mi, tr: [...tr], st, age: late ? age + (G.year + 245) : age, alive: true, loy: 85, bond: 0, merit: D.RANKS[r].m || 0, jue: Math.min(20, D.RANKS[r].tier * 2), loc: W.capital ? (W.capital(c) || D.COUNTRIES[c].cap) : D.COUNTRIES[c].cap, hist: true, death };
   if (special === 'mount') o.mount = true;
   if (o.tr.length < 2) o.tr = S.genTraits(S.roleOf(r), D.RANKS[r].tier, 2 - o.tr.length, o.tr);
   o.tac = h[13] ? h[13].filter(t => D.TACTICS[t]) : S.genTactics(o);
@@ -3663,7 +3865,7 @@ S.histOfficer = (h, late) => {
 };
 S.newGame = (cfg) => {
   G = {
-    v: 5, mode: cfg.mode || 'normal', custom: cfg.custom || null, year: D.START_YEAR, month: 1, turn: 0, diff: cfg.diff ?? 1,
+    v: 6, mode: cfg.mode || 'normal', custom: cfg.custom || null, year: D.START_YEAR, month: 1, turn: 0, diff: cfg.diff ?? 1,
     cty: {}, prov: {}, off: {}, nid: 1, dip: {}, log: [], hist: [], flags: {},
     offers: [], pend: [], reports: [], over: null, seed: Math.floor(Math.random() * 1e9),
   };
@@ -3749,9 +3951,10 @@ S.createPlayer = (cfg) => {
   if (r === 'gyos') { retire(cc.gyos); cc.gyos = o.id; }
   if (r === 'daij') { retire(cc.mins[cfg.min]); cc.mins[cfg.min] = o.id; }
 
-  const startMerit = r === 'kuns' ? 0 : (D.MERIT_TIER[tier] || 0);
-  let jue = 1; while (jue < 20 && startMerit >= D.JUE[jue + 1].m) jue++;
-  if (r === 'kuns') jue = 20;
+  const startMerit = r === 'kuns' ? 0 : (rk.m || 0);
+  const fame0 = 10 + tier * 8;
+  let { j: jue, g: jueG } = S.jueFromMerit(startMerit, tier, fame0);
+  if (r === 'kuns') { jue = 20; jueG = 0; }
   o.jue = jue; o.merit = startMerit;
 
   // location
@@ -3768,7 +3971,8 @@ S.createPlayer = (cfg) => {
   const startGold = [0, 600, 1800, 4500, 10000, 22000, 45000, 100000, 220000, 450000, 2000000][tier];
   const me = G.me = {
     oid: o.id, rank: r, min: o.min, loc, boss: null, gen: null,
-    gold: startGold, food: S.startFood(tier), ap: 0, merit: startMerit, jue, fame: 10 + tier * 8,
+    gold: startGold, food: S.startFood(tier), ap: 0, merit: startMerit, jue, jueG, jueT: -1, fame: fame0,
+    grade: 0, stepT: G.turn, renown: Math.round([0, 0, 0, 0, 10, 30, 70, 150, 280, 450, 700][tier] * (rk.track === 'civ' ? 0.3 : 1)), epi: [], epiSel: null, feats: {},
     exp: { bu: 0, tou: 0, chi: 0, pol: 0, mi: 0 },
     army: { sq: [], wu: [], subs: [], dep: null, stg: null, orders: {} },
     land: { ha: 0, hh: 0, fac: {}, build: [], order: 60, loyal: 65, tax: 1, name: '' },
@@ -3794,7 +3998,7 @@ S.createPlayer = (cfg) => {
   else {
     const chi = S.stat(o, 'chi');
     const st = { bu: S.stat(o, 'bu'), tou: S.stat(o, 'tou'), chi, pol: S.stat(o, 'pol'), mi: S.stat(o, 'mi') };
-    const n = r === 'gunshi' ? 6 : tier >= 7 ? 4 : tier >= 4 ? 2 : 1;
+    const n = rk.track === 'staff' ? Math.max(3, tier - 1) : tier >= 7 ? 4 : tier >= 4 ? 2 : 1;
     me.tac = S.genTactics(Object.assign({ st: o.st, r }, st), n);
   }
   if (!me.tac.includes('shazone')) me.tac.push('shazone');
@@ -3822,35 +4026,44 @@ S.frontProv = (c) => {
   return U.maxBy(ps, p => S.adj(p.id).filter(q => G.prov[q].o !== c && S.atWar(c, G.prov[q].o)).length * 10 + S.adj(p.id).filter(q => G.prov[q].o !== c).length * 2 + Math.random()) || ps[0];
 };
 
-S.setupChain = () => {
+// 上官と所属軍の将を決める（fresh: 新しいゲーム。昇進のときは、今の上官が合っていればそのまま）
+S.setupChain = (fresh = true) => {
   const me = G.me, o = S.myOff(), c = o.c, cc = G.cty[c], r = me.rank;
   const loc = me.loc;
+  const keep = fresh ? null : G.off[me.boss];
   const find = (rr) => U.pick(S.officersOf(c, x => x.r === rr && x.id !== o.id));
   const gen = (rr) => S.genOfficer(c, rr, { loc });
+  const want = (rr, mk) => (keep && keep.alive && !keep.ret && keep.c === c && keep.r === rr) ? keep : mk();
   const stationGeneral = () => {
+    if (keep && keep.alive && !keep.ret && keep.c === c && ['shog', 'dais'].includes(keep.r)) return keep;
     let g = U.maxBy(S.officersOf(c, x => ['shog', 'dais'].includes(x.r) && x.loc === loc && x.id !== o.id), x => x.tou);
     if (!g) { g = find('shog') || gen('shog'); g.loc = loc; }
     return g;
   };
+  const topGeneral = () => want('dais', () => U.maxBy(S.officersOf(c, x => x.r === 'dais' && x.id !== o.id), x => x.tou) || gen('dais'));
+  const gov = () => { const p = G.prov[loc]; return p && p.gov && p.gov !== o.id && G.off[p.gov]?.alive ? p.gov : null; };
+  const head = () => (cc.josh && cc.josh !== o.id ? cc.josh : cc.ruler);
   switch (r) {
-    case 'goch': me.boss = gen('hyak').id; me.gen = stationGeneral().id; break;
-    case 'hyak': me.boss = gen('senn').id; me.gen = stationGeneral().id; break;
-    case 'gohy': me.boss = gen('senn').id; me.gen = stationGeneral().id; break;
-    case 'senn': me.boss = (find('goz') || gen('goz')).id; G.off[me.boss].loc = loc; me.gen = stationGeneral().id; break;
+    case 'goch': case 'shic': case 'tonc': me.boss = want('hyak', () => gen('hyak')).id; me.gen = stationGeneral().id; break;
+    case 'hyak': case 'sanb': case 'gohy': me.boss = want('senn', () => gen('senn')).id; me.gen = stationGeneral().id; break;
+    case 'senn': { const b = want('goz', () => find('goz') || gen('goz')); b.loc = loc; me.boss = b.id; me.gen = stationGeneral().id; break; }
     case 'sanz': case 'goz': { const g = stationGeneral(); me.boss = g.id; me.gen = g.id; break; }
-    case 'shog': { let g = find('dais') || gen('dais'); me.boss = g.id; me.gen = o.id; break; }
-    case 'gunshi': { let g = U.maxBy(S.officersOf(c, x => x.r === 'dais'), x => x.tou) || gen('dais'); g.loc = loc; me.boss = g.id; me.gen = g.id; break; }
-    case 'dais': me.boss = cc.ruler; me.gen = o.id; break;
-    case 'ritei': me.boss = gen('teic').id; break;
-    case 'teic': me.boss = gen('kyos').id; break;
-    case 'kyos': me.boss = gen('kenr').id; break;
-    case 'kenj': me.boss = gen('kenr').id; break;
-    case 'kenr': me.boss = G.prov[loc].gov && G.prov[loc].gov !== o.id ? G.prov[loc].gov : cc.josh; break;
-    case 'guns': case 'daij': case 'gyos': me.boss = cc.josh && cc.josh !== o.id ? cc.josh : cc.ruler; break;
+    case 'shog': me.boss = topGeneral().id; me.gen = o.id; break;
+    case 'dais': case 'tenka': me.boss = cc.ruler; me.gen = o.id; break;
+    // 軍師の道：若いうちは駐屯地の将軍の幕下、軍師からは大将軍の幕下
+    case 'gunri': case 'sanbo': case 'gshib': case 'chosh': { const g = stationGeneral(); me.boss = g.id; me.gen = g.id; break; }
+    case 'gunshi': case 'dgun': { const g = topGeneral(); g.loc = loc; me.boss = g.id; me.gen = g.id; break; }
+    case 'ritei': me.boss = want('teic', () => gen('teic')).id; break;
+    case 'teic': case 'kyosa': me.boss = want('kyos', () => gen('kyos')).id; break;
+    case 'kyos': case 'reis': case 'kenj': me.boss = want('kenr', () => gen('kenr')).id; break;
+    case 'kenr': case 'gunj': me.boss = gov() || head(); break;
+    case 'guns': case 'daij': case 'gyos': me.boss = head(); break;
     case 'josh': me.boss = cc.ruler; break;
     case 'kuns': me.boss = null; break;
   }
-  if (me.boss && G.off[me.boss]) G.off[me.boss].bond = 10;
+  if (!S.isMilLike()) me.gen = null;
+  if (fresh && me.boss && G.off[me.boss]) G.off[me.boss].bond = 10;
+  if (!fresh && keep && keep.id !== me.boss) S.log(`上官が${G.off[me.boss]?.n || '－'}に替わった。`);
 };
 
 S.compSplit = (c, total, opt = {}) => {
@@ -3881,15 +4094,22 @@ S.setupArmy = (cfg) => {
     }
     return;
   }
+  const bow = c === 'qin' || c === 'han' ? 'xbow' : 'arch';
   if (r === 'teic') { add('militia', 8); add('arch', 4); }
+  else if (r === 'kyosa') { add('militia', 18); add('arch', 7); }
   else if (r === 'kyos') { add('militia', 30); add('arch', 10); add('inf', 10); }
+  else if (r === 'reis') { add('militia', 60); add('arch', 25); add('inf', 15); }
   else if (r === 'kenj') { add('inf', 140); add('arch', 60); }
+  else if (r === 'shic') { add('inf', 10); }
+  else if (r === 'tonc') { add('inf', 40); add(bow, 10); }
   else if (r === 'hyak') { add('inf', 100); }
-  else if (r === 'gohy') { add('inf', 300); add('spear', 100); add(c === 'qin' || c === 'han' ? 'xbow' : 'arch', 100); }
+  else if (r === 'sanb') { add('inf', 180); add('spear', 60); add(bow, 60); }
+  else if (r === 'gohy') { add('inf', 300); add('spear', 100); add(bow, 100); }
+  else if (r === 'gunri') { add('guard', 20); }
+  else if (r === 'sanbo') { add('guard', 50); }
   else if (r === 'daij' && me.min === 'eii') { add('guard', 2000); add('inf', 1500); add('xbow', 1000); add('lcav', 500); }
   else {
-    let total = D.RANKS[r].troops;
-    if (r === 'gunshi') total = 1000;
+    const total = D.RANKS[r].troops;
     const sp = S.compSplit(c, total);
     // 大部隊は兵種ごとに複数の隊へ
     const unitSize = total >= 100000 ? 20000 : total >= 20000 ? 5000 : total >= 3000 ? 1000 : 100000;
@@ -3917,7 +4137,7 @@ S.setupArmy = (cfg) => {
     }
     if (sorted[0]) sorted[0].ld = null; // 主人公の直属
   }
-  if (r === 'gunshi') me.army.stg = null;
+  if (D.RANKS[r].track === 'staff') me.army.stg = null;
 };
 
 S.makeDeputyCandidates = (n = 3) => {
@@ -4014,6 +4234,20 @@ S.migrate = () => {
     if (bonus > 0) { G.me.food = (G.me.food || 0) + bonus; S.log(`兵糧の見直しで、蔵に兵糧${U.num(bonus)}石が届いた。`, 'good'); }
     G.v = 5;
   }
+  if (G.v < 6) {
+    // 官職の等級・爵の三段・武名と異名。官職と爵は下げず、今の中での段だけを功績から決める
+    const me = G.me, R = me.rec || {};
+    if (!D.RANKS[me.rank]) me.rank = S.myOff().r = 'hyak';
+    me.grade = S.gradeFromMerit(me.rank, me.merit);
+    me.stepT = G.turn;
+    me.jue = U.clamp(me.jue || 1, 1, 20);
+    me.jueG = 0; while (me.jueG < 2 && me.merit >= S.jueNeed(me.jue, me.jueG + 1)) me.jueG++;
+    me.jueT = -1;
+    me.renown = Math.round((R.wins || 0) * 4 + (R.slain || []).length * 12 + (R.duels || 0) * 10 + Math.sqrt(R.kills || 0) * 2);
+    me.epi = me.epi || []; me.epiSel = me.epiSel ?? null; me.feats = me.feats || {};
+    S.log(`官職に三等〜一等の等級ができ、爵も下・中・上の三段に分かれた。今は${S.rankLabel()}・${S.jueLabel()}。`, 'good');
+    G.v = 6;
+  }
 };
 
 /* =========================================================
@@ -4028,6 +4262,8 @@ const HOOK = {
   event: async (ev) => 0,
   // 数を入れてもらう（画面では UI.askNumber）。テストでは既定値
   number: async (o) => o.value ?? o.max,
+  // 異名・武名の演出（画面では UI.fame）
+  fame: async (o) => HOOK.info({ title: o.title, seal: o.seal || '武名', big: true, body: [o.lead, o.epithet ? `「${o.epithet}」` : '', ...(o.lines || []).map(l => `${l.who || S.cname(l.c)}：${l.s}`)].filter(Boolean).join('\n') }),
 };
 
 /* ---------- 功績・昇進 ---------- */
@@ -4042,50 +4278,98 @@ W.gainMerit = (n, why) => {
   S.myOff().merit = me.merit;
   if (v > 0) me.fame = Math.min(999, me.fame + v / 120 * S.fxm(S.myOff(), 'fame'));
   if (why) S.log(`功績 ${v > 0 ? '+' : ''}${U.num(v)}（${why}）`, v > 0 ? 'good' : 'bad');
-  if (S.juePromote()) S.log(`爵位が上がった：${D.JUE[me.jue].n}（田${D.JUE[me.jue].ha}頃${D.JUE[me.jue].hh ? '・食邑' + D.JUE[me.jue].hh + '戸' : ''}）`, 'big');
+  const up = S.juePromote();
+  if (up) W.logJue(up);
   return v;
 };
-
-W.nextRank = () => {
-  const r = G.me.rank, rk = D.RANKS[r];
-  if (r === 'dais') return null;
-  return rk.up;
+W.logJue = (st) => {
+  const me = G.me, o = S.myOff(), L = S.jueLand(me.jue, me.jueG || 0);
+  const lvUp = st.g === 0;
+  S.log(`爵位が上がった：${S.jueLabel()}（田${L.ha}頃${L.hh ? '・食邑' + U.num(L.hh) + '戸' : ''}）`, lvUp ? 'big' : 'good');
+  if (lvUp && me.jue >= 9) S.chron(`${o.n}、爵${D.JUE[me.jue].n}を賜る。`);
 };
 
+// 次の官職（等級ではなく）
+W.nextRank = () => D.RANKS[G.me.rank]?.up || null;
+
+// 昇進：一度に一段（等級か官職）だけ。功績・在任期間・条件がそろったとき
 W.checkPromotion = async (ceremony = '論功行賞') => {
+  await W.flushFame();
   const me = G.me, o = S.myOff();
-  let steps = 0;
-  while (steps < 2) {
-    const nx = W.nextRank(); if (!nx) break;
-    const tier = D.RANKS[me.rank].tier;
-    if (me.merit < D.MERIT_TIER[tier + 1]) break;
-    // 上位職の条件
-    if (nx === 'josh') {
-      const cc = S.myCty(); const ruler = G.off[cc.ruler];
-      if ((ruler?.bond || 0) < 25 && me.fame < 300) break;
-    }
-    if (nx === 'daij') {
-      // 空席の大臣を選ぶ
-      const cc = S.myCty();
-      const opts = D.MIN_ORDER.map(m => ({ v: m, label: D.MINISTRIES[m].n, sub: (G.off[cc.mins[m]]?.n || '空席') + '（現職）' }));
-      const pick = await HOOK.choose({ title: '大臣への昇進', body: '郡守としての功績が認められ、九卿に列せられることになった。担当を選べ。', choices: opts });
-      me.min = pick || 'chiso'; o.min = me.min;
-      const old = G.off[cc.mins[me.min]]; if (old && old.id !== o.id) { old.r = 'guns'; old.min = null; }
-      cc.mins[me.min] = o.id;
-      me.loc = D.COUNTRIES[o.c].cap; o.loc = me.loc;
-    }
-    await W.promote(nx, ceremony);
-    steps++;
-    if (steps >= 1 && me.merit < D.MERIT_TIER[tier + 2] * 1.25) break;
+  const st = S.nextStep();
+  if (!S.stepReady(st)) return 0;
+  if (st.kind === 'grade') { await W.gradeUp(st.g, ceremony); return 1; }
+  const nx = st.r;
+  if (nx === 'daij') {
+    // 空席の大臣を選ぶ
+    const cc = S.myCty();
+    const opts = D.MIN_ORDER.map(m => ({ v: m, label: D.MINISTRIES[m].n, sub: (G.off[cc.mins[m]]?.n || '空席') + '（現職）' }));
+    const pick = await HOOK.choose({ title: '大臣への昇進', body: '郡守としての功績が認められ、九卿に列せられることになった。担当を選べ。', choices: opts });
+    me.min = pick || 'chiso'; o.min = me.min;
+    const old = G.off[cc.mins[me.min]]; if (old && old.id !== o.id) { old.r = 'guns'; old.min = null; }
+    cc.mins[me.min] = o.id;
+    me.loc = D.COUNTRIES[o.c].cap; o.loc = me.loc;
   }
-  return steps;
+  await W.promote(nx, ceremony);
+  return 1;
+};
+S.pay = () => Math.round(D.RANKS[G.me.rank].pay * (1 + 0.15 * (G.me.grade || 0)));
+// 同じ官職の中で等級が上がる
+W.gradeUp = async (g, why) => {
+  const me = G.me, o = S.myOff();
+  me.grade = g; me.stepT = G.turn;
+  me.fame = Math.min(999, me.fame + 2 + S.tier());
+  me.rec.prom.push({ d: S.dateStr(), r: me.rank, g });
+  S.log(`【昇格】${S.rankLabel()}に進んだ。`, 'big');
+  const nx = S.nextStep();
+  const body = [
+    `${o.n}を${S.rankLabel()}に進める。`,
+    `俸禄：金${U.fmt(S.pay())}／月`,
+    nx ? `次は${S.rankName(nx.r, nx.g)}（功績${U.num(nx.need)}・在任${nx.mo}か月${nx.req.length ? '・' + nx.req.map(x => x.label).join('・') : ''}）` : '',
+  ].filter(Boolean);
+  await HOOK.info({ title: why || '論功行賞', seal: '昇格', body: body.join('\n') });
+};
+
+// 定員 cap まで国軍の兵を増やす（新しい兵は練度が低い）。split: 大きな隊は分けて隊長を付けやすくする
+W.fillArmy = (cap, split = true) => {
+  const me = G.me, o = S.myOff(), c = o.c, A = me.army, rk = D.RANKS[me.rank];
+  const have = S.armyNominal();
+  if (cap <= have) return 0;
+  const add = cap - have;
+  const tr = Math.round(U.clamp(S.avgTraining() * 0.6 + 20, 20, 60));
+  if (rk.track === 'civ' && rk.tier <= 3) {
+    const put = (t, n) => { if (n <= 0) return; const ex = A.sq.find(s => s.t === t && !s.pv && !s.ld); if (ex) { ex.tr = Math.round((ex.tr * ex.n + tr * n) / Math.max(1, ex.n + n)); ex.n += n; ex.max = Math.max(ex.max + n, ex.n); } else A.sq.push(S.newSquad(t, n, { tr })); };
+    put('militia', Math.round(add * 0.7)); put('arch', add - Math.round(add * 0.7));
+  } else {
+    const sp = S.compSplit(c, add);
+    const unitSize = !split ? Infinity : cap >= 100000 ? 20000 : cap >= 20000 ? 5000 : cap >= 3000 ? 1000 : Infinity;
+    for (const t in sp) {
+      let n = sp[t];
+      const ex = A.sq.find(s => s.t === t && !s.pv && !s.ld && Math.max(s.n, s.max) + n <= unitSize);
+      if (ex) { ex.tr = Math.round((ex.tr * ex.n + tr * n) / Math.max(1, ex.n + n)); ex.n += n; ex.max = Math.max(ex.max + n, ex.n); continue; }
+      while (n > 0) { const k = Math.min(n, unitSize); A.sq.push(S.newSquad(t, k, { tr })); n -= k; }
+    }
+  }
+  for (const s of A.sq) s.max = Math.max(s.max, s.n);
+  return add;
+};
+// 功績に応じて率いる兵が増える官職（将軍・大将軍）：上限が伸びたら新しい兵が配属される
+W.growArmy = () => {
+  const me = G.me, rk = D.RANKS[me.rank];
+  if (!rk || !rk.tmax) return 0;
+  const cap = S.armyCap(), have = S.armyNominal();
+  if (cap - have < Math.max(1000, cap * 0.03)) return 0;
+  const add = W.fillArmy(cap, false);
+  if (add > 0) S.log(`功績が認められ、兵${U.fmt(add)}人が新たに配属された（定員${U.fmt(cap)}）。`, 'good');
+  return add;
 };
 
 W.promote = async (nx, why) => {
   const me = G.me, o = S.myOff(), c = o.c, cc = G.cty[c];
-  const old = me.rank, oldT = D.RANKS[old].tier;
+  const old = me.rank;
   const prevJur = me.jur;
   me.rank = nx; o.r = nx;
+  me.grade = 0; me.stepT = G.turn;
   const rk = D.RANKS[nx];
   me.rec.prom.push({ d: S.dateStr(), r: nx });
   // unique posts
@@ -4113,73 +4397,172 @@ W.promote = async (nx, why) => {
     A.wu = [];
     A.sq = A.sq.filter(s => s.pv);
   }
-  if (rk.track === 'mil' || nx === 'gunshi' || ['teic', 'kyos', 'kenj', 'kenr', 'guns', 'daij', 'gyos', 'josh'].includes(nx)) {
-    const cap = rk.troops, have = S.armyTotal(false);
-    if (cap > have) {
-      const add = cap - have;
-      const tr = Math.round(U.clamp(S.avgTraining() * 0.6 + 20, 20, 60));
-      if (rk.track === 'civ' && rk.tier <= 3) { A.sq.push(S.newSquad('militia', Math.round(add * 0.7), { tr })); A.sq.push(S.newSquad('arch', Math.round(add * 0.3), { tr })); }
-      else {
-        const sp = S.compSplit(c, add);
-        const unitSize = cap >= 100000 ? 20000 : cap >= 20000 ? 5000 : cap >= 3000 ? 1000 : 100000;
-        for (const t in sp) {
-          let n = sp[t];
-          const ex = A.sq.find(s => s.t === t && !s.pv && s.n + n <= unitSize);
-          if (ex) { ex.n += n; ex.max = Math.max(ex.max, ex.n); ex.tr = Math.round((ex.tr + tr) / 2); continue; }
-          while (n > 0) { const k = Math.min(n, unitSize); A.sq.push(S.newSquad(t, k, { tr })); n -= k; }
-        }
-      }
-    }
-    for (const s of A.sq) s.max = Math.max(s.max, s.n);
+  if (rk.troops > 0 && nx !== 'kuns') {
+    W.fillArmy(S.armyCap(), true);
     // 副官
-    if (!A.dep) { const d = S.makeDeputyCandidates(1)[0]; const off = S.genOfficer(c, D.RANK_ORDER_MIL[Math.max(0, rk.tier - 2)], { stats: d.stats }); off.n = d.n; off.sei = d.sei; off.mei = d.mei; off.tr = d.tr; off.lord = o.id; off.bond = 20; A.dep = off.id; A.subs.push(off.id); }
+    if (!A.dep && rk.tier >= 2) { const d = S.makeDeputyCandidates(1)[0]; const off = S.genOfficer(c, D.RANK_ORDER_MIL[Math.max(0, Math.min(6, rk.tier - 2))], { stats: d.stats }); off.n = d.n; off.sei = d.sei; off.mei = d.mei; off.tr = d.tr; off.lord = o.id; off.bond = 20; A.dep = off.id; A.subs.push(off.id); }
     // 新しい隊に隊長を付ける
     for (const s of A.sq) {
-      if (!s.ld && s !== A.sq[0] && s.n >= 300 && A.subs.length < 12 && U.ch(0.7)) {
-        const l = S.genOfficer(c, D.RANK_ORDER_MIL[Math.max(0, rk.tier - 3)], { loc: me.loc }); l.lord = o.id; l.bond = 10; s.ld = l.id; A.subs.push(l.id);
+      if (!s.ld && !s.pv && s !== A.sq[0] && s.n >= 300 && A.subs.length < 12 && U.ch(0.7)) {
+        const l = S.genOfficer(c, D.RANK_ORDER_MIL[Math.max(0, Math.min(7, rk.tier - 3))], { loc: me.loc }); l.lord = o.id; l.bond = 10; s.ld = l.id; A.subs.push(l.id);
       }
     }
   }
-  if (nx === 'gunshi' || nx === 'shog' || nx === 'dais') {
+  if ((rk.track === 'staff' && rk.tier >= 5) || (rk.track === 'mil' && rk.tier >= 7)) {
     const chi = S.stat(o, 'chi');
     for (const t of D.TACTIC_ORDER) if (!me.tac.includes(t) && D.TACTICS[t].req.chi <= chi - 15) me.tac.push(t);
   }
+  if (rk.track === 'staff') A.stg = null;
   // 上官
-  S.setupChainAfterPromotion(old);
+  S.setupChain(false);
   me.ap = Math.max(me.ap, 0);
   W.gainMerit(0);
-  const J = D.JUE[me.jue];
+  const J = S.jueLand(me.jue, me.jueG || 0);
+  if (nx === 'tenka') {
+    // 天下の大将軍：天下が認める
+    S.log(`【天下の大将軍】${o.n}の名は七国に並ぶ者がない。人は${o.n}を「天下の大将軍」と呼ぶ。`, 'big');
+    S.chron(`${o.n}、天下の大将軍と称される。`);
+    me.fame = 999;
+    await HOOK.fame({ kind: 'tenka', title: '天下の大将軍', seal: '天下', epithet: '天下の大将軍', name: o.n, lead: `${S.cname(c)}の${o.n}。その武名は七国に轟き、並ぶ者はもういない。人々は${o.n}をこう呼んだ——`, lines: W.fameLines('tenka', '天下の大将軍') });
+    return;
+  }
   const lines = [
-    `${o.n}を${rk.name}${nx === 'daij' ? '（' + D.MINISTRIES[me.min].n + '）' : ''}に任ず。`,
-    `爵位：${J.n}　田${J.ha}頃${J.hh ? '・食邑' + U.num(J.hh) + '戸' : ''}`,
-    rk.troops ? `率いる兵：${U.fmt(S.armyTotal())}` : '',
+    `${o.n}を${S.rankLabel()}${nx === 'daij' ? '（' + D.MINISTRIES[me.min].n + '）' : ''}に任ず。`,
+    `爵位：${S.jueLabel()}　田${J.ha}頃${J.hh ? '・食邑' + U.num(J.hh) + '戸' : ''}`,
+    rk.troops ? `率いる兵：${U.fmt(S.armyTotal())}${rk.tmax ? `（功績に応じて最大${U.fmt(rk.tmax)}）` : ''}` : '',
   ].filter(Boolean);
   S.log(`【昇進】${rk.name}に任じられた！`, 'big');
   S.chron(`${o.n}、${rk.name}に昇進。`);
   await HOOK.info({ title: why || '論功行賞', seal: '昇進', body: lines.join('\n'), big: true });
 };
 
-S.setupChainAfterPromotion = (old) => {
-  const me = G.me, o = S.myOff(), c = o.c;
-  const r = me.rank;
-  const keepBoss = G.off[me.boss];
-  // 新しい上官
-  const gen = (rr) => S.genOfficer(c, rr, { loc: me.loc });
-  switch (r) {
-    case 'hyak': me.boss = gen('senn').id; break;
-    case 'gohy': me.boss = gen('senn').id; break;
-    case 'senn': me.boss = gen('goz').id; break;
-    case 'sanz': case 'goz': if (!keepBoss || !['shog', 'dais'].includes(keepBoss.r)) { me.boss = (S.officersOf(c, x => x.r === 'shog')[0] || gen('shog')).id; } me.gen = me.boss; break;
-    case 'shog': me.boss = (U.maxBy(S.officersOf(c, x => x.r === 'dais'), x => x.tou) || gen('dais')).id; me.gen = o.id; break;
-    case 'dais': me.boss = G.cty[c].ruler; me.gen = o.id; break;
-    case 'teic': me.boss = gen('kyos').id; break;
-    case 'kyos': me.boss = gen('kenr').id; break;
-    case 'kenj': me.boss = gen('kenr').id; break;
-    case 'kenr': me.boss = G.prov[me.loc].gov !== o.id ? G.prov[me.loc].gov : G.cty[c].josh; break;
-    case 'guns': case 'daij': case 'gyos': me.boss = G.cty[c].josh !== o.id ? G.cty[c].josh : G.cty[c].ruler; break;
-    case 'josh': me.boss = G.cty[c].ruler; break;
+S.setupChainAfterPromotion = () => S.setupChain(false);
+
+/* ---------- 武名と異名 ---------- */
+// 合戦の働きから武名を計算し、異名や「名が轟く」演出を予約する（演出は W.flushFame で）
+W.renownFromBattle = (spec, br, won) => {
+  const me = G.me, o = S.myOff();
+  if (!spec || spec.role === 'watch' || !br || br.meFate === 'dead') return 0;
+  const s0 = br.sides?.[0]?.start || 0, s1 = br.sides?.[1]?.start || 0, total = s0 + s1;
+  const scale = total >= 200000 ? 4 : total >= 60000 ? 3 : total >= 15000 ? 2.2 : total >= 3000 ? 1.5 : total >= 500 ? 1 : 0.5;
+  const kind = spec.ctx?.kind || spec.kind;
+  const cmd = !!spec.sides[0]?.cmdAll;
+  const slain = br.slainInfo || (br.slainNames || []).map(n => ({ n, hist: false, tier: 3 }));
+  const kills = br.meKills || 0, duels = br.duelWins || 0, rear = br.merit?.rearguard || 0;
+  const ratio = s1 / Math.max(1, s0);
+  let pts = (won ? 5 : 0) + Math.min(25, Math.sqrt(kills) * 0.9) + duels * 12 + rear * 8;
+  for (const x of slain) pts += x.hist ? 35 : 3 + (x.tier || 3) * 2;
+  if (won && cmd) pts += 8 * U.clamp(ratio, 0.5, 3);
+  if (kind === 'bandit') pts *= 0.4;
+  pts *= scale;
+  if (!won) pts *= 0.35;
+  pts = Math.round(pts);
+  if (pts <= 0) return 0;
+  // 手柄の種類
+  const myU = (br.units || []).find(u => u.side === 0 && u.ldId === o.id);
+  const ut = myU ? D.UT[myU.t] : null;
+  let feat = 'brave';
+  if (kind === 'bandit') feat = 'bandit';
+  else if (kind === 'nomad') feat = 'nomad';
+  else if (duels > 0 && (slain.some(x => x.hist) || duels >= 2)) feat = 'duel';
+  else if (slain.length >= 2 || slain.some(x => x.hist)) feat = 'slayer';
+  else if (won && ratio >= 1.6) feat = 'few';
+  else if (won && spec.kind === 'siege' && spec.city === 1) feat = 'siege';
+  else if (won && (spec.kind === 'siege' || spec.kind === 'pass') && spec.city === 0) feat = 'wall';
+  else if (rear > 0) feat = 'rear';
+  else if (won && cmd && total >= 40000) feat = 'big';
+  else if (ut && ut.cls === 'cav') feat = 'cav';
+  else if (ut && ut.cls === 'rng') feat = 'arch';
+  else if (duels > 0) feat = 'duel';
+  me.feats = me.feats || {}; me.feats[feat] = (me.feats[feat] || 0) + 1;
+  const lv0 = S.renownLv();
+  me.renown = (me.renown || 0) + pts;
+  if (pts >= 5) S.log(`武名 +${U.num(pts)}（${spec.title}）`, 'good');
+  me.fame = Math.min(999, me.fame + pts / 10);
+  const lv1 = S.renownLv();
+  me.fameQ = me.fameQ || [];
+  // 異名：大きな戦での目立つ手柄で、今の異名の手柄を大きく上回るとき
+  const best = U.maxBy(me.epi || [], x => x.pts || 0);
+  const notable = won && pts >= 40 && (total >= 8000 || slain.some(x => x.hist) || duels > 0);
+  if (notable && (!best || pts >= (best.pts || 0) * 1.6)) me.fameQ.push({ k: 'epithet', feat, pts, title: spec.title, pid: spec.pid });
+  if (lv1 > lv0) me.fameQ.push({ k: 'renown', lv: lv1, feat });
+  return pts;
+};
+// 異名を作る。一度使ったひな形（「〇〇の猛虎」など）は場所が違っても使わない
+W.makeEpithet = (feat, pid) => {
+  const me = G.me, o = S.myOff();
+  const place = pid && S.P[pid] ? S.P[pid].name : S.cname(o.c);
+  const have = new Set((me.epi || []).map(x => x.n)), usedT = new Set((me.epi || []).map(x => x.tpl).filter(Boolean));
+  const mei = o.mei || o.n.slice(1) || o.n;
+  const make = (t) => ({ tpl: t, n: t.replace('{p}', place).replace('{c}', S.cname(o.c)).replace('{m}', mei) });
+  for (const f of [feat, 'big', 'brave', ...Object.keys(D.EPITHET)]) {
+    const T = D.EPITHET[f]; if (!T) continue;
+    const cands = T.t.filter(t => !usedT.has(t)).map(make).filter(x => !have.has(x.n));
+    if (cands.length) return U.pick(cands);
   }
-  if (keepBoss && keepBoss.id !== me.boss) S.log(`上官が${G.off[me.boss]?.n || '－'}に替わった。`);
+  return null;
+};
+// 七国の反応（演出用）。同じ言い回しが続かないように、言葉の山から順に配る
+D.FAME_SAY = {
+  own: ['都の民は{nm}の名を口々に称えている。', '兵たちは{nm}の下で戦いたいと願い出た。', '王は{name}の働きを聞き、深く頷いた。', '{nm}の凱旋を一目見ようと、沿道に人があふれた。'],
+  war: ['将兵は{nm}の旗を恐れはじめた。', '{nm}を討った者に千金を与える、と触れが出た。', '夜ごと、兵の間で{nm}の噂がささやかれている。', '{nm}の名を聞いただけで、新兵が震え上がったという。', '将軍たちが集まり、{nm}への備えを論じた。'],
+  other: ['宮廷でも{nm}の噂が語られた。', '市の講談師が{nm}の戦いを語り、人だかりができた。', '「{name}とはいかなる人物か」と王が問うた。', '若者たちが{nm}の真似をして木の枝を振り回している。', '使者が{nm}の様子を探りに来た。'],
+  tenkaOwn: ['王は自ら城門まで出迎え、{name}の手を取った。', '国中の民がひれ伏し、{nm}の名を唱えた。'],
+  tenkaWar: ['{nm}の旗の前に、兵は戦わずして退いた。', '王は「{name}がいる限り、攻めてはならぬ」と命じた。', '将たちは{nm}と戦場で相まみえることを恐れている。', '国境の守りが三倍に増やされた。'],
+  tenkaOther: ['七国の誰もが、{nm}の名を知っている。', '王は{name}に宝物を贈り、誼を通じようとした。', '{nm}の武勇は詩に詠まれ、子どもまで歌っている。'],
+  quote: ['面白い。いずれ戦場で相まみえよう。', 'その名、覚えておこう。', '若い芽は、早いうちに摘まねばならぬ。', '侮れぬ者が現れたな。', '……ほう。', '我が首を取れる者がいるとすれば、その男であろう。'],
+};
+W.fameLines = (kind, ep) => {
+  const o = S.myOff(), my = o.c, nm = ep ? `「${ep}」` : o.n;
+  const pools = {};
+  const say = (k) => { const P = pools[k] || (pools[k] = U.shuffle(D.FAME_SAY[k].slice())); const t = P.shift() || U.pick(D.FAME_SAY[k]); return t.replace(/\{nm\}/g, nm).replace(/\{name\}/g, o.n); };
+  const T = kind === 'tenka';
+  const out = [];
+  for (const c of D.CORDER) {
+    const cc = G.cty[c]; if (!cc || !cc.alive) continue;
+    const k = c === my ? (T ? 'tenkaOwn' : 'own') : S.atWar(my, c) ? (T ? 'tenkaWar' : 'war') : (T ? 'tenkaOther' : 'other');
+    out.push({ c, s: say(k) });
+  }
+  // 名のある他国の将のひとこと
+  const foes = Object.values(G.off).filter(x => x.alive && x.hist && !x.ret && !x.player && x.c !== my && G.cty[x.c]?.alive && ['dais', 'shog', 'kuns', 'josh', 'gunshi'].includes(x.r));
+  for (const x of U.shuffle(foes.slice()).slice(0, kind === 'epithet' ? 1 : 2)) out.push({ c: x.c, who: x.n, s: say('quote') });
+  return out;
+};
+W.giveEpithet = async (f) => {
+  const me = G.me, o = S.myOff();
+  const e = W.makeEpithet(f.feat, f.pid); if (!e) return;
+  const n = e.n;
+  me.epi = me.epi || [];
+  me.epi.push({ n, tpl: e.tpl, k: f.feat, pts: f.pts, d: S.dateStr(), why: `${f.title}で${D.EPITHET[f.feat]?.n || '活躍'}` });
+  me.epiSel = null;
+  me.fame = Math.min(999, me.fame + 15);
+  S.log(`【異名】${o.n}は「${n}」と呼ばれるようになった。`, 'big');
+  S.chron(`${o.n}、${f.title}の働きで「${n}」と呼ばれる。`);
+  await HOOK.fame({ kind: 'epithet', title: '異名', seal: '異名', epithet: n, name: o.n, lead: `${f.title}での働きにより、人々は${o.n}をこう呼ぶようになった。`, lines: W.fameLines('epithet', n) });
+};
+W.renownUp = async (f) => {
+  const me = G.me, o = S.myOff();
+  // 名が知れ渡ったのに異名がなければ、これまでの手柄から付く
+  if (f.lv >= 2 && !(me.epi || []).length) {
+    const feat = U.maxBy(Object.keys(me.feats || {}), k => me.feats[k]) || f.feat || 'brave';
+    const e = W.makeEpithet(feat, null);
+    if (e) { me.epi = [{ n: e.n, tpl: e.tpl, k: feat, pts: 0, d: S.dateStr(), why: `数々の手柄（${D.EPITHET[feat]?.n || '戦'}）` }]; S.chron(`${o.n}、「${e.n}」と呼ばれる。`); }
+  }
+  const ep = S.epithet(), R = D.RENOWN[f.lv];
+  const who = ep ? `「${ep}」${o.n}` : o.n;
+  const msg = R.say.replace('{n}', who).replace('{c}', S.cname(o.c));
+  S.log(`【武名】${msg}`, 'big');
+  if (f.lv >= 3) S.chron(msg);
+  if (f.lv >= 2) await HOOK.fame({ kind: 'renown', lv: f.lv, title: f.lv >= 4 ? R.n : `武名　${R.n}`, seal: '武名', epithet: ep, name: o.n, lead: msg, note: `合戦では味方の士気+${f.lv}・敵の士気−${Math.round(f.lv * 1.5)}。主人公の隊は近くの敵を威圧する。`, lines: f.lv >= 3 ? W.fameLines('renown', ep) : [] });
+};
+W.flushFame = async () => {
+  const me = G.me; if (!me || !me.fameQ || !me.fameQ.length) return;
+  const q = me.fameQ; me.fameQ = [];
+  for (const f of q) {
+    if (G.over) break;
+    if (f.k === 'epithet') await W.giveEpithet(f);
+    else if (f.k === 'renown') await W.renownUp(f);
+  }
 };
 
 /* ---------- 経験による特性の会得 ---------- */
@@ -4223,12 +4606,13 @@ W.playerEconomy = () => {
   const me = G.me, o = S.myOff(), L = me.land;
   const rk = D.RANKS[me.rank];
   const lines = [];
-  let gold = rk.pay, food = 0;
+  const pay = S.pay();
+  let gold = pay, food = 0;
   const taxMul = [0.75, 1, 1.3][L.tax];
   const goldLand = (L.hh * 32 + L.ha * 28) * taxMul * (1 + 0.3 * L.fac.market + 0.12 * (L.fac.brewery || 0)) * S.fxm(o, 'gold');
   const foodLand = (L.ha * 12.5 + L.hh * 0.6) * taxMul * (1 + 0.3 * L.fac.farm) * (G.month === 9 ? 3 : 0.8) * S.fxm(o, 'food');
   gold += goldLand; food += foodLand;
-  if (me.jur) { const j = me.jur; const perk = j.hh * (0.3 + j.comm / 100) * 0.4 * S.fxm(o, 'gold'); gold += perk; }
+  if (me.jur) { const j = me.jur; const perk = j.hh * (0.3 + j.comm / 100) * 0.4 * (D.JUR[me.rank]?.perk ?? 1) * S.fxm(o, 'gold'); gold += perk; }
   if (me.rank === 'kuns') { gold += S.myCty().gold * 0.004; }
   // 私兵の維持
   const pv = U.sum(me.army.sq.filter(s => s.pv), s => s.n);
@@ -4236,7 +4620,7 @@ W.playerEconomy = () => {
   food -= upk; gold -= pv * 15;
   me.gold = Math.round(me.gold + gold);
   me.food = Math.round(me.food + food);
-  lines.push(`収入 金${U.fmt(gold + pv * 15)}（俸禄${U.fmt(rk.pay)}・領地${U.fmt(goldLand)}）／兵糧${food >= 0 ? '+' : ''}${U.fmt(food)}石`);
+  lines.push(`収入 金${U.fmt(gold + pv * 15)}（俸禄${U.fmt(pay)}・領地${U.fmt(goldLand)}）／兵糧${food >= 0 ? '+' : ''}${U.fmt(food)}石`);
   if (me.food < 0) {
     const lost = Math.ceil(pv * 0.15);
     for (const s of me.army.sq.filter(s => s.pv)) s.n = Math.max(0, s.n - Math.ceil(s.n * 0.15));
@@ -4314,7 +4698,7 @@ W.develop = (c) => {
     const gov = G.off[p.gov];
     const gp = gov && gov.alive ? gov.pol : 50;
     const gv = gov && gov.alive ? gov : null;
-    const isPlayerJur = G.me.jur && G.me.jur.lv === 'jun' && G.me.jur.prov === p.id;
+    const isPlayerJur = G.me.jur && G.me.jur.lv === 'jun' && G.me.jur.prov === p.id && !D.JUR[G.me.rank]?.deputy;
     const k = (isPlayerJur ? 0.25 : 1) * (gp / 70) * dev * (pol === 'develop' ? 1.6 : 1) * (cc.gold > 0 ? 1 : 0.3);
     p.agri = Math.min(100, p.agri + 0.22 * k * S.fxm(gv, 'agri') * (c === 'qin' && S.lawOn(c, 'junou') ? 1.2 : 1) * Math.max(0.1, 1 - p.agri / 110));
     p.comm = Math.min(100, p.comm + 0.18 * k * S.fxm(gv, 'comm') * Math.max(0.1, 1 - p.comm / 110));
@@ -4455,6 +4839,12 @@ W.histOffensive = async () => {
   else if (myC === 'qin' && S.isMil()) await HOOK.info({ title: h.title, seal: '出陣', body: `${h.text}
 秦は総力を挙げて${S.cname(h.c)}を攻める。戦功を立てる好機だ。` });
 };
+// 名の轟いた主人公が守る郡は、敵が攻めるのをためらう（攻めの見込みを低く見積もる）
+W.renownFear = (pid) => {
+  const me = G.me; if (!me || !S.isMilLike() || me.loc !== pid || G.prov[pid].o !== S.myOff().c) return 1;
+  const lv = S.renownLv();
+  return lv >= 3 ? 1 + 0.25 * (lv - 2) : 1;
+};
 W.campaignPlans = (c, all) => {
   const plans = [];
   for (const src of S.ownedProvs(c)) {
@@ -4463,7 +4853,7 @@ W.campaignPlans = (c, all) => {
       if (tgt.o === c || !S.atWar(c, tgt.o)) continue;
       const atk = src.troops * 0.68;
       if (atk < 3000 && !all) continue;
-      const def = tgt.troops * W.fortMul(q);
+      const def = tgt.troops * W.fortMul(q) * W.renownFear(q);
       const odds = atk / Math.max(1, def);
       plans.push({ src: src.id, tgt: q, atk: Math.round(atk), def: tgt.troops, odds });
     }
@@ -4638,19 +5028,20 @@ W.succession = (c) => {
 W.involvement = (camp) => {
   const me = G.me, o = S.myOff(), myC = o.c;
   if (camp.atk !== myC && camp.def !== myC) return null;
-  if (me.inj > 0 && D.RANKS[me.rank].track === 'mil') return null;
+  if (me.inj > 0 && S.isMilLike()) return null;
   const side = camp.atk === myC ? 'atk' : 'def';
   const rk = D.RANKS[me.rank];
   const near = side === 'atk' ? (me.loc === camp.src) : (me.loc === camp.tgt || (me.loc === camp.src && false));
   if (me.rank === 'kuns' || me.rank === 'josh') return side === 'def' ? { side, role: 'top' } : null;
-  if (rk.track === 'mil' || me.rank === 'gunshi') {
+  if (rk.track === 'mil' || rk.track === 'staff') {
     const vol = me.flags.volunteer && me.flags.volunteer >= G.turn && (S.adj(camp.src).includes(me.loc) || S.adj(camp.tgt).includes(me.loc));
     if (near || vol || (side === 'def' && S.adj(camp.tgt).includes(me.loc) && rk.tier >= 6 && U.ch(0.5))) {
       const cmdId = side === 'atk' ? camp.atkCmd : camp.defCmd;
       const cmd = G.off[cmdId];
       let role = 'unit';
-      if (me.rank === 'gunshi') role = 'gunshi';
-      else if (rk.tier >= 7 && (!cmd || cmd.tou < S.stat(o, 'tou') || me.rank === 'dais' || (cmd.r !== 'dais' && me.rank === 'shog'))) role = 'commander';
+      // 軍師の道：軍師からは総軍師、若いうちは将の軍で戦う
+      if (rk.track === 'staff') role = rk.tier >= 7 ? 'gunshi' : 'unit';
+      else if (rk.tier >= 7 && (!cmd || cmd.tou < S.stat(o, 'tou') || me.rank === 'dais' || me.rank === 'tenka' || (cmd.r !== 'dais' && me.rank === 'shog'))) role = 'commander';
       return { side, role };
     }
     return null;
@@ -4711,7 +5102,7 @@ W.resolveCampaign = async (camp) => {
 };
 
 /* ---------- 合戦の構成 ---------- */
-W.snap = (o, extra) => o ? Object.assign({ id: o.id, n: o.n, sei: o.sei || o.n.slice(0, 1), bu: S.stat(o, 'bu'), tou: S.stat(o, 'tou'), chi: S.stat(o, 'chi'), pol: S.stat(o, 'pol'), mi: S.stat(o, 'mi'), tr: o.tr || [], tac: (o.player ? G.me.tac : o.tac) || [], st: o.st || 'bal', r: o.r, player: !!o.player, hist: !!o.hist, mount: !!o.mount, xfx: o.player ? S.itemFx() : null }, extra || {}) : null;
+W.snap = (o, extra) => o ? Object.assign({ id: o.id, n: o.n, sei: o.sei || o.n.slice(0, 1), bu: S.stat(o, 'bu'), tou: S.stat(o, 'tou'), chi: S.stat(o, 'chi'), pol: S.stat(o, 'pol'), mi: S.stat(o, 'mi'), tr: o.tr || [], tac: (o.player ? G.me.tac : o.tac) || [], st: o.st || 'bal', r: o.r, player: !!o.player, hist: !!o.hist, mount: !!o.mount, xfx: o.player ? S.playerXfx() : null }, extra || {}) : null;
 W.tempLeader = (c, tier) => {
   const nm = S.genName();
   const b = 32 + tier * 5;
@@ -4877,11 +5268,11 @@ W.buildSpec = (o) => {
       // 上官の隊（低い階級）
       const tier = S.tier();
       if (o.role === 'unit' && remain > pTotal * 3) {
-        const pSize = me.rank === 'goch' || me.rank === 'ritei' ? 95 : me.rank === 'hyak' || me.rank === 'teic' ? Math.min(900, remain * 0.3) : Math.min(pTotal * 4, remain * 0.25);
+        const pSize = tier <= 1 ? 95 : tier === 2 ? Math.min(900, remain * 0.3) : Math.min(pTotal * 4, remain * 0.25);
         const boss = G.off[me.boss];
         if (pSize >= 20) {
           const n = Math.round(pSize);
-          units.push({ side: si, t: me.rank === 'ritei' || me.rank === 'teic' ? 'militia' : 'inf', n, tr: 40, wl: 1, al: 1, grp: 'front', ctrl: 'ai', ld: boss ? W.snap(boss) : W.tempLeader(X.c, tier + 1), parentOfMe: true });
+          units.push({ side: si, t: S.isCiv() && tier <= 2 ? 'militia' : 'inf', n, tr: 40, wl: 1, al: 1, grp: 'front', ctrl: 'ai', ld: boss ? W.snap(boss) : W.tempLeader(X.c, tier + 1), parentOfMe: true });
           remain -= n;
         }
       }
@@ -4907,6 +5298,11 @@ W.buildSpec = (o) => {
     // 攻城兵器
     if ((spec.kind === 'siege' || spec.kind === 'pass') && spec.city !== si) W.siegeKit(units, X.c, X.troops, si);
     spec.units.push(...units.filter(u => u.n > 0));
+  }
+  // 武名：主人公の名が知れていれば、味方は奮い立ち、敵はひるむ
+  if (meSide && o.role !== 'watch') {
+    const lv = S.renownLv();
+    if (lv > 0) { spec.sides[0].morale = (spec.sides[0].morale || 0) + lv; spec.sides[1].morale = (spec.sides[1].morale || 0) - Math.round(lv * 1.5); spec.renown = { lv, ep: S.epithet(), n: myOff.n }; }
   }
   // 主人公の側の軍師
   if (o.role === 'gunshi') spec.sides[0].gunshi = W.snap(myOff);
@@ -5020,6 +5416,7 @@ W.applyBattleResult = (spec, br) => {
     res.capture = res.win === 'atk' && (spec.kind !== 'field' ? br.cityTaken || br.winner !== -1 : true);
   }
   if (br.meFate === 'dead') G.over = { kind: 'death', text: `${o.n}は${spec.title}で討ち死にした。` };
+  else res.renown = W.renownFromBattle(spec, br, won);
   return res;
 };
 
@@ -5032,7 +5429,7 @@ W.genOffers = () => {
   if (!P) return;
   const force = Math.max(5, S.armyTotal());
   const hostile = S.adj(me.loc).filter(q => G.prov[q].o !== c && (S.atWar(c, G.prov[q].o) || S.dip(c, G.prov[q].o).rel < -40));
-  const canFight = (rk.track === 'mil' || me.rank === 'gunshi' || (rk.track === 'civ' && force >= 5)) && me.inj === 0;
+  const canFight = (S.isMilLike() || (rk.track === 'civ' && force >= 5)) && me.inj === 0;
   if (canFight && hostile.length && (rk.track !== 'civ' || rk.tier <= 6)) {
     const n = U.ch(0.7) ? (U.ch(0.35) ? 2 : 1) : 0;
     for (let i = 0; i < n; i++) {
@@ -5114,7 +5511,7 @@ W.taskTemplates = () => {
     T.push({ k: 'bandit', pid: j.prov, desc: `${S.P[j.prov].name}の盗賊を討伐せよ`, due, rew: base * 1.2 });
     T.push({ k: 'gold', amount: Math.round(300 * tier * tier), desc: `国庫に金${U.fmt(300 * tier * tier)}を納めよ`, due, rew: base * 0.8 });
   }
-  if (rk.track === 'mil' || me.rank === 'gunshi') {
+  if (S.isMilLike()) {
     const tgt = Math.min(95, Math.round(S.avgTraining() + 10));
     T.push({ k: 'train', target: tgt, desc: `部隊の練度を${tgt}まで上げよ`, due, rew: base });
     T.push({ k: 'merit', target: Math.round(20 * tier * tier), start: me.merit, desc: `戦場で功績${Math.round(20 * tier * tier)}を挙げよ`, due, rew: base * 1.2 });
@@ -5225,7 +5622,7 @@ W.annualReview = async () => {
     lines.push(`管轄の伸び：農${Math.round(j.agri - b.agri)} 商${Math.round(j.comm - b.comm)} 治${Math.round(j.order - b.order)} 民${Math.round(j.loyal - b.loyal)}`);
     j.base = { agri: j.agri, comm: j.comm, order: j.order, loyal: j.loyal, cult: j.cult, hh: j.hh, def: j.def };
   }
-  if (S.isMil() || me.rank === 'gunshi') {
+  if (S.isMilLike()) {
     const t = S.avgTraining();
     merit += Math.round((t - 40) * S.tier() * 4);
     lines.push(`部隊の練度：${Math.round(t)}`);
@@ -5359,6 +5756,9 @@ W.endMonth = async () => {
   G.month++; if (G.month > 12) { G.month = 1; G.year++; }
   G.turn++;
   me.ap = S.apMax();
+  // 爵は一か月に一段ずつ。率いる兵は功績に応じて増える
+  const ju = S.juePromote(); if (ju) W.logJue(ju);
+  W.growArmy();
   // 本国の滅亡
   if (G.flags.homeFallen && !G.over) await W.homeFallen();
   // 統一
@@ -5367,8 +5767,9 @@ W.endMonth = async () => {
   if (!G.over) await W.council();
   W.genOffers();
   // 主人公の再配置（上官の移動）
-  if (S.isMil() && me.gen && G.off[me.gen] && G.off[me.gen].alive && G.off[me.gen].loc && G.prov[G.off[me.gen].loc]?.o === o.c && D.RANKS[me.rank].tier <= 6) me.loc = G.off[me.gen].loc;
+  if (S.isMilLike() && me.gen && me.gen !== o.id && G.off[me.gen] && G.off[me.gen].alive && G.off[me.gen].loc && G.prov[G.off[me.gen].loc]?.o === o.c && D.RANKS[me.rank].tier <= 6) me.loc = G.off[me.gen].loc;
   o.loc = me.loc;
+  if (!G.over) await W.flushFame();
   return G.report;
 };
 
@@ -5379,9 +5780,10 @@ W.homeFallen = async () => {
   if (pick === 'serve') {
     o.c = by; me.loc = W.capital(by); o.loc = me.loc;
     const t = Math.max(1, S.tier() - 2);
-    const track = D.RANKS[me.rank].track === 'civ' ? D.RANK_ORDER_CIV : D.RANK_ORDER_MIL;
-    me.rank = track[Math.min(track.length - 1, t - 1)] || 'hyak'; o.r = me.rank;
-    me.merit = D.MERIT_TIER[D.RANKS[me.rank].tier]; o.merit = me.merit;
+    const tk = D.RANKS[me.rank].track;
+    me.rank = S.rankAtTier(tk === 'top' ? 'civ' : tk, t); o.r = me.rank;
+    me.merit = D.RANKS[me.rank].m; o.merit = me.merit;
+    me.grade = 0; me.stepT = G.turn;
     me.army.sq = me.army.sq.filter(s => s.pv); me.tasks = [];
     if (D.JUR[me.rank]) S.setupJur(me.rank, me.loc); else me.jur = null;
     const cap = D.RANKS[me.rank].troops;
@@ -5417,7 +5819,7 @@ W.launchPlayerCampaign = async (tgt, troops, opts = {}) => {
   G.prov[src].troops += camp.atkTroops; // applyCampaign で差し引くため一度戻す
   let res;
   if (lead) {
-    const asGunshi = me.rank === 'gunshi' && G.off[me.boss] && G.off[me.boss].alive;
+    const asGunshi = S.isStaff() && S.tier() >= 7 && G.off[me.boss] && G.off[me.boss].alive;
     const spec = W.buildSpec({ kind, pid: tgt, from: src, title: `${S.P[tgt].name}攻略戦`, A: { c, troops: camp.atkTroops, cmd: asGunshi ? G.off[me.boss] : o, officers: S.officersOf(c, x => ['shog', 'goz'].includes(x.r) && x.loc === src).slice(0, 4) }, B: { c: P.o, troops: P.troops, cmd: G.off[camp.defCmd], officers: S.officersOf(P.o, x => ['shog', 'goz', 'dais'].includes(x.r) && x.loc === tgt).slice(0, 4) }, me: 'A', role: asGunshi ? 'gunshi' : 'commander', cityOf: kind === 'field' ? null : 'B', ctx: { camp: camp.id, side: 'atk' } });
     const br = await HOOK.battle(spec);
     res = W.applyBattleResult(spec, br);
@@ -5458,7 +5860,8 @@ const tier_ = () => S.tier();
 const rank_ = () => G.me.rank;
 const track_ = () => D.RANKS[G.me.rank].track;
 const cty_ = () => S.myCty();
-const isMilLike = () => track_() === 'mil' || rank_() === 'gunshi';
+const isMilLike = () => S.isMilLike();
+const isGunshi = () => S.isStaff() && tier_() >= 7;
 const hasArmy = () => G.me.army.sq.some(s => s.n > 0);
 const st_ = k => S.stat(S.myOff(), k);
 
@@ -5574,10 +5977,11 @@ A.def({ id: 'kenkin', cat: 'self', n: '献金', ap: 0, d: '私財を国庫に納
   } });
 A.def({ id: 'kaimono', cat: 'self', n: '市場', ap: 0, d: '兵糧・武具・名馬・兵法書を買う。',
   run: async () => UI.shop() });
-A.def({ id: 'jinzai', cat: 'self', n: '人材探索', ap: 1, d: '在野の人材を探して部下に迎える。', req: () => tier_() >= 3 ? true : '五百将・郷嗇夫以上',
+A.def({ id: 'jinzai', cat: 'self', n: '人材探索', ap: 1, d: '在野の人材を探して部下に迎える。', req: () => tier_() >= 3 ? true : '三百将・郷嗇夫・軍吏以上',
   run: async () => {
     const me = me_(), o = mo_();
-    const luck = S.stat(o, 'mi') / 100 + (me.land.fac.school || 0) * 0.06 + S.fx(o, 'talent') + (S.lawOn(o.c, 'kakkei') ? 0.1 : 0);
+    // 名が知れているほど人が集まる
+    const luck = S.stat(o, 'mi') / 100 + (me.land.fac.school || 0) * 0.06 + S.fx(o, 'talent') + (S.lawOn(o.c, 'kakkei') ? 0.1 : 0) + S.renownLv() * 0.05;
     if (!U.ch(0.35 + luck * 0.5)) return '有望な人材は見つからなかった。';
     const tierT = Math.max(1, Math.min(7, tier_() - U.ri(0, 2)));
     const rr = (track_() === 'civ' ? D.RANK_ORDER_CIV : D.RANK_ORDER_MIL)[tierT - 1];
@@ -5590,7 +5994,7 @@ A.def({ id: 'jinzai', cat: 'self', n: '人材探索', ap: 1, d: '在野の人材
     W.learn('recruitOk');
     return `${x.n}が部下になった。`;
   } });
-A.def({ id: 'jousou', cat: 'self', n: '上奏・献策', ap: 1, d: '上官や君主へ意見を申し上げる。舌戦で説き伏せれば通る。', req: () => rank_() === 'kuns' ? '君主には不要' : (tier_() >= 2 ? true : '百将・亭長以上'),
+A.def({ id: 'jousou', cat: 'self', n: '上奏・献策', ap: 1, d: '上官や君主へ意見を申し上げる。舌戦で説き伏せれば通る。', req: () => rank_() === 'kuns' ? '君主には不要' : (tier_() >= 2 ? true : '屯長・亭長以上'),
   run: async () => {
     const me = me_(), o = mo_(), c = o.c, cc = cty_();
     const ch = [];
@@ -5631,11 +6035,11 @@ A.def({ id: 'jousou', cat: 'self', n: '上奏・献策', ap: 1, d: '上官や君
       if (S.allied(c, tc)) chance = 0.02;
       if (!U.ch(U.clamp(chance, 0.03, 0.95))) return '攻略の許可は下りなかった。';
       if (!S.atWar(c, tc)) W.declareWar(c, tc);
-      const maxT = rank_() === 'dais' ? 300000 : rank_() === 'shog' ? 50000 : 80000;
+      const maxT = { tenka: 600000, dais: 300000, shog: 100000, dgun: 150000 }[rank_()] || 80000;
       const avail = U.sum([...new Set([...S.adj(pid).filter(q => G.prov[q].o === c), me.loc])].map(q => G.prov[q]), p => p.o === c ? p.troops * 0.7 : 0);
       const troops = Math.round(Math.max(S.armyTotal(), Math.min(maxT, avail + S.armyTotal())));
       await HOOK.info({ title: '攻略の許可が下りた', seal: '王命', body: `${S.P[pid].name}を攻めよ。動員兵力 ${U.fmt(troops)}。` });
-      if (rank_() === 'gunshi') {
+      if (isGunshi()) {
         const boss = G.off[me.boss];
         await W.launchPlayerCampaign(pid, troops, { lead: true });
         return boss ? `${boss.n}の軍の総軍師として戦った。` : '';
@@ -5645,7 +6049,7 @@ A.def({ id: 'jousou', cat: 'self', n: '上奏・献策', ap: 1, d: '上官や君
     }
     return null;
   } });
-A.def({ id: 'idou', cat: 'self', n: '移動', ap: 1, d: '軍の駐屯地を移す。', req: () => (tier_() >= 7 && isMilLike()) ? true : '将軍・大将軍・軍師のみ',
+A.def({ id: 'idou', cat: 'self', n: '移動', ap: 1, d: '軍の駐屯地を移す。', req: () => (tier_() >= 7 && isMilLike()) ? true : '将軍・軍師以上のみ',
   run: async () => {
     const me = me_(), o = mo_();
     const pid = await A.pickProv('移動先', S.ownedProvs(o.c).filter(p => p.id !== me.loc), p => `兵${U.fmt(p.troops)}${S.enemyNeighbors(p.id).length ? '　前線' : ''}`);
@@ -5733,7 +6137,7 @@ A.def({ id: 'gono', cat: 'army', n: '伍の仲間', ap: 1, d: '伍の四人と�
     if (k === 'talk') { w.bond = Math.min(100, w.bond + U.ri(8, 15)); let s = `${w.n}と夜通し語り合った。絆${Math.round(w.bond)}`; if (w.bond >= 80 && !w.tr && U.ch(0.3)) { w.tr = U.pick(['kobu', 'tenun', 'moushou']); s += `　${w.n}は「${D.TRAITS[w.tr].n}」の素質を見せた。`; } return s; }
     return null;
   } });
-A.def({ id: 'senjutsu', cat: 'army', n: '戦術研究', ap: 1, d: '兵法を学び、新しい戦術を会得する。', req: () => (rank_() === 'gunshi' || st_('chi') >= 45) ? true : '軍師か知力45以上',
+A.def({ id: 'senjutsu', cat: 'army', n: '戦術研究', ap: 1, d: '兵法を学び、新しい戦術を会得する。', req: () => (S.isStaff() || st_('chi') >= 45) ? true : '軍師の道か知力45以上',
   run: async () => {
     const me = me_(), o = mo_();
     const st = { bu: S.stat(o, 'bu'), tou: S.stat(o, 'tou'), chi: S.stat(o, 'chi'), pol: S.stat(o, 'pol'), mi: S.stat(o, 'mi') };
@@ -5744,7 +6148,7 @@ A.def({ id: 'senjutsu', cat: 'army', n: '戦術研究', ap: 1, d: '兵法を学�
     const t = await HOOK.choose({ title: '戦術研究', body: `知力 ${st.chi}　会得 ${me.tac.length}/${D.TACTIC_ORDER.length}`, choices: [...can.map(t => ({ v: t, label: `${D.TACTICS[t].n}（${D.TACTIC_CATS[D.TACTICS[t].cat]}）`, sub: `要 ${D.tacticReqStr(t)}　${D.TACTICS[t].d}`, disabled: st.chi < D.TACTICS[t].req.chi - 15 })), { v: null, label: 'やめる' }] });
     if (!t) return null;
     const req = D.TACTICS[t].req.chi;
-    let p = U.clamp(0.35 + (st.chi - req) / 60 + (rank_() === 'gunshi' ? 0.25 : 0) + (me.eq.book ? 0.15 : 0) + S.fx(o, 'exp') * 0.3, 0.05, 0.95);
+    let p = U.clamp(0.35 + (st.chi - req) / 60 + (S.isStaff() ? 0.15 + (tier_() >= 7 ? 0.1 : 0) : 0) + (me.eq.book ? 0.15 : 0) + S.fx(o, 'exp') * 0.3, 0.05, 0.95);
     if (!D.tacticReqOk(t, st)) p *= 0.4;
     if (U.ch(p)) { me.tac.push(t); o.tac = me.tac; return `戦術「${D.TACTICS[t].n}」を会得した！`; }
     me.exp.chi += 20;
@@ -5793,7 +6197,7 @@ A.def({ id: 'teisatsu', cat: 'ops', n: '偵察', ap: 1, d: '隣の敵地を探�
     W.gainMerit(Math.round(5 * tier_()), '偵察');
     return `${S.P[pid].name}：守備兵 ${U.fmt(p.troops)}　城壁${Math.round(p.wall)}　将：${gens.join('、') || 'なし'}`;
   } });
-A.def({ id: 'shutsugeki', cat: 'ops', n: '出撃（小規模戦闘）', ap: 2, d: '自軍だけで隣の敵地へ打って出る。許可は要らないが領土は奪えない。', req: () => (tier_() >= 7 && isMilLike()) ? true : '将軍・大将軍・軍師のみ',
+A.def({ id: 'shutsugeki', cat: 'ops', n: '出撃（小規模戦闘）', ap: 2, d: '自軍だけで隣の敵地へ打って出る。許可は要らないが領土は奪えない。', req: () => (tier_() >= 7 && isMilLike()) ? true : '将軍・軍師以上のみ',
   run: async () => {
     const me = me_(), o = mo_();
     const opts = S.adj(me.loc).filter(q => G.prov[q].o !== o.c && !S.allied(o.c, G.prov[q].o) && S.dip(o.c, G.prov[q].o).st !== 'truce');
@@ -5806,7 +6210,7 @@ A.def({ id: 'shutsugeki', cat: 'ops', n: '出撃（小規模戦闘）', ap: 2, d
     G.offers.push(of);
     return await A.runOffer(of);
   } });
-A.def({ id: 'shigan', cat: 'ops', n: '従軍志願', ap: 1, d: '近くで戦が起きたら必ず加わる（来月）。', req: () => (isMilLike() && tier_() <= 6) || '六階級以下の武官のみ',
+A.def({ id: 'shigan', cat: 'ops', n: '従軍志願', ap: 1, d: '近くで戦が起きたら必ず加わる（来月）。', req: () => (isMilLike() && tier_() <= 6) || '将軍より下の武官・軍師のみ',
   run: async () => { me_().flags.volunteer = G.turn + 1; return '次の戦に志願した。'; } });
 
 /* ======== 管轄（文官） ======== */
@@ -6117,7 +6521,7 @@ A.def({ id: 'shihei', cat: 'land', n: '私兵募集', ap: 1, d: '私領で兵を
     return `私兵の${D.UT[ty].n}を${U.num(n)}人募った（金-${U.fmt(n * per)}）。`;
   } });
 // 兵種転換（一部の兵を別の兵種へ）
-A.convCost = (t) => Math.round(D.UT[t].cost * 40);
+A.convCost = (t) => Math.round(D.UT[t].cost * 8);
 // 隊 sqId の n 人を兵種 t に変える（金がかかり、練度は6割になる）。変えた人数を返す
 A.convertTroops = (sqId, n, t) => {
   const me = G.me, A2 = me.army, s = A2.sq.find(x => x.id === sqId);
@@ -6154,7 +6558,7 @@ A.FOOD_PRICE = 8; // 市場の兵糧 1石あたりの金
 A.canField = (t) => {
   const req = D.UT_REQ[t]; if (!req) return true;
   const me = G.me;
-  if (req.special === 'mount') return S.myOff().c === 'qin' && me.land.fac.school >= 1 || me.rank === 'dais';
+  if (req.special === 'mount') return S.myOff().c === 'qin' && me.land.fac.school >= 1 || me.rank === 'dais' || me.rank === 'tenka';
   return (me.land.fac[req.fac] || 0) >= req.lv || (S.tier() >= 7 && req.lv <= 2) || (me.rank === 'daij' && me.min === 'taiboku' && req.fac === 'stable');
 };
 A.def({ id: 'r_junsatsu', cat: 'land', n: '領地巡察', ap: 1, d: '私領を見回り、治安と民心を上げる。',
@@ -6175,7 +6579,7 @@ A.visibleCats = () => {
   const r = G.me.rank, tr = D.RANKS[r].track;
   const cats = ['self'];
   if (hasArmy() || tr === 'mil') cats.push('army');
-  if (tr === 'mil' || r === 'gunshi' || G.offers.length || r === 'guns') cats.push('ops');
+  if (tr === 'mil' || tr === 'staff' || G.offers.length || r === 'guns') cats.push('ops');
   if (G.me.jur) cats.push('jur');
   if (r === 'daij' || r === 'gyos') cats.push('min');
   if (S.isTop()) cats.push('nat', 'dip', 'war');
@@ -6308,7 +6712,7 @@ EV.generic = [
       if (k === 'kill') { G.me.fame += 3; }
       if (k === 'turn') { if (U.ch(S.stat(S.myOff(), 'chi') / 130)) { W.gainMerit(15 * S.tier(), '二重間者'); G.me.flags.spy = G.turn + 6; S.log('間者を寝返らせた。敵の内情が筒抜けになる。', 'good'); } else S.log('間者に逃げられた。', 'bad'); }
     } },
-  { id: 'jealous', w: () => (G.me.boss && G.me.merit > D.MERIT_TIER[S.tier()] * 1.2) ? 1.2 : 0, run: async () => {
+  { id: 'jealous', w: () => (G.me.boss && G.me.merit > D.RANKS[G.me.rank].m * 1.2 + 100) ? 1.2 : 0, run: async () => {
       const b = G.off[G.me.boss]; if (!b) return;
       const k = await HOOK.choose({ title: '上官の嫉妬', body: `${b.n}が、手柄を立てる主人公を快く思っていないらしい。`, choices: [{ v: 'gift', label: '贈り物をする', sub: `金${U.fmt(300 * S.tier() * S.tier())}`, disabled: G.me.gold < 300 * S.tier() * S.tier() }, { v: 'endure', label: '黙って耐える' }, { v: 'debate', label: '直談判する（舌戦）' }] });
       if (k === 'gift') { G.me.gold -= 300 * S.tier() * S.tier(); b.bond += 12; }
@@ -6521,12 +6925,12 @@ EV.frontNear = (c, foe, pref) => {
 EV.histBattle = async (o) => {
   const my = EV.myC(), me = G.me;
   const mine = my === o.atk.c ? 'atk' : my === o.def.c ? 'def' : null;
-  const involved = mine && (S.isMil() || S.isTop() || me.rank === 'gunshi') && S.tier() >= 3 && me.inj === 0 && (S.isTop() || S.tier() >= 7 || me.loc === o.pid || S.adj(o.pid).includes(me.loc));
+  const involved = mine && (S.isMilLike() || S.isTop()) && S.tier() >= 3 && me.inj === 0 && (S.isTop() || S.tier() >= 7 || me.loc === o.pid || S.adj(o.pid).includes(me.loc));
   S.log(`【${o.title}】${o.text}`, 'big'); S.chron(o.text);
   if (involved) {
     const k = await HOOK.choose({ title: o.title, seal: '史実', body: `${o.text}\n${S.cname(o.atk.c)}軍 約${U.fmt(o.atk.troops)}　対　${S.cname(o.def.c)}軍 約${U.fmt(o.def.troops)}`, choices: [{ v: 1, label: '戦場へ向かう' }, { v: 0, label: '他の将に任せる' }] });
     if (k) {
-      const role = S.isTop() || S.tier() >= 7 || me.rank === 'gunshi' ? (me.rank === 'gunshi' ? 'gunshi' : 'commander') : 'unit';
+      const role = S.isStaff() ? (S.tier() >= 7 ? 'gunshi' : 'unit') : (S.isTop() || S.tier() >= 7 ? 'commander' : 'unit');
       const X = mine === 'atk' ? o.atk : o.def, Y = mine === 'atk' ? o.def : o.atk;
       const myCmd = role === 'commander' ? S.myOff() : (EV.histOff(X.cmd) && EV.histOff(X.cmd).alive ? EV.histOff(X.cmd) : W.pickCommander(X.c, o.pid));
       const foeCmd = EV.histOff(Y.cmd) && EV.histOff(Y.cmd).alive ? EV.histOff(Y.cmd) : W.pickCommander(Y.c, o.pid);
@@ -6873,7 +7277,7 @@ EV.throne = async () => {
   const me = G.me, o = S.myOff(), cc = S.myCty();
   const ruler = G.off[cc.ruler];
   if (!ruler || ruler.player) return;
-  if (!['josh', 'dais'].includes(me.rank)) return;
+  if (!['josh', 'dais', 'tenka'].includes(me.rank)) return;
   const power = me.fame + (me.rank === 'josh' ? 150 : 100);
   // 君主が老いて崩御 → 禅譲の可能性
   if (G.flags.rulerDied === G.turn - 1 || (ruler.bond >= 70 && me.fame >= 350 && U.ch(0.04))) {
@@ -7177,6 +7581,14 @@ B.start = (bt) => {
     }
   }
   if (bt.city) { const ds = bt.city.side; bt.siegeFood = (bt.spec.food ?? 6) + (bt.sides[ds].acts.has('roujou') ? 4 : 0); }
+  // 武名：名の知れた主人公の旗に、敵がどよめく
+  const rn = bt.spec.renown;
+  if (rn && rn.lv >= 2 && bt.sides[0].player) {
+    const nm = rn.ep ? `「${rn.ep}」` : rn.n;
+    B.logMsg(bt, `${nm}の旗が翻る。敵陣にどよめきが走った。`, 'good');
+    const mu = bt.units.find(u => u.me && u.side === 0);
+    if (mu) B.text(bt, mu.x, mu.y - 24 * (bt.p || 1), nm, 'good');
+  }
 };
 
 B.defaultForm = t => (D.UT[t].cls === 'rng' ? 'line' : 'line');
@@ -9494,6 +9906,8 @@ B.result = (bt) => {
     if (x.side === 0 && x.id) out.slainOfficers.push(x.id);
     if (x.byPlayer) { offMerit += x.tier * x.tier * 22 + (x.hist ? 300 : 0); out.slainNames.push(x.n); }
   }
+  // 主人公の隊が討った敵将（武名・異名に使う）
+  out.slainInfo = bt.stat.slain.filter(x => x.byPlayer && x.side === 1).map(x => ({ n: x.n, hist: !!x.hist, tier: x.tier || 3 }));
   for (const x of bt.stat.captured) { if (x.side === 1 && x.id) out.capturedOfficers.push(x.id); if (x.byPlayer) offMerit += x.tier * x.tier * 18; }
   const ord = bt.spec.role === 'unit' ? (bt.stat.order > bt.stat.disobey * 2 ? 10 * (bt.stat.order > 20 ? 2 : 1) : (bt.stat.meKills > 15 ? 0 : -15)) : 0;
   out.merit = { officers: offMerit, duel: bt.stat.duelMerit || 0, points: bt.stat.points, rearguard: bt.stat.rearguard, cmdKills: bt.sides[0].cmdAll ? bt.stat.cmdKills : 0, order: ord };
@@ -11425,6 +11839,30 @@ UI.info = (o) => UI.modal((box, close) => {
   b.onclick = () => close(true);
   box.append(b);
 });
+// 異名・武名・天下の大将軍の演出（漆の札に金の文字。七国の反応が順に浮かぶ）
+UI.fame = (o) => UI.modal((box, close) => {
+  box.classList.add('fame');
+  if (o.kind === 'tenka') box.classList.add('tenka');
+  if (box.parentElement) box.parentElement.classList.add('fame-wrap');
+  box.append(U.h('div', { class: 'mseal', 'aria-hidden': 'true' }, o.seal || '武名'));
+  box.append(U.h('div', { class: 'fame-k' }, o.title || '武名'));
+  if (o.lead) box.append(U.h('p', { class: 'fame-lead' }, o.lead));
+  if (o.epithet) box.append(U.h('div', { class: 'fame-ep' }, `「${o.epithet}」`));
+  if (o.name && o.epithet) box.append(U.h('div', { class: 'fame-name' }, o.name));
+  if (o.note) box.append(U.h('p', { class: 'fame-note' }, o.note));
+  const L = o.lines || [];
+  if (L.length) {
+    const wrap = U.h('div', { class: 'fame-lines' });
+    L.forEach((l, i) => {
+      const who = l.who ? U.h('b', {}, l.who) : U.h('span', { html: UI.cseal(l.c, 28) });
+      wrap.append(U.h('div', { class: 'fame-line', style: { animationDelay: `${(1 + i * 0.3).toFixed(2)}s` } }, who, U.h('span', {}, l.s)));
+    });
+    box.append(wrap);
+  }
+  const b = U.h('button', { class: 'btn seal wide', style: { marginTop: '18px' } }, o.ok || (o.kind === 'tenka' ? '天下に名を刻む' : '承知した'));
+  b.onclick = () => close(true);
+  box.append(b);
+});
 UI.multiPick = (o) => UI.modal((box, close) => {
   UI.head(box, o);
   const sel = new Set(o.chosen || []);
@@ -11576,7 +12014,7 @@ UI.drawTitleMap = (cv) => {
 };
 UI.help = () => UI.info({
   title: '遊び方', body:
-`1. 国と立場（伍長〜君主、里典〜丞相）を選び、主人公の能力を決める。
+`1. 国と立場（伍長〜大将軍、軍吏〜大軍師、里典〜御史大夫、丞相・君主）を選び、主人公の能力を決める。
 2. 毎月「任務状」の数だけ行動できる。立場ごとにできることが違う。
    ・武官：訓練・装備・出撃・戦場へ駆けつける
    ・「軍」タブの「部隊の割り振り」で、部下に何人任せるか・合戦での任せ方・兵種の転換を決められる（任務状は使わない）
@@ -11585,8 +12023,11 @@ UI.help = () => UI.info({
 3. 行動を終えたら「月を進める」。各国が動き、戦や事件が起きる。
 4. 合戦はリアルタイム。部隊をタップして選び、地面で移動、敵で攻撃。
    伍ごとの士気、挟撃、伏兵、射撃区域、攻城、一騎打ちを駆使せよ。
-5. 功績を挙げると昇進し、爵位と田宅（私領）が増える。
-6. 自国が天下を統一すれば終幕。
+5. 功績を挙げると昇進する。官職は三等→二等→一等と一段ずつ進み、一段ごとに在任期間が要る。上の官職には名声や戦歴も要る。
+   ・将軍・大将軍は功績に応じて率いる兵が増える（将軍は最大十万、大将軍は最大五十万）。
+   ・爵（二十等爵）は下・中・上の三段に分かれ、一か月に一段ずつ上がる。爵が上がると田宅（私領）が増える。
+6. 大きな戦で活躍すると武名が上がり、「〇〇の鬼神」のような異名で呼ばれる。名が天下に轟けば、合戦で敵がひるむ。武官の頂点は「天下の大将軍」。
+7. 自国が天下を統一すれば終幕。
 
 ・地図は二本指（またはホイール）で拡大できる。寄るほど県・郷・里、川や道まで細かく見える。郡をタップすると県の一覧。
 ・合戦の戦場は、全体マップのその土地の地形（川・森・田畑・村・道）からつくられる。
@@ -11622,10 +12063,10 @@ UI.setupCountry = () => {
   U.$('#s-next').onclick = () => UI.setupRank();
 };
 UI.RANK_GROUPS = [
-  ['王と宰相', ['kuns', 'josh']],
-  ['武官（将軍の系列）', ['dais', 'shog', 'goz', 'sanz', 'senn', 'gohy', 'hyak', 'goch']],
-  ['軍師', ['gunshi']],
-  ['文官（官吏の系列）', ['gyos', 'daij', 'guns', 'kenr', 'kenj', 'kyos', 'teic', 'ritei']],
+  ['王と宰相', ['kuns', 'josh'], ''],
+  ['武官（将軍の系列）', D.LADDER.mil.filter(r => D.SELECTABLE.includes(r)).reverse(), '頂点は「天下の大将軍」。大将軍として武名を天下に轟かせた者だけが至る。'],
+  ['軍師（幕僚の系列）', D.LADDER.staff.slice().reverse(), '大軍師の先は丞相。軍師からは合戦で総軍師として全軍に指示を出せる。'],
+  ['文官（官吏の系列）', D.LADDER.civ.slice().reverse(), '御史大夫の先は丞相。'],
 ];
 UI.rankPower = (r) => {
   const rk = D.RANKS[r];
@@ -11634,13 +12075,13 @@ UI.rankPower = (r) => {
   else if (r === 'josh') out.push('国法・外交・戦争の決定', '人事・評定');
   else if (r === 'gyos') out.push('監察・弾劾・法案の上奏');
   else if (r === 'daij') out.push('九卿の一つの国政');
-  else if (r === 'gunshi') out.push('戦術の管理・軍議', '合戦で全軍に指示');
+  else if (rk.track === 'staff') { if (rk.tier >= 7) out.push('戦術の管理・軍議', '合戦で全軍に指示'); else out.push('軍議で策を献じる', '将の軍で戦う'); }
   else if (rk.track === 'mil') {
     if (rk.tier >= 7) out.push('小規模戦闘を自由に', '攻略の上奏（戦争は許可制）');
     else out.push('上官の下で戦う');
     if (r === 'goch') out.push('伍の四人を管理');
   } else if (rk.track === 'civ') out.push(`${D.JUR[r]?.n || ''}の内政`, r === 'teic' ? '盗賊の捕縛' : '');
-  out.push(`兵${U.fmt(rk.troops)}`, `任務状${rk.ap}`);
+  out.push(`兵${U.fmt(rk.troops)}${rk.tmax ? '〜' + U.fmt(rk.tmax) : ''}`, `任務状${rk.ap}`);
   return out.filter(Boolean).join('・');
 };
 UI.setupRank = () => {
@@ -11652,11 +12093,12 @@ UI.setupRank = () => {
     return h ? `（史実では${h[0]}）` : '';
   };
   let html = '';
-  for (const [g, rs] of UI.RANK_GROUPS) {
-    html += `<div class="sec-h">${g}</div><div class="grid wide">`;
+  for (const [g, rs, note] of UI.RANK_GROUPS) {
+    html += `<div class="sec-h">${g}</div>${note ? `<p class="note" style="margin:-4px 0 8px">${note}</p>` : ''}<div class="grid wide">`;
     for (const r of rs) {
       const rk = D.RANKS[r];
-      html += `<button class="pick ${UI.cfg.rank === r ? 'on' : ''}" data-r="${r}"><span class="tag">${rk.track === 'top' ? '' : '第' + U.kanjiNum(rk.tier) + '階'}</span><b>${rk.name}</b><small>${rk.desc}${holder(r)}</small><small style="color:var(--jade)">${UI.rankPower(r)}</small></button>`;
+      const pos = rk.track === 'top' ? -1 : (D.LADDER[rk.track] || []).indexOf(r);
+      html += `<button class="pick ${UI.cfg.rank === r ? 'on' : ''}" data-r="${r}"><span class="tag">${pos >= 0 ? '第' + U.kanjiNum(pos + 1) + '階' : ''}</span><b>${rk.name}</b><small>${rk.desc}${holder(r)}</small><small style="color:var(--jade)">${UI.rankPower(r)}</small></button>`;
     }
     html += '</div>';
   }
@@ -11690,7 +12132,7 @@ UI.traitCost = (id) => { const T = D.TRAITS[id]; if (!T) return 0; if (T.custom)
 UI.TRAIT_MAX = 3;
 UI.pool = (cfg) => 100 + (cfg.age >= 45 ? 30 : cfg.age >= 30 ? 15 : 0) + cfg.bonus + (D.RANKS[cfg.rank].tier >= 7 ? 20 : 0);
 UI.used = (cfg) => U.sum(Object.values(cfg.stats), v => UI.statCost(v)) + U.sum(cfg.traits, t => UI.traitCost(t));
-UI.tacMax = (cfg) => cfg.mode === 'custom' ? D.TACTIC_ORDER.length : 1 + Math.floor(cfg.stats.chi / 25) + (cfg.rank === 'gunshi' ? 2 : 0) + (D.RANKS[cfg.rank].tier >= 7 ? 1 : 0);
+UI.tacMax = (cfg) => cfg.mode === 'custom' ? D.TACTIC_ORDER.length : 1 + Math.floor(cfg.stats.chi / 25) + (D.RANKS[cfg.rank].track === 'staff' ? 2 : 0) + (D.RANKS[cfg.rank].tier >= 7 ? 1 : 0);
 UI.effStats = (cfg) => { const st = Object.assign({}, cfg.stats); for (const t of cfg.traits) { const T = D.TRAITS[t]; if (T) for (const k of S.STATK) if (T.fx[k]) st[k] += T.fx[k]; } return st; };
 UI.defaultTactics = (cfg) => {
   const st = UI.effStats(cfg);
@@ -11726,11 +12168,11 @@ UI.editor = () => {
   if (!cfg._init || cfg._init !== cfg.rank) {
     cfg._init = cfg.rank;
     const tr = D.RANKS[cfg.rank].track;
-    const pre = cfg.rank === 'gunshi' ? '軍師' : tr === 'civ' || cfg.rank === 'josh' ? '宰相' : cfg.rank === 'kuns' ? '万能' : (D.RANKS[cfg.rank].tier >= 6 ? '名将' : '猛将');
+    const pre = tr === 'staff' ? '軍師' : tr === 'civ' || cfg.rank === 'josh' ? '宰相' : cfg.rank === 'kuns' ? '万能' : (D.RANKS[cfg.rank].tier >= 6 ? '名将' : '猛将');
     cfg.stats = Object.assign({}, UI.PRESETS[pre]);
-    cfg.traits = cfg.rank === 'gunshi' ? ['gunryaku', 'fukuhei'] : tr === 'civ' ? ['nousei', 'houka'] : cfg.rank === 'kuns' || cfg.rank === 'josh' ? ['jinbou', 'benzetsu'] : ['kobu', 'totsu'];
+    cfg.traits = tr === 'staff' ? ['gunryaku', 'fukuhei'] : tr === 'civ' ? ['nousei', 'houka'] : cfg.rank === 'kuns' || cfg.rank === 'josh' ? ['jinbou', 'benzetsu'] : ['kobu', 'totsu'];
     if (cfg.mode !== 'custom') UI.fitPool(cfg);
-    cfg.style = cfg.rank === 'gunshi' ? 'chi' : 'bal';
+    cfg.style = tr === 'staff' ? 'chi' : 'bal';
     cfg.tactics = UI.defaultTactics(cfg);
   }
   UI.show('edit');
@@ -11770,7 +12212,7 @@ UI.renderEditor = () => {
     </div>`).join('');
   const myProvs = D.PROVINCES.filter(p => p.o === cfg.country && !p.pass);
   const locOpts = myProvs.map(p => `<option value="${p.id}" ${cfg.loc === p.id ? 'selected' : ''}>${p.name}${p.cap ? '（都）' : ''}</option>`).join('');
-  const needLoc = ['goch', 'hyak', 'gohy', 'senn', 'sanz', 'goz', 'shog', 'dais', 'gunshi', 'ritei', 'teic', 'kyos', 'kenj', 'kenr', 'guns'].includes(cfg.rank);
+  const needLoc = rk.track === 'mil' || rk.track === 'staff' || (rk.track === 'civ' && rk.tier <= 6);
   const deps = UI._deps && rk.tier >= 2 ? UI._deps.map((d, i) => `<button class="tchip ${cfg.deputy === d ? 'on' : ''}" data-dep="${i}"><b>${d.n}（${d.kind}）</b><small>武${d.stats.bu} 統${d.stats.tou} 知${d.stats.chi} 政${d.stats.pol} 魅${d.stats.mi}　${d.tr.map(t => D.TRAITS[t].n).join('・')}</small></button>`).join('') : '';
   const tmax = UI.tacMax(cfg), st = UI.effStats(cfg);
   const tcompact = cfg.tactics.length > 8;
@@ -12088,7 +12530,7 @@ UI.ctrWorkshop = (o = {}) => UI.modal((box, close) => {
     const list = U.h('div', { class: 'ctr-who' });
     for (const x of people) {
       const on = (x.tr || []).includes(who);
-      const info = x.player ? D.RANKS[G.me.rank].name : `${D.RANKS[x.r] ? D.RANKS[x.r].name : ''}${x.id === G.me.army.dep ? '・副官' : ''}　統${S.stat(x, 'tou')} 武${S.stat(x, 'bu')} 知${S.stat(x, 'chi')}`;
+      const info = x.player ? S.rankLabel() : `${D.RANKS[x.r] ? D.RANKS[x.r].name : ''}${x.id === G.me.army.dep ? '・副官' : ''}　統${S.stat(x, 'tou')} 武${S.stat(x, 'bu')} 知${S.stat(x, 'chi')}`;
       list.append(U.h('div', { class: 'ctr-wrow' }, U.h('div', { style: { minWidth: 0 } }, U.h('b', {}, x.player ? `${x.n}（自分）` : x.n), U.h('small', {}, info)),
         btn(on ? '外す' : '付ける', on ? '' : 'pri', () => {
           x.tr = on ? x.tr.filter(t => t !== who) : (x.tr || []).concat(who);
@@ -12116,7 +12558,7 @@ UI.startGame = async () => {
   const o = S.myOff(), rk = D.RANKS[G.me.rank];
   const boss = G.off[G.me.boss];
   const lines = [
-    `${S.cname(o.c)}の${rk.name}${G.me.min ? '（' + D.MINISTRIES[G.me.min].n + '）' : ''}、${o.n}。`,
+    `${S.cname(o.c)}の${S.rankLabel()}${G.me.min ? '（' + D.MINISTRIES[G.me.min].n + '）' : ''}、${o.n}。`,
     `所在：${S.P[G.me.loc].name}`,
     boss ? `上官：${boss.n}（${D.RANKS[boss.r]?.name || ''}）` : '',
     G.me.army.sq.length ? `兵：${U.fmt(S.armyTotal())}` : '',
@@ -12594,7 +13036,7 @@ UI.header = () => {
   const ap = S.apMax();
   const aps = Array.from({ length: Math.max(ap, me.ap) }, (_, i) => `<i class="${i < me.ap ? '' : 'used'}"></i>`).join('');
   U.$('#hdr').innerHTML = `${UI.cseal(o.c)}
-    <div class="hdr-id"><b>${U.esc(o.n)}　${rk.name}${me.min ? '・' + D.MINISTRIES[me.min].n : ''}</b><small>${S.dateStr()}（${D.SEASON(G.month)}）・${D.JUE[me.jue].n}・${S.P[me.loc]?.name || ''}${me.inj ? '・負傷' : ''}</small></div>
+    <div class="hdr-id"><b>${U.esc(o.n)}　${S.rankLabel()}${me.min ? '・' + D.MINISTRIES[me.min].n : ''}</b><small>${S.dateStr()}（${D.SEASON(G.month)}）・${D.JUE[me.jue].n}・${S.P[me.loc]?.name || ''}${me.inj ? '・負傷' : ''}${S.epithet() ? `・「${U.esc(S.epithet())}」` : ''}</small></div>
     <div class="hdr-res"><span class="num">金 ${U.fmt(me.gold)}</span><span class="ap" title="任務状 ${me.ap}/${ap}" aria-label="任務状 残り${me.ap}">${aps}</span></div>
     <button class="bt-ic" id="hdr-menu" aria-label="メニュー">≡</button>`;
   U.$('#hdr-menu').onclick = () => UI.menu();
@@ -13064,7 +13506,8 @@ UI.armyTab = (c) => {
   const me = G.me, o = S.myOff(), A2 = me.army;
   S.tidyArmy();
   const tot = S.armyTotal(), cap = S.armyCap(), pv = U.sum(A2.sq.filter(s => s.pv), s => s.n);
-  let html = `<div class="step-h" style="margin-top:0"><h2>軍</h2><small>${U.fmt(tot)}人（国軍 ${U.fmt(tot - pv)}／上限${U.fmt(cap)}・私兵 ${U.fmt(pv)}／${U.fmt(S.pvCap())}）</small></div>`;
+  const rkA = D.RANKS[me.rank];
+  let html = `<div class="step-h" style="margin-top:0"><h2>軍</h2><small>${U.fmt(tot)}人（国軍 ${U.fmt(tot - pv)}／上限${U.fmt(cap)}${rkA.tmax ? `・功績で最大${U.fmt(rkA.tmax)}` : ''}・私兵 ${U.fmt(pv)}／${U.fmt(S.pvCap())}）</small></div>`;
   const quick = ['kunren', 'moukun', 'hojuu', 'soubi', 'hensei', 'gono', 'senjutsu'].map(id => A.list.find(a => a.id === id)).filter(a => a && A.status(a).show);
   html += `<div style="display:flex;gap:6px;flex-wrap:wrap">${quick.map(a => `<button class="btn sm" data-a="${a.id}" ${A.status(a).ok ? '' : 'disabled'}>${a.n}${a.ap ? `（${a.ap}）` : ''}</button>`).join('')}</div>`;
   if (A2.wu.length) {
@@ -13298,23 +13741,24 @@ UI.worldView = () => {
 /* ---------- 人物 ---------- */
 UI.pplTab = (c) => {
   const me = G.me, o = S.myOff(), rk = D.RANKS[me.rank];
-  const nx = W.nextRank();
-  const tier = rk.tier;
-  const need = nx ? D.MERIT_TIER[tier + 1] : null;
-  const prevNeed = D.MERIT_TIER[tier];
-  const nextJ = D.JUE[me.jue + 1];
   const stats = Object.keys(UI.statName).map(k => {
     const v = S.stat(o, k), ex = me.exp[k], nd = 40 + o[k] * 0.8;
     return `<div class="stat-row" style="grid-template-columns:3.5em 1fr 2.6em"><b style="font-size:14px">${UI.statName[k]}</b><div>${UI.bar(v, 100, 'br')}<div class="bar" style="height:3px;margin-top:3px"><i style="width:${U.clamp(ex / nd * 100, 0, 100)}%"></i></div></div><span class="num" style="text-align:right">${v}</span></div>`;
   }).join('');
   const boss = G.off[me.boss], ruler = G.off[S.myCty().ruler], gen = G.off[me.gen];
   const rel = (x, role) => x ? `<div class="card" style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div style="min-width:0"><span class="note">${role}</span><br><b>${U.esc(x.n)}</b> <small class="note">${D.RANKS[x.r]?.name || ''}</small><div class="note">武${x.bu} 統${x.tou} 知${x.chi} 政${x.pol} 魅${x.mi}</div></div><div style="text-align:right;min-width:70px"><span class="note num">絆${Math.round(x.bond)}</span>${UI.bar(x.bond + 100, 200)}</div></div>` : '';
+  const ep = S.epithet();
+  const jn = S.jueNext();
+  const jueNote = !jn ? '' : me.merit < jn.need ? `（次の${S.jueName(jn.j, jn.g)}まで功績${U.num(jn.need - me.merit)}）`
+    : jn.t > S.tier() ? `（次の${S.jueName(jn.j, jn.g)}は${UI.tierName(jn.t)}以上の官職から）`
+    : jn.fame && me.fame < jn.fame ? `（次の${S.jueName(jn.j, jn.g)}は名声${jn.fame}から）`
+    : `（来月、${S.jueName(jn.j, jn.g)}に上がる）`;
   let html = `<div class="card prof"><div class="banner-prev"><div class="pole"></div><div class="flag" style="background:${D.COUNTRIES[o.c].color === '#26262d' ? '#2e2e38' : D.COUNTRIES[o.c].color}">${U.esc(o.sei)}</div></div>
-    <div style="min-width:0"><h2 style="font-size:24px">${U.esc(o.n)}</h2><div class="note">${S.cname(o.c)}・${rk.name}${me.min ? '（' + D.MINISTRIES[me.min].n + '）' : ''}・${o.age}歳・${UI.styleName[o.st]}</div>
-    <div class="note">爵 ${D.JUE[me.jue].n}${nextJ ? `（次の${nextJ.n}まで功績${U.num(Math.max(0, nextJ.m - me.merit))}）` : ''}</div>
+    <div style="min-width:0"><h2 style="font-size:24px">${U.esc(o.n)}</h2>${ep ? `<div class="epi">「${U.esc(ep)}」</div>` : ''}<div class="note">${S.cname(o.c)}・${S.rankLabel()}${me.min ? '（' + D.MINISTRIES[me.min].n + '）' : ''}・${o.age}歳・${UI.styleName[o.st]}</div>
+    <div class="note">爵 ${S.jueLabel()}${jueNote}</div>
     <div class="note">名声 ${Math.round(me.fame)}${me.spouse ? `・妻 ${U.esc(me.spouse.n)}` : ''}${me.inj ? `・負傷（あと${me.inj}か月）` : ''}</div></div></div>
-    <div class="card" style="margin-top:10px"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b>功績 ${U.num(me.merit)}</b><span class="note">${nx ? `次の官職「${D.RANKS[nx].name}」まで ${U.num(Math.max(0, need - me.merit))}` : '武官の頂点'}</span></div>
-      ${nx ? UI.bar(me.merit - prevNeed, need - prevNeed, 'br') : ''}</div>
+    ${UI.careerCard()}
+    ${UI.renownCard()}
     <div class="sec-h">能力</div><div class="card">${stats}<p class="note" style="margin:6px 0 0">細い線は鍛錬の経験。</p></div>
     <div class="sec-h">特性 <small class="note">${o.tr.length}</small></div><div class="chipgrid">${o.tr.map(t => UI.traitChip(t, false, o.tr.length > 10)).join('') || '<p class="empty">なし</p>'}</div>
     <div class="sec-h">装備</div><div class="kv">${['weapon', 'armor', 'horse', 'book', 'treasure'].map(k => `<div><span>${{ weapon: '武器', armor: '鎧', horse: '馬', book: '書', treasure: '宝' }[k]}</span><b>${me.eq[k] ? D.ITEMS[me.eq[k]].n : '－'}</b></div>`).join('')}</div>
@@ -13326,7 +13770,83 @@ UI.pplTab = (c) => {
   U.$('#p-dir').onclick = () => UI.directory();
   U.$('#p-items').onclick = () => UI.items();
   U.$('#p-ctr').onclick = async () => { await UI.ctrWorkshop({ game: true }); UI.refresh(); };
+  U.$('#p-ladder').onclick = () => UI.ladder();
+  U.$('#p-jue').onclick = () => UI.jueList();
+  for (const b of U.$$('[data-epi]', c)) b.onclick = () => { G.me.epiSel = +b.dataset.epi; UI.toast(`「${G.me.epi[G.me.epiSel].n}」を名乗る`); UI.refresh(); };
 };
+// 格（tier）を代表の官職で言う
+UI.tierName = (t) => t >= 9 ? '丞相' : [D.RANK_ORDER_MIL[t - 1], D.RANK_ORDER_CIV[t - 1]].filter(Boolean).map(r => D.RANKS[r].name).join('・');
+// 出世：今の官職・等級と、次の一段の条件
+UI.careerCard = () => {
+  const me = G.me, rk = D.RANKS[me.rank], st = S.nextStep();
+  let h = `<div class="card" style="margin-top:10px"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b>功績 ${U.num(me.merit)}</b><span class="note">${S.rankLabel()}・俸禄 金${U.fmt(S.pay())}／月</span></div>`;
+  if (st) {
+    const lo = S.gradeNeed(me.rank, me.grade || 0);
+    const wait = S.stepWait(st);
+    const conds = [
+      { label: `功績${U.num(st.need)}`, ok: me.merit >= st.need, note: me.merit >= st.need ? '' : `あと${U.num(st.need - me.merit)}` },
+      { label: `在任${st.mo}か月`, ok: wait === 0, note: wait ? `あと${wait}か月` : '' },
+      ...st.req.map(x => ({ label: x.label, ok: x.ok, note: x.ok ? '' : `今は${x.have}` })),
+    ];
+    h += `<div class="note" style="margin-top:4px">次の${st.kind === 'rank' ? '昇進' : '昇格'}：<b style="color:var(--fg)">${S.rankName(st.r, st.kind === 'rank' && D.RANKS[st.r].track === 'top' ? null : st.g)}</b></div>`;
+    h += UI.bar(Math.max(0, me.merit - lo), Math.max(1, st.need - lo), 'br');
+    h += `<ul class="conds">${conds.map(x => `<li class="${x.ok ? 'ok' : ''}"><i aria-hidden="true">${x.ok ? '✓' : '・'}</i>${x.label}${x.note ? `<small>（${x.note}）</small>` : ''}</li>`).join('')}</ul>`;
+  } else h += `<p class="note" style="margin:6px 0 0">${rk.track === 'top' ? '位人臣を極めた。' : 'この道の頂点に立った。'}</p>`;
+  if (rk.tmax) h += `<p class="note" style="margin:6px 0 0">率いる兵の上限 ${U.fmt(S.armyCap())}（功績に応じて最大${U.fmt(rk.tmax)}）</p>`;
+  h += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn sm" id="p-ladder">出世の道</button><button class="btn sm" id="p-jue">爵位の一覧</button></div></div>`;
+  return h;
+};
+// 武名と異名
+UI.renownCard = () => {
+  const me = G.me, lv = S.renownLv(), cur = D.RENOWN[lv], nx = D.RENOWN[lv + 1], v = Math.round(me.renown || 0);
+  const E = me.epi || [], ep = S.epithet();
+  let h = `<div class="sec-h">武名</div><div class="card"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b>${cur.n}</b><span class="note num">武名 ${U.num(v)}${nx ? ` ／ 次の「${nx.n}」まで ${U.num(nx.m - v)}` : ''}</span></div>`;
+  if (nx) h += UI.bar(v - cur.m, nx.m - cur.m, 'br');
+  h += `<p class="note" style="margin:6px 0 0">${lv ? `合戦では味方の士気+${lv}・敵の士気−${Math.round(lv * 1.5)}。主人公の隊は近くの敵を威圧する。人材も集まりやすい。${lv >= 3 ? '主人公が守る郡には、敵が攻めてくるのをためらう。' : ''}` : '大きな戦で活躍する（敵将を討つ・一騎打ちに勝つ・寡兵で勝つなど）と武名が上がり、名が天下に知れ渡っていく。'}</p>`;
+  if (E.length) h += `<div class="chipgrid" style="margin-top:8px">${E.map((x, i) => `<button class="tchip ${ep === x.n ? 'on' : ''}" data-epi="${i}" aria-pressed="${ep === x.n}"><b>「${U.esc(x.n)}」</b><small>${U.esc(x.d)}　${U.esc(x.why || '')}</small></button>`).join('')}</div><p class="note" style="margin:6px 0 0">異名を押すと、それを名乗る。</p>`;
+  else h += `<p class="note" style="margin:6px 0 0">異名はまだない。</p>`;
+  return h + '</div>';
+};
+// 出世の道（官職の一覧）
+UI.ladder = () => UI.modal((box, close) => {
+  const me = G.me, rk = D.RANKS[me.rank];
+  const order = rk.track === 'top' ? ['civ', 'staff', 'mil'] : [rk.track, ...['mil', 'staff', 'civ'].filter(t => t !== rk.track)];
+  let tab = order[0];
+  UI.head(box, { title: '出世の道', body: '官職は三等→二等→一等と進み、一等から次の官職へ上がる。一段ごとに功績と在任期間が要り、上の官職には名声や戦歴も要る。' });
+  const seg = U.h('div', { class: 'seg', style: { marginTop: '10px' } });
+  const list = U.h('div', { class: 'ladder' });
+  const render = () => {
+    seg.innerHTML = order.map(t => `<button data-t="${t}" class="${t === tab ? 'on' : ''}">${D.LADDER_NAME[t]}</button>`).join('');
+    for (const b of seg.querySelectorAll('button')) b.onclick = () => { tab = b.dataset.t; render(); };
+    const L = D.LADDER[tab].slice();
+    if (tab !== 'mil') L.push('josh');
+    const curIdx = L.indexOf(me.rank);
+    list.innerHTML = L.map((r, i) => {
+      const x = D.RANKS[r];
+      const cls = r === me.rank ? 'cur' : (curIdx >= 0 && i < curIdx ? 'done' : '');
+      const req = x.req ? S.reqList(r).map(q => q.label).join('・') : '';
+      const grades = x.track !== 'top' && !x.nograde ? `<span class="gr">${D.GRADES.map((g, gi) => `<span class="${r === me.rank && (me.grade || 0) === gi ? 'on' : ''}">${g} ${U.num(S.gradeNeed(r, gi))}</span>`).join('')}</span>` : '';
+      return `<div class="lrow ${cls}"><b>${x.name}</b><span class="num">功績${U.num(x.m)}</span><small>兵${U.fmt(x.troops)}${x.tmax ? '〜' + U.fmt(x.tmax) : ''}・俸禄 金${U.fmt(x.pay)}・一段${S.stepMonths(r)}か月${req ? '・' + req : ''}</small>${grades}</div>`;
+    }).reverse().join('');
+  };
+  render();
+  const b = U.h('button', { class: 'btn seal wide', style: { marginTop: '14px' } }, '閉じる');
+  b.onclick = () => close(true);
+  box.append(seg, list, b);
+});
+// 爵位の一覧
+UI.jueList = () => UI.modal((box, close) => {
+  const me = G.me;
+  UI.head(box, { title: '二十等爵', body: '功績で上がる。一つの爵も下・中・上の三段に分かれ、一か月に一段ずつしか上がらない。高い爵には、それに見合う官職が要る。' });
+  const list = U.h('div', { class: 'ladder' });
+  list.innerHTML = D.JUE.slice(1).map((J, k) => {
+    const j = k + 1, cls = j === me.jue ? 'cur' : j < me.jue ? 'done' : '';
+    return `<div class="lrow ${cls}"><b>${J.n}</b><span class="num">功績${U.num(J.m)}</span><small>田${J.ha}頃${J.hh ? '・食邑' + U.num(J.hh) + '戸' : ''}${J.t ? `・${UI.tierName(J.t)}以上` : ''}${J.fame ? `・名声${J.fame}` : ''}</small>${j === me.jue ? `<span class="gr">${D.JUE_SUB.map((g, gi) => `<span class="${(me.jueG || 0) === gi ? 'on' : ''}">${g} ${U.num(S.jueNeed(j, gi))}</span>`).join('')}</span>` : ''}</div>`;
+  }).reverse().join('');
+  const b = U.h('button', { class: 'btn seal wide', style: { marginTop: '14px' } }, '閉じる');
+  b.onclick = () => close(true);
+  box.append(list, b);
+});
 UI.directory = () => UI.modal((box, close) => {
   UI.head(box, { title: '人物録' });
   const tabs = U.h('div', { class: 'tabs' });
@@ -13437,7 +13957,7 @@ UI.ending = async () => {
   const lines = [
     ov.text,
     `${S.dateStr()}　${o.n}（${o.age}歳）`,
-    `最終官職：${D.RANKS[me.rank].name}　爵：${D.JUE[me.jue].n}`,
+    `最終官職：${S.rankLabel()}　爵：${S.jueLabel()}${S.epithet() ? `　異名「${S.epithet()}」` : ''}　武名：${D.RENOWN[S.renownLv()].n}`,
     `合戦 ${me.rec.battles}（勝${me.rec.wins}）・討った兵 ${U.num(me.rec.kills)}・一騎打ち ${me.rec.duels}`,
     me.rec.slain.length ? `討ち取った将：${me.rec.slain.slice(-8).join('、')}` : '',
     ov.kind === 'unify' ? (me.rank === 'kuns' ? '王は皇帝を名乗り、天下に号令した。' : `${D.RANKS[me.rank].name}として統一の礎を築いた名は、長く語り継がれた。`) : '',
@@ -13647,7 +14167,7 @@ const SAVE = {
     if (str.startsWith('raw:')) return decodeURIComponent(escape(atob(str.slice(4))));
     throw new Error('読み込めない形式です');
   },
-  meta() { const o = S.myOff(); return { date: S.dateStr(), name: o.n, rank: D.RANKS[G.me.rank].name, c: S.cname(o.c), ts: Date.now() }; },
+  meta() { const o = S.myOff(); return { date: S.dateStr(), name: o.n, rank: S.rankLabel(), c: S.cname(o.c), ts: Date.now() }; },
   _chain: {},
   async save(slot) {
     if (!G) return false;
@@ -13726,6 +14246,7 @@ HOOK.battle = async (spec) => {
 };
 HOOK.choose = (o) => UI.choose(o);
 HOOK.info = (o) => UI.info(o);
+HOOK.fame = (o) => UI.fame(o);
 HOOK.number = (o) => UI.askNumber(o);
 HOOK.duel = (o) => UI.duel(o);
 
