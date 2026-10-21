@@ -360,12 +360,50 @@ table.tbl th{color:var(--fg2);font-weight:500;font-size:12px}
 .mv-row label{font-size:13px;color:var(--fg2)}
 .mv-row input[type=number]{width:8em;flex:none;text-align:right;font-size:17px;background:var(--bg2)}
 .mv-ed input[type=range]{width:100%;min-height:28px;padding:0;border:0;background:transparent}
-.mv-q,.mv-dst{display:flex;flex-wrap:wrap;gap:6px}
+.mv-q,.mv-dst,.mv-ty{display:flex;flex-wrap:wrap;gap:6px}
+.mv-ty .chip small{font-size:11px;opacity:.8}
 .mv-acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .mv-acts .btn.warn{border-color:var(--bad);color:#f2a08c}
 .empty.sm{font-size:12.5px;padding:8px 0 2px;border-top:1px dashed var(--line)}
 .al-foot{display:flex;justify-content:flex-end;margin:2px 0 6px}
 .note.warn{color:var(--warn)}
+/* ---------- 特性工房 ---------- */
+.tchip.cx{border-style:dashed}
+.modal.ctr input[type=text],.modal.ctr input[type=search],.modal.ctr select{background:rgba(255,250,232,.9);color:var(--ink);border:1px solid #9c8350}
+.ctr-top{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+.ctr-card{border:1px solid #9c8350;background:rgba(255,250,232,.62);border-radius:8px;padding:10px 12px;margin-top:8px;display:flex;flex-direction:column;gap:3px}
+.ctr-card.neg{border-color:#b0543c}
+.ctr-h{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.ctr-h b{font-size:16px;min-width:0;overflow-wrap:anywhere}
+.ctr-pw{font-size:12px;color:#6b5428;white-space:nowrap}
+.ctr-card small{color:#5b4b31;font-size:12.5px;line-height:1.5}
+.ctr-card small.ctr-users{color:#2e4a3f}
+.ctr-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ctr-f{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.ctr-f label{font-size:12.5px;color:#5b4b31}
+.ctr-pwline{margin:12px 0 2px;font-size:13.5px;line-height:1.5}
+.ctr-pwline b{font-size:20px}
+.ctr-pwline small{color:#5b4b31;font-size:12px}
+.ctr-eh{display:flex;justify-content:space-between;align-items:center;margin:14px 0 6px;gap:8px}
+.ctr-fx{display:flex;flex-direction:column;border-top:1px solid rgba(120,90,40,.35)}
+.ctr-row{display:grid;grid-template-columns:minmax(0,1fr) 4.6em 2.4em 2.4em 2.4em;gap:6px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(120,90,40,.2)}
+.ctr-k{font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal .ctr-row input{min-height:34px;padding:4px 6px;text-align:right;background:rgba(255,250,232,.9);color:var(--ink);border:1px solid #9c8350;border-radius:6px}
+.ctr-u{font-size:11.5px;color:#5b4b31;white-space:nowrap}
+.ctr-pm,.ctr-x{min-height:34px;border:1px solid #9c8350;background:#efe2b9;border-radius:6px;padding:0;color:var(--ink);font-size:14px}
+.ctr-flag{grid-column:2/5;font-size:13px;color:#2e4a3f}
+.ctr-opt{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:14px}
+.modal .ctr-opt input{width:20px;height:20px;min-height:0;margin:2px 0 0;flex:none;accent-color:#2e4a3f;color-scheme:light}
+.ctr-opt small{display:block;font-size:12px;color:#5b4b31}
+.ctr-pick{max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 0}
+.ctr-g{font-family:var(--font-head);font-size:13px;color:#6b5428;margin:10px 2px 6px;letter-spacing:.08em;border-bottom:1px solid rgba(120,90,40,.35);padding-bottom:2px}
+.ctr-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ctr-bottom{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.modal.ctr .ctr-bottom{position:sticky;bottom:calc(-18px - env(safe-area-inset-bottom,0px));z-index:2;margin-bottom:calc(-18px - env(safe-area-inset-bottom,0px));padding:12px 0 calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,var(--slip) 75%,rgba(216,199,147,0))}
+.ctr-who{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.ctr-wrow{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #9c8350;background:rgba(255,250,232,.62);border-radius:8px;padding:8px 12px}
+.ctr-wrow small{display:block;color:#5b4b31;font-size:12px}
+.ctr-gate{margin-top:10px}
 /* 数を入れる（竹簡） */
 .numask{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .na-row{display:flex;gap:8px;align-items:center}
@@ -1466,6 +1504,103 @@ D.traitDesc = (id) => {
   return T._d;
 };
 for (const id of D.TRAIT_ORDER) Object.defineProperty(D.TRAITS[id], 'd', { get() { return D.traitDesc(id); }, enumerable: false, configurable: true });
+
+/* ---------- 自作の特性（特性工房） ----------
+   ブラウザに保存し、使ったものはセーブにも写す。id は cx_ で始まる。
+   乱数で配る特性の候補（D.TRAIT_ORDER）には入れない。 */
+D.TRAIT_CATS.custom = '自作';
+D.TRAIT_CAT_ORDER.push('custom');
+// 工房で選ぶときの効果の分類
+D.FXG = [
+  ['能力', ['bu', 'tou', 'chi', 'pol', 'mi']],
+  ['合戦', ['atk', 'def', 'spd', 'chg', 'brace', 'big', 'few', 'sally', 'chaos', 'fatigue', 'train_b', 'slots', 'cp_rec', 'courier', 'noRetreat']],
+  ['士気', ['mor', 'mor_rec', 'mor_res', 'rally', 'fear', 'aura']],
+  ['戦い方', ['flank_res', 'flank_dmg', 'pincer', 'pursuit', 'rearguard', 'disengage', 'ambush', 'stealth', 'detect', 'sight', 'night', 'night_def']],
+  ['射撃', ['rng_dmg', 'rng_range', 'rng_rate', 'ammo', 'arrow_res', 'arrow_mor', 'snipe', 'ff_res']],
+  ['兵種', ['c_inf', 'c_rng', 'c_cav', 'c_chr', 'c_sie', 'u_spear', 'u_heavy', 'u_arch', 'u_xbow', 'u_lcav', 'u_hcav', 'u_harch', 'u_mount', 'u_militia', 'u_guard', 'u_ladder', 'u_shield', 'cav_arch', 'horse']],
+  ['相手', ['vs_inf', 'vs_rng', 'vs_cav', 'vs_chr', 'vs_sie', 'vs_nomad', 'vs_bandit', 'vs_hq']],
+  ['地形・天候', ['t_plain', 't_hill', 't_mount', 't_forest', 't_marsh', 't_water', 't_city', 't_village', 't_field', 't_steppe', 't_pass', 't_desert', 'terrain', 'mv_forest', 'mv_mount', 'mv_marsh', 'mv_water', 'mv_rough', 'w_rain', 'w_fog', 'w_snow', 'w_wind', 'weather']],
+  ['陣形', ['form_all', 'form_fast', 'f_line', 'f_fish', 'f_crane', 'f_arrow', 'f_square', 'f_cres', 'f_goose', 'f_snake', 'f_loose']],
+  ['計略・攻城', ['fire', 'fire_res', 'water', 'siege_atk', 'siege_def', 'climb', 'ram', 'trap', 'surrender']],
+  ['武芸', ['hero', 'lead_surv', 'duel', 'duel_hp', 'duel_read', 'duel_ki', 'duel_flee', 'capture']],
+  ['戦のあと', ['heal', 'loot', 'camp_heal', 'camp_def']],
+  ['内政', ['train', 'agri', 'comm', 'order', 'loyal', 'cult', 'hh', 'recruit', 'tax', 'gold', 'food', 'upkeep', 'build', 'fort', 'levee', 'bandit']],
+  ['政治・人物', ['debate', 'dip', 'plot', 'spy', 'talent', 'bond', 'merit', 'fame', 'exp', 'health', 'luck', 'loy', 'trade', 'smith', 'ap']],
+];
+(() => {
+  const seen = new Set();
+  for (const g of D.FXG) g[1] = g[1].filter(k => D.FXK[k] && !seen.has(k) && seen.add(k));
+  const rest = Object.keys(D.FXK).filter(k => !seen.has(k));
+  if (rest.length) D.FXG.push(['その他', rest]);
+})();
+D.CTR_STATS = ['bu', 'tou', 'chi', 'pol', 'mi'];
+D.CTR_FAST = new Set(['spd', 'f_snake', 'form_fast', 'rng_rate', 'rng_range', 'climb', 'siege_atk', 'cp_rec', 'sight']);
+// 工房で決められる幅（画面の単位。％の効果は％で）
+D.fxLim = (k) => {
+  const t = D.FXK[k] && D.FXK[k][1];
+  if (t === 'f') return { min: 1, max: 1, step: 1, def: 1, unit: '' };
+  if (t === 'n') {
+    if (D.CTR_STATS.includes(k)) return { min: -50, max: 100, step: 1, def: 5, unit: '' };
+    if (k === 'slots' || k === 'ap') return { min: -2, max: 5, step: 1, def: 1, unit: '' };
+    if (k === 'duel_hp') return { min: -50, max: 200, step: 5, def: 20, unit: '' };
+    return { min: -30, max: 50, step: 1, def: 5, unit: '' };
+  }
+  if (t === 'r') return { min: -100, max: 90, step: 5, def: 20, unit: '%' };
+  if (D.CTR_FAST.has(k)) return { min: -50, max: 100, step: 5, def: 20, unit: '%' };
+  return { min: -90, max: 300, step: 5, def: 20, unit: '%' };
+};
+D.fxPct = (k) => { const t = D.FXK[k] && D.FXK[k][1]; return t === 'p' || t === 'r'; };
+D.fxToUi = (k, v) => (D.fxPct(k) ? Math.round(v * 100) : v);
+D.fxFromUi = (k, x) => (D.FXK[k] && D.FXK[k][1] === 'f' ? 1 : D.fxPct(k) ? x / 100 : x);
+// 強さ（組み込みの特性のおよその値：一段目≒3・二段目≒5・★≒10）
+D.CTR_BROAD = new Set(['atk', 'def', 'chg', 'brace', 'rng_dmg', 'mor_res', 'mor_rec', 'pincer', 'pursuit', 'hero', 'big', 'few', 'flank_dmg', 'aura', 'fear', 'spd', 'form_all', 'terrain', 'cp_rec', 'rally', 'duel', 'lead_surv', 'ambush', 'siege_atk', 'siege_def', 'fire']);
+D.fxPower = (k, v) => {
+  const t = D.FXK[k] && D.FXK[k][1]; if (!t) return 0;
+  if (t === 'f') return k === 'cav_arch' ? 6 : 2;
+  if (t === 'n') return v * (D.CTR_STATS.includes(k) || k === 'mor' ? 1 : k === 'train_b' ? 0.5 : k === 'duel_hp' ? 0.1 : k === 'slots' ? 8 : k === 'ap' ? 15 : 1);
+  if (t === 'r') return v * 10;
+  if (D.CTR_BROAD.has(k)) return v * 20;
+  if (/^(c_|u_|vs_|t_|w_|f_|mv_)/.test(k)) return v * 7;
+  return v * 8;
+};
+D.ctrPower = (def) => {
+  let p = 0;
+  for (const k in (def && def.fx) || {}) p += D.fxPower(k, def.fx[k]) * (def.side && !D.CTR_STATS.includes(k) ? 2 : 1);
+  if (def && def.sk && D.SKILLS[def.sk]) p += 4;
+  return Math.round(p * 10) / 10;
+};
+// 通常モードで付けるときの能力pt（組み込みの★は20pt・二段目は8pt）
+D.ctrCost = (pw) => (pw < 0 ? Math.max(-8, Math.round(pw * 2)) : Math.max(0, Math.round((pw - 2.5) * 2.6)));
+D.ctrDescAuto = (T) => {
+  const ks = Object.keys(T.fx || {});
+  const many = ks.length > 6;
+  const parts = ks.slice(0, many ? 4 : 6).map(k => D.fxText(k, T.fx[k]));
+  if (many) parts.push(`ほか${ks.length - 4}件`);
+  if (T.sk && D.SKILLS[T.sk]) parts.push(`戦法「${D.SKILLS[T.sk].n}」`);
+  return (parts.filter(Boolean).join('・') || '効果なし') + (T.side ? '（総大将なら全軍に効く）' : '');
+};
+// 合戦中に使える戦法（準備の要る計略は除く）
+D.CTR_SKILLS = () => Object.keys(D.SKILLS).filter(k => !D.SKILLS[k].tactic && k !== 'kakei_t');
+D.CTR_IDS = [];
+D.regCTrait = (def) => {
+  if (!def || typeof def.id !== 'string' || !/^cx_[a-z0-9]+$/i.test(def.id)) return null;
+  const fx = {};
+  for (const k in def.fx || {}) { const v = Number(def.fx[k]); if (D.FXK[k] && Number.isFinite(v) && v !== 0) { const L = D.fxLim(k); fx[k] = D.FXK[k][1] === 'f' ? 1 : U.clamp(v, D.fxFromUi(k, L.min), D.fxFromUi(k, L.max)); } }
+  const sk = def.sk && D.SKILLS[def.sk] && D.CTR_SKILLS().includes(def.sk) ? def.sk : undefined;
+  const pw = D.ctrPower({ fx, side: !!def.side, sk });
+  const T = { id: def.id, n: String(def.n || '').trim().slice(0, 12) || '無名の特性', cat: 'custom', lv: pw >= 8 ? 3 : pw >= 4 ? 2 : 1, fx, role: 'any', custom: true, side: !!def.side, sk, neg: pw < 0, pw, cost: D.ctrCost(pw), ud: String(def.d || '').trim().slice(0, 80), ts: def.ts || 0 };
+  Object.defineProperty(T, 'd', { get() { return T.ud || D.ctrDescAuto(T); }, enumerable: false, configurable: true });
+  D.TRAITS[def.id] = T;
+  if (!D.CTR_IDS.includes(def.id)) D.CTR_IDS.push(def.id);
+  return T;
+};
+D.ctrDef = (id) => { const T = D.TRAITS[id]; return T && T.custom ? { id, n: T.n, d: T.ud, fx: Object.assign({}, T.fx), side: T.side, sk: T.sk || null, ts: T.ts } : null; };
+// 最強：すべての効果を最大に（退かずの陣は縛りなので入れない）
+D.ctrMax = (base) => {
+  const fx = {};
+  for (const k in D.FXK) if (k !== 'noRetreat') fx[k] = D.fxFromUi(k, D.fxLim(k).max);
+  return { id: (base && base.id) || 'cx_' + U.uid(), n: (base && base.n) || '天下無双', d: (base && base.d) || '', fx, side: true, sk: 'kyouhei', ts: 0 };
+};
 
 /* ---------- 戦術（軍議で準備） ---------- */
 // req: 必要な能力  cat: 分類  fx: 準備した側の全部隊に効く効果  act: 特別な仕掛け
@@ -3256,8 +3391,10 @@ S.fx = (o, k) => {
   if (o.tr) for (const t of o.tr) { const T = D.TRAITS[t]; if (T && T.fx[k]) v += T.fx[k]; }
   if (o.xfx) { if (o.xfx[k]) v += o.xfx[k]; }
   else if (typeof G !== 'undefined' && G && G.me && o.id === G.me.oid) { const ix = S.itemFx(); if (ix[k]) v += ix[k]; }
-  return v;
+  return S.fxClamp(k, v);
 };
+// 短所を重ねても掛け算が負にならないように
+S.fxClamp = (k, v) => { const t = D.FXK[k] && D.FXK[k][1]; if (t === 'p' && v < -0.9) return -0.9; if (t === 'r' && v < -2) return -2; return v; };
 S.fxm = (o, k) => 1 + S.fx(o, k);
 S.myFx = (k) => S.fx(S.myOff(), k);
 // 装備の効果を効果キーに
@@ -3283,6 +3420,43 @@ S.lawMul = (c, key) => {
   return v;
 };
 S.lawAdd = (c, key) => { let v = 0; const cc = G.cty[c]; if (!cc) return 0; for (const l of cc.laws) { const e = D.LAWS[l]?.eff; if (e && e[key] != null) v += e[key]; } return v; };
+
+/* ---------- 自作の特性（このブラウザに保存し、使ったものはセーブにも写す） ---------- */
+S.CTR_KEY = 'shichiyu.ctraits.v1';
+S.ctrLib = () => { try { const v = JSON.parse(localStorage.getItem(S.CTR_KEY) || '[]'); return Array.isArray(v) ? v.filter(d => d && d.id) : []; } catch (e) { return []; } };
+S.ctrStore = (list) => { try { localStorage.setItem(S.CTR_KEY, JSON.stringify(list)); return true; } catch (e) { return false; } };
+S.ctrBoot = () => { for (const d of S.ctrLib()) D.regCTrait(d); };
+// 作る・直す（このブラウザの工房と、遊んでいるゲームの両方に反映）
+S.ctrPut = (def) => {
+  const T = D.regCTrait(Object.assign({}, def, { ts: Date.now() }));
+  if (!T) return null;
+  const list = S.ctrLib().filter(d => d.id !== T.id); list.push(D.ctrDef(T.id)); S.ctrStore(list);
+  if (typeof G !== 'undefined' && G) S.ctrSync();
+  return T;
+};
+S.ctrUsers = (id) => (typeof G !== 'undefined' && G ? Object.values(G.off).filter(o => o.alive && (o.tr || []).includes(id)) : []);
+S.ctrDelete = (id) => {
+  S.ctrStore(S.ctrLib().filter(d => d.id !== id));
+  if (S.ctrUsers(id).length) return false;   // 使っている人がいる間は消さずに残す
+  delete D.TRAITS[id]; D.CTR_IDS = D.CTR_IDS.filter(x => x !== id);
+  return true;
+};
+S.ctrSync = () => {
+  if (typeof G === 'undefined' || !G) return;
+  const out = {};
+  for (const o of Object.values(G.off)) for (const t of o.tr || []) if (!out[t] && D.TRAITS[t] && D.TRAITS[t].custom) out[t] = D.ctrDef(t);
+  G.ctr = out;
+};
+// セーブに写っている自作の特性を登録する（工房の方が新しければそちらを使う）
+S.ctrFromSave = (g) => {
+  const lib = S.ctrLib(); let add = false;
+  for (const id in g.ctr || {}) {
+    const d = g.ctr[id], mine = lib.find(x => x.id === id);
+    D.regCTrait(mine && (mine.ts || 0) >= (d.ts || 0) ? mine : d);
+    if (!mine) { lib.push(d); add = true; }
+  }
+  if (add) S.ctrStore(lib);
+};
 
 /* ---------- logging ---------- */
 S.log = (s, k = 'info') => { G.log.unshift({ t: G.turn, d: S.dateStr(), s, k }); if (G.log.length > 160) G.log.length = 160; };
@@ -3639,6 +3813,7 @@ S.createPlayer = (cfg) => {
     if (cu.jue) { me.jue = Math.max(me.jue, cu.jue); o.jue = me.jue; S.applyJueLand(); }
   }
   me.ap = S.apMax();
+  S.ctrSync();
 };
 
 S.frontProv = (c) => {
@@ -3808,10 +3983,11 @@ S.apMax = () => {
 };
 
 /* ---------- serialization ---------- */
-S.serialize = () => JSON.stringify(G);
+S.serialize = () => { S.ctrSync(); return JSON.stringify(G); };
 S.load = (json) => {
   const g = typeof json === 'string' ? JSON.parse(json) : json;
   if (!g || !g.me || !g.prov || !g.off) throw new Error('セーブデータの形式が違います');
+  S.ctrFromSave(g);
   G = g;
   S.migrate();
   return G;
@@ -5517,7 +5693,7 @@ A.def({ id: 'soubi', cat: 'army', n: '装備強化', ap: 1, d: '武器・防具�
   } });
 A.def({ id: 'wariburi', cat: 'army', n: '部隊の割り振り', ap: 0, d: '誰にどれだけの兵を任せるかを人数で決める。合戦での任せ方も決められる。任務状は使わない。', req: () => (hasArmy() && (G.me.army.subs.length > 0 || G.me.army.sq.length > 1 || G.me.army.sq.some(s => s.pv))) || '部下か複数の隊が要る',
   run: async () => { if (typeof UI !== 'undefined' && UI) { UI.curTab = 'army'; UI._scrollAllot = true; } return null; } });
-A.def({ id: 'hensei', cat: 'army', n: '兵種転換', ap: 1, d: '一部の兵を別の兵種に鍛え直す。金がかかり、練度が下がる。', req: () => (hasArmy() && tier_() >= 2) || '百将以上',
+A.def({ id: 'hensei', cat: 'army', n: '兵種転換', ap: 0, d: '一部の兵を別の兵種に鍛え直す。金がかかり、練度が下がる。任務状は使わない（「軍」の割り振りからもできる）。', req: () => (hasArmy() && tier_() >= 2) || '百将以上',
   run: async () => A.convert() });
 A.def({ id: 'gono', cat: 'army', n: '伍の仲間', ap: 1, d: '伍の四人と語らい、一人を鍛える。', req: () => (G.me.army.wu.length > 0) || '伍長・里典のみ',
   run: async () => {
@@ -5915,18 +6091,14 @@ A.def({ id: 'shihei', cat: 'land', n: '私兵募集', ap: 1, d: '私領で兵を
     return `私兵の${D.UT[ty].n}を${U.num(n)}人募った（金-${U.fmt(n * per)}）。`;
   } });
 // 兵種転換（一部の兵を別の兵種へ）
-A.convert = async () => {
-  const me = G.me, A2 = me.army;
-  const s = await A.pickSquad('転換する部隊', false); if (!s || s === 'all') return null;
-  const types = D.UT_TRAINABLE.filter(t => t !== s.t && A.canField(t));
-  if (!types.length) return '転換できる兵種がない（厩舎・工房・鍛冶場で増える）。';
-  const t = await HOOK.choose({ title: '新しい兵種', body: '施設（厩舎・工房・鍛冶場）で選べる兵種が増える。', choices: types.map(t => ({ v: t, label: D.UT[t].n, sub: D.UT[t].desc + `　1人あたり金${Math.round(D.UT[t].cost * 40)}` })).concat([{ v: null, label: 'やめる' }]) });
-  if (!t) return null;
-  const per = Math.round(D.UT[t].cost * 40), maxN = Math.min(s.n, Math.floor(me.gold / per));
-  if (maxN < 1) return `金が足りない（1人あたり金${per}）。`;
-  const amt = await HOOK.number({ title: `何人を${D.UT[t].n}に転換する？`, body: `${S.squadName(s)}　${U.num(s.n)}人\n1人あたり金${per}。転換した兵の練度は6割になる。`, min: 1, max: maxN, value: maxN, unit: '人', info: (n) => `金${U.fmt(n * per)}` });
-  if (!amt) return null;
-  const n = Math.min(maxN, Math.max(1, Math.floor(amt)));
+A.convCost = (t) => Math.round(D.UT[t].cost * 40);
+// 隊 sqId の n 人を兵種 t に変える（金がかかり、練度は6割になる）。変えた人数を返す
+A.convertTroops = (sqId, n, t) => {
+  const me = G.me, A2 = me.army, s = A2.sq.find(x => x.id === sqId);
+  if (!s || s.t === t || !D.UT[t] || !D.UT_TRAINABLE.includes(t) || !A.canField(t)) return 0;
+  const per = A.convCost(t);
+  n = Math.min(s.n, Math.floor(me.gold / per), Math.max(0, Math.floor(n)));
+  if (n < 1) return 0;
   me.gold -= n * per;
   const share = s.pv ? n : Math.min(s.max, Math.round(s.max * n / Math.max(1, s.n)));
   const from = { tr: s.tr * 0.6, wl: s.wl, al: s.al, xp: s.xp || 0 };
@@ -5935,7 +6107,21 @@ A.convert = async () => {
   if (!ns) { ns = S.newSquad(t, 0, { pv: s.pv, tr: from.tr, wl: s.wl, al: s.al, ld: s.ld || null }); ns.max = 0; A2.sq.push(ns); }
   S.mergeInto(ns, from, n, share);
   S.tidyArmy();
-  return `${U.num(n)}人を${D.UT[t].n}に転換した。`;
+  return n;
+};
+A.convert = async () => {
+  const me = G.me;
+  const s = await A.pickSquad('転換する部隊', false); if (!s || s === 'all') return null;
+  const types = D.UT_TRAINABLE.filter(t => t !== s.t && A.canField(t));
+  if (!types.length) return '転換できる兵種がない（厩舎・工房・鍛冶場で増える）。';
+  const t = await HOOK.choose({ title: '新しい兵種', body: '施設（厩舎・工房・鍛冶場）で選べる兵種が増える。', choices: types.map(t => ({ v: t, label: D.UT[t].n, sub: D.UT[t].desc + `　1人あたり金${A.convCost(t)}` })).concat([{ v: null, label: 'やめる' }]) });
+  if (!t) return null;
+  const per = A.convCost(t), maxN = Math.min(s.n, Math.floor(me.gold / per));
+  if (maxN < 1) return `金が足りない（1人あたり金${per}）。`;
+  const amt = await HOOK.number({ title: `何人を${D.UT[t].n}に転換する？`, body: `${S.squadName(s)}　${U.num(s.n)}人\n1人あたり金${per}。転換した兵の練度は6割になる。`, min: 1, max: maxN, value: maxN, unit: '人', info: (n) => `金${U.fmt(n * per)}` });
+  if (!amt) return null;
+  const n = A.convertTroops(s.id, amt, t);
+  return n ? `${U.num(n)}人を${D.UT[t].n}に転換した（金-${U.fmt(n * per)}）。` : '転換できなかった。';
 };
 A.PV_PRICE = 60;
 A.FOOD_PRICE = 8; // 市場の兵糧 1石あたりの金
@@ -6848,6 +7034,7 @@ B.unitFx = (bt, u) => {
   const sd = bt.sides[u.side];
   const fx = Object.assign({}, sd.fx || {});
   B.addFx(fx, B.ldFx(u.ld, B.isCmdLd(bt, u)));
+  for (const k in fx) fx[k] = S.fxClamp(k, fx[k]);
   u.fx = fx;
   if (u.t === 'lcav' && fx.cav_arch > 0 && !u.horseArch) { u.horseArch = true; if (!u.ammo) u.ammo = 18; }
   if (!bt.started) u.ammo = Math.round((u.horseArch && !u.ut.ammo ? 18 : (u.ut.ammo || 0)) * (1 + (fx.ammo || 0)));
@@ -11362,7 +11549,8 @@ UI.help = () => UI.info({
 `1. 国と立場（伍長〜君主、里典〜丞相）を選び、主人公の能力を決める。
 2. 毎月「任務状」の数だけ行動できる。立場ごとにできることが違う。
    ・武官：訓練・装備・出撃・戦場へ駆けつける
-   ・「軍」タブの「部隊の割り振り」で、部下に何人任せるかと合戦での任せ方を決められる（任務状は使わない）
+   ・「軍」タブの「部隊の割り振り」で、部下に何人任せるか・合戦での任せ方・兵種の転換を決められる（任務状は使わない）
+   ・「人物」タブの「特性工房」で、自分だけの特性を作って付けられる
    ・文官：管轄地の内政、大臣は国政、丞相・君主は国法・外交・戦争
 3. 行動を終えたら「月を進める」。各国が動き、戦や事件が起きる。
 4. 合戦はリアルタイム。部隊をタップして選び、地面で移動、敵で攻撃。
@@ -11468,7 +11656,7 @@ UI.CUSTOM_PRESETS = {
   '平凡': { bu: 50, tou: 50, chi: 50, pol: 50, mi: 50 },
 };
 UI.statCost = (v) => { let c = 0; for (let i = 41; i <= v; i++) c += i > 80 ? 2 : 1; for (let i = 40; i > v; i--) c -= 1; return c; };
-UI.traitCost = (id) => { const T = D.TRAITS[id]; if (!T) return 0; if (T.neg) return -6; return T.lv >= 3 ? 20 : T.lv === 2 ? 8 : 0; };
+UI.traitCost = (id) => { const T = D.TRAITS[id]; if (!T) return 0; if (T.custom) return T.cost; if (T.neg) return -6; return T.lv >= 3 ? 20 : T.lv === 2 ? 8 : 0; };
 UI.TRAIT_MAX = 3;
 UI.pool = (cfg) => 100 + (cfg.age >= 45 ? 30 : cfg.age >= 30 ? 15 : 0) + cfg.bonus + (D.RANKS[cfg.rank].tier >= 7 ? 20 : 0);
 UI.used = (cfg) => U.sum(Object.values(cfg.stats), v => UI.statCost(v)) + U.sum(cfg.traits, t => UI.traitCost(t));
@@ -11535,7 +11723,7 @@ UI.editorErrors = (cfg) => {
   }
   return errs;
 };
-UI.traitChip = (t, removable, compact) => { const T = D.TRAITS[t]; if (!T) return ''; return `<span class="tchip on lv${T.lv}${T.neg ? ' neg' : ''}${compact ? ' sm' : ''}" title="${U.esc(T.d)}"><b>${'★'.repeat(T.lv >= 3 ? 1 : 0)}${U.esc(T.n)}${removable ? `<i class="x" data-rmt="${t}" role="button" aria-label="外す">✕</i>` : ''}</b>${compact ? '' : `<small>${U.esc(T.d)}</small>`}</span>`; };
+UI.traitChip = (t, removable, compact) => { const T = D.TRAITS[t]; if (!T) return ''; return `<span class="tchip on lv${T.lv}${T.neg ? ' neg' : ''}${T.custom ? ' cx' : ''}${compact ? ' sm' : ''}" title="${U.esc(T.d)}"><b>${'★'.repeat(T.lv >= 3 ? 1 : 0)}${U.esc(T.n)}${removable ? `<i class="x" data-rmt="${t}" role="button" aria-label="外す">✕</i>` : ''}</b>${compact ? '' : `<small>${U.esc(T.d)}</small>`}</span>`; };
 UI.renderEditor = () => {
   const cfg = UI.cfg, root = U.$('#scr-edit');
   const custom = cfg.mode === 'custom';
@@ -11587,7 +11775,7 @@ UI.renderEditor = () => {
     <p class="note">${{ ins: '本能型：突撃と乱戦に強く、伏兵を勘で察する。読めない動きで敵を崩す。', chi: '知略型：軍議で準備できる戦術が一つ増え、射撃区域と伏兵の効果が上がる。', bal: '均衡型：兵の士気が少し高い。どんな戦場でも崩れにくい。' }[cfg.style]}</p>
     <div class="sec-h">特性 <small class="note">${custom ? `${cfg.traits.length}個` : `${cfg.traits.length}/${UI.TRAIT_MAX}　★や上位はpt消費・短所はpt還元`}</small></div>
     <div class="chipgrid" id="e-traits">${cfg.traits.map(t => UI.traitChip(t, true, cfg.traits.length > 8)).join('') || '<p class="empty">なし</p>'}</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm pri" id="e-tpick">特性を選ぶ（全${D.TRAIT_ORDER.length}種）</button>${custom ? '' : '<button class="btn sm" id="e-trand">おまかせ</button>'}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm pri" id="e-tpick">特性を選ぶ（全${D.TRAIT_ORDER.length + D.CTR_IDS.length}種）</button><button class="btn sm" id="e-tmake">特性を作る${D.CTR_IDS.length ? `（自作${D.CTR_IDS.length}）` : ''}</button>${custom ? '' : '<button class="btn sm" id="e-trand">おまかせ</button>'}</div>
     <div class="sec-h">戦術 <small class="note">${cfg.tactics.length}${custom ? '' : '/' + tmax}　軍議で準備できる策</small></div>
     <div class="chipgrid" id="e-tacs">${tacChips || '<p class="empty">なし</p>'}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm pri" id="e-cpick">戦術を選ぶ（全${D.TACTIC_ORDER.length}種）</button>${custom ? '<button class="btn sm" id="e-call">すべて会得</button>' : '<button class="btn sm" id="e-cauto">おまかせ</button>'}</div>
@@ -11629,6 +11817,7 @@ UI.renderEditor = () => {
     const r = await UI.traitPicker({ selected: cfg.traits, max: custom ? 60 : UI.TRAIT_MAX, custom, cfg });
     if (r) { cfg.traits = r; if (!custom) UI.fitPool(cfg); rerender(); }
   };
+  U.$('#e-tmake').onclick = async () => { await UI.ctrWorkshop({ cfg }); rerender(); };
   const trand = U.$('#e-trand'); if (trand) trand.onclick = () => { const role = S.roleOf(cfg.rank); cfg.traits = S.genTraits(role === 'staff' ? 'staff' : role, rk.tier, 2).filter(t => UI.traitCost(t) <= 8); UI.fitPool(cfg); rerender(); };
   U.$('#e-cpick').onclick = async () => {
     const st2 = UI.effStats(cfg);
@@ -11668,8 +11857,8 @@ UI.traitPicker = (o) => UI.modal((box, close) => {
   const upd = () => { count.textContent = custom ? `選択中 ${sel.size}` : `選択中 ${sel.size}/${o.max}　特性のpt ${cost()}`; };
   const render = () => {
     const qq = q.trim();
-    const ids = D.TRAIT_ORDER.filter(id => {
-      const T = D.TRAITS[id];
+    const ids = D.TRAIT_ORDER.concat(D.CTR_IDS).filter(id => {
+      const T = D.TRAITS[id]; if (!T) return false;
       if (cat === 'sel') { if (!sel.has(id)) return false; }
       else if (cat !== 'all' && T.cat !== cat) return false;
       if (qq && !(T.n.includes(qq) || T.d.includes(qq) || D.TRAIT_CATS[T.cat].includes(qq))) return false;
@@ -11680,7 +11869,7 @@ UI.traitPicker = (o) => UI.modal((box, close) => {
       const dis = !custom && (T.uniq || T.cat === 'king' && !['kuns', 'josh'].includes(o.cfg?.rank));
       const mark = T.lv >= 3 ? '★' : T.lv === 2 ? '◆' : '';
       return `<button class="tp ${sel.has(id) ? 'on' : ''} ${T.neg ? 'neg' : ''}" data-t="${id}" ${dis ? 'disabled' : ''}><b>${mark}${U.esc(T.n)}<em>${D.TRAIT_CATS[T.cat]}${!custom && UI.traitCost(id) ? `・${UI.traitCost(id) > 0 ? '' : '+'}${Math.abs(UI.traitCost(id))}pt` : ''}</em></b><small>${U.esc(T.d)}</small></button>`;
-    }).join('') + (ids.length > 400 ? `<p class="note">ほか${ids.length - 400}件（検索で絞り込める）</p>` : '') + (ids.length ? '' : '<p class="empty">見つからない</p>');
+    }).join('') + (ids.length > 400 ? `<p class="note">ほか${ids.length - 400}件（検索で絞り込める）</p>` : '') + (ids.length ? '' : `<p class="empty">${cat === 'custom' && !qq ? 'まだない。主人公の画面の「特性を作る」で作れる。' : '見つからない'}</p>`);
     upd();
   };
   list.onclick = (e) => {
@@ -11705,6 +11894,184 @@ UI.traitPicker = (o) => UI.modal((box, close) => {
   const ok = U.h('button', { class: 'btn seal', style: { flex: 1 } }, '決定'); ok.onclick = () => close([...sel]);
   row.append(clr, cancel, ok); box.append(row);
   render();
+});
+/* ---------- 特性工房：自分で特性を作る ---------- */
+// 主人公の作成で、自作の特性を付ける・外す（通常モードは数と能力ptの範囲で）
+UI.ctrToggleCfg = (cfg, id) => {
+  const T = D.TRAITS[id]; if (!T) return false;
+  if (cfg.traits.includes(id)) { cfg.traits = cfg.traits.filter(t => t !== id); return true; }
+  if (cfg.mode !== 'custom') {
+    if (cfg.traits.length >= UI.TRAIT_MAX) { UI.toast(`通常モードの特性は${UI.TRAIT_MAX}つまで。カスタムならいくつでも付けられる`); return false; }
+    const left = UI.pool(cfg) - UI.used(cfg);
+    if (T.cost > left) { UI.toast(`能力ptが足りない（残り${left}pt・この特性は${T.cost}pt）。カスタムなら自由に付けられる`); return false; }
+  }
+  cfg.traits.push(id);
+  return true;
+};
+UI.ctrWorkshop = (o = {}) => UI.modal((box, close) => {
+  box.classList.add('tall', 'ctr');
+  const cfg = o.cfg || null, inGame = !!o.game && typeof G !== 'undefined' && !!G;
+  const normalCfg = !!cfg && cfg.mode !== 'custom';
+  let view = 'list', cur = null, pick = null, who = null, gateOk = false;
+  const btn = (label, cls, on) => { const b = U.h('button', { class: 'btn sm' + (cls ? ' ' + cls : '') }, label); if (on) b.onclick = on; return b; };
+  const R = () => { const y = box.scrollTop; box.innerHTML = ''; ({ list: vList, edit: vEdit, pick: vPick, who: vWho })[view](); box.scrollTop = y; };
+  const go = (v) => { view = v; box.innerHTML = ''; ({ list: vList, edit: vEdit, pick: vPick, who: vWho })[view](); box.scrollTop = 0; };
+
+  // 作った特性の一覧
+  const vList = () => {
+    UI.head(box, { title: '特性工房', body: '自分だけの特性を作って付けられる。作った特性はこのブラウザに残り、付けた特性はセーブにも写る。' + (normalCfg ? '\n通常モードでは強さに応じた能力ptを使う。カスタムなら自由に付けられる。' : '') });
+    box.append(U.h('div', { class: 'ctr-top' },
+      btn('＋ 新しく作る', 'seal', () => { cur = { id: 'cx_' + U.uid(), n: '', d: '', fx: {}, side: false, sk: null }; go('edit'); }),
+      btn('最強の特性を作る', 'pri', () => { cur = D.ctrMax(); go('edit'); })));
+    const ids = D.CTR_IDS.filter(id => D.TRAITS[id]).sort((a, b) => (D.TRAITS[b].ts || 0) - (D.TRAITS[a].ts || 0));
+    if (!ids.length) box.append(U.h('p', { class: 'empty' }, 'まだない。「新しく作る」か「最強の特性を作る」から始める。'));
+    for (const id of ids) {
+      const T = D.TRAITS[id];
+      const users = inGame ? S.ctrUsers(id) : [];
+      const card = U.h('div', { class: 'ctr-card' + (T.neg ? ' neg' : '') });
+      card.append(U.h('div', { class: 'ctr-h' }, U.h('b', {}, (T.lv >= 3 ? '★' : '') + T.n), U.h('span', { class: 'ctr-pw' }, `強さ ${U.num(T.pw)}${normalCfg ? `・${T.cost}pt` : ''}`)));
+      card.append(U.h('small', {}, T.d));
+      if (users.length) card.append(U.h('small', { class: 'ctr-users' }, '付けている人：' + users.map(x => (x.player ? '自分' : x.n)).join('・')));
+      const acts = U.h('div', { class: 'ctr-acts' });
+      if (cfg) { const on = cfg.traits.includes(id); acts.append(btn(on ? '主人公から外す' : '主人公に付ける', on ? '' : 'pri', () => { UI.ctrToggleCfg(cfg, id); R(); })); }
+      if (inGame) acts.append(btn('付ける・外す', 'pri', () => { who = id; go('who'); }));
+      acts.append(btn('直す', '', () => { cur = D.ctrDef(id); go('edit'); }));
+      acts.append(btn('写す', '', () => { const d = D.ctrDef(id); d.id = 'cx_' + U.uid(); d.n = (d.n + 'の写し').slice(0, 12); S.ctrPut(d); R(); }));
+      const del = btn('消す', 'ghost');
+      del.onclick = () => {
+        if (del.dataset.sure !== '1') { del.dataset.sure = '1'; del.textContent = 'もう一度押すと消す'; return; }
+        if (cfg) cfg.traits = cfg.traits.filter(t => t !== id);
+        UI.toast(S.ctrDelete(id) ? `「${T.n}」を消した` : '工房からは消した（付けている人がいるので、このゲームでは残る）');
+        R();
+      };
+      acts.append(del);
+      card.append(acts);
+      box.append(card);
+    }
+    box.append(U.h('div', { class: 'ctr-bottom' }, U.h('button', { class: 'btn seal', style: { flex: 1 }, onclick: () => close(true) }, '閉じる')));
+  };
+
+  // 作る・直す
+  const vEdit = () => {
+    const isNew = !D.TRAITS[cur.id];
+    UI.head(box, { title: isNew ? '特性を作る' : `「${D.TRAITS[cur.id].n}」を直す` });
+    const nm = U.h('input', { type: 'text', maxlength: 12, value: cur.n || '', placeholder: '例：天下無双', 'aria-label': '特性の名前', autocomplete: 'off' });
+    const ds = U.h('input', { type: 'text', maxlength: 80, value: cur.d || '', placeholder: '空欄なら効果から自動でつくる', 'aria-label': '特性の説明', autocomplete: 'off' });
+    box.append(U.h('div', { class: 'ctr-f' }, U.h('label', {}, '名前（12文字まで）'), nm, U.h('label', {}, '説明'), ds));
+    const pwl = U.h('div', { class: 'ctr-pwline', 'aria-live': 'polite' });
+    box.append(pwl);
+    box.append(U.h('div', { class: 'ctr-top' },
+      btn('最強にする', 'pri', () => { const m = D.ctrMax(cur); cur.fx = m.fx; cur.side = true; cur.sk = m.sk; if (!String(cur.n || '').trim()) cur.n = m.n; R(); }),
+      btn('効果をすべて外す', '', () => { cur.fx = {}; cur.side = false; cur.sk = null; R(); })));
+    const keys = Object.keys(cur.fx);
+    box.append(U.h('div', { class: 'ctr-eh' }, U.h('b', {}, `効果 ${keys.length}件`), btn('＋ 効果を足す', 'seal', () => { pick = new Set(Object.keys(cur.fx)); go('pick'); })));
+    const list = U.h('div', { class: 'ctr-fx' });
+    if (!keys.length) list.append(U.h('p', { class: 'empty' }, 'まだ効果がない。「効果を足す」から選ぶ。'));
+    for (const k of keys) {
+      const L = D.fxLim(k), t = D.FXK[k][1];
+      const row = U.h('div', { class: 'ctr-row' }, U.h('span', { class: 'ctr-k', title: D.FXK[k][0] }, D.FXK[k][0]));
+      if (t === 'f') row.append(U.h('span', { class: 'ctr-flag' }, 'あり'));
+      else {
+        const inp = U.h('input', { type: 'text', inputmode: 'numeric', value: String(D.fxToUi(k, cur.fx[k])), 'aria-label': `${D.FXK[k][0]}（${L.min}〜${L.max}${L.unit}）` });
+        const setv = (x) => { x = U.clamp(Math.round(Number(x) || 0), L.min, L.max); inp.value = String(x); if (x === 0) cur.fx[k] = 0; else cur.fx[k] = D.fxFromUi(k, x); upd(); };
+        inp.onchange = () => setv(String(inp.value).replace(/[^0-9-]/g, ''));
+        inp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } };
+        const pm = U.h('button', { class: 'ctr-pm', 'aria-label': `${D.FXK[k][0]}の正負を入れ替える` }, '±');
+        pm.onclick = () => setv(-Number(String(inp.value).replace(/[^0-9-]/g, '') || 0));
+        row.append(inp, U.h('span', { class: 'ctr-u' }, t === 'r' ? '%減' : L.unit), pm);
+      }
+      const x = U.h('button', { class: 'ctr-x', 'aria-label': `${D.FXK[k][0]}を外す` }, '✕');
+      x.onclick = () => { delete cur.fx[k]; R(); };
+      row.append(x);
+      list.append(row);
+    }
+    box.append(list);
+    const cb = U.h('input', { type: 'checkbox', checked: cur.side ? true : null });
+    cb.onchange = () => { cur.side = cb.checked; upd(); };
+    box.append(U.h('label', { class: 'ctr-opt' }, cb, U.h('span', {}, '総大将なら全軍に効く', U.h('small', {}, '自分が総大将の合戦では、能力以外の効果が味方の全部隊に効く（強さは2倍）'))));
+    const sel = U.h('select', { 'aria-label': '合戦で使える戦法' }, U.h('option', { value: '' }, '戦法なし'), ...D.CTR_SKILLS().map(k => U.h('option', { value: k, selected: cur.sk === k ? true : null }, `${D.SKILLS[k].n}：${D.SKILLS[k].d}`)));
+    sel.onchange = () => { cur.sk = sel.value || null; upd(); };
+    box.append(U.h('div', { class: 'ctr-f' }, U.h('label', {}, '合戦で使える戦法'), sel));
+    const save = U.h('button', { class: 'btn seal', style: { flex: 1 } }, '保存する');
+    const upd = () => {
+      cur.n = nm.value; cur.d = ds.value;
+      const pw = D.ctrPower(cur);
+      const tier = pw < 0 ? '短所' : pw >= 50 ? '天下に比類なし' : pw >= 8 ? '★上位' : pw >= 4 ? '二段目' : '一段目';
+      pwl.innerHTML = `強さ <b>${U.num(pw)}</b>　${tier}<br><small>通常モードで付けるなら${U.num(D.ctrCost(pw))}pt（組み込みの★は20pt）。カスタムなら自由に付けられる。</small>`;
+      const live = Object.keys(cur.fx).some(k => cur.fx[k]) || cur.sk;
+      save.disabled = !String(cur.n).trim() || !live;
+    };
+    nm.oninput = upd; ds.oninput = upd;
+    save.onclick = () => {
+      const T = S.ctrPut(cur); if (!T) return;
+      if (isNew && cfg && !cfg.traits.includes(T.id)) UI.ctrToggleCfg(cfg, T.id);
+      UI.toast(`「${T.n}」を${isNew ? '作った' : '直した'}`);
+      go('list');
+    };
+    box.append(U.h('div', { class: 'ctr-bottom' }, btn('やめる', '', () => go('list')), save));
+    upd();
+  };
+
+  // 効果を選ぶ
+  const vPick = () => {
+    UI.head(box, { title: '効果を選ぶ', body: '足したい効果をいくつでも選ぶ。数はあとで決める。' });
+    const q = U.h('input', { type: 'search', class: 'tp-search', placeholder: '効果を探す（例：騎兵、森、農業、一騎打ち）', 'aria-label': '効果を探す' });
+    const wrap = U.h('div', { class: 'ctr-pick' });
+    const cnt = U.h('div', { class: 'note', style: { marginTop: '6px', color: '#5b4b31' } });
+    const draw = () => {
+      const qq = q.value.trim();
+      wrap.innerHTML = D.FXG.map(([g, ks]) => {
+        const vis = ks.filter(k => !qq || D.FXK[k][0].includes(qq) || g.includes(qq));
+        return vis.length ? `<div class="ctr-g">${g}</div><div class="ctr-chips">${vis.map(k => `<button class="chip${pick.has(k) ? ' on' : ''}" data-k="${k}" aria-pressed="${pick.has(k)}">${D.FXK[k][0]}</button>`).join('')}</div>` : '';
+      }).join('') || '<p class="empty">見つからない</p>';
+      cnt.textContent = `選んでいる効果 ${pick.size}件`;
+    };
+    wrap.onclick = (e) => {
+      const b = e.target.closest('[data-k]'); if (!b) return;
+      const k = b.dataset.k;
+      if (pick.has(k)) pick.delete(k); else pick.add(k);
+      b.classList.toggle('on', pick.has(k)); b.setAttribute('aria-pressed', String(pick.has(k)));
+      cnt.textContent = `選んでいる効果 ${pick.size}件`;
+    };
+    let tmr = null;
+    q.oninput = () => { clearTimeout(tmr); tmr = setTimeout(draw, 120); };
+    box.append(q, wrap, cnt);
+    box.append(U.h('div', { class: 'ctr-bottom' },
+      btn('戻る', '', () => go('edit')),
+      btn('全部選ぶ', '', () => { for (const k in D.FXK) if (k !== 'noRetreat') pick.add(k); draw(); }),
+      U.h('button', { class: 'btn seal', style: { flex: 1 }, onclick: () => { for (const k of Object.keys(cur.fx)) if (!pick.has(k)) delete cur.fx[k]; for (const k of pick) if (!(k in cur.fx)) cur.fx[k] = D.fxFromUi(k, D.fxLim(k).def); go('edit'); } }, '決定')));
+    draw();
+  };
+
+  // 遊んでいるゲームで、自分や部下に付ける
+  const vWho = () => {
+    const T = D.TRAITS[who];
+    if (!T) { go('list'); return; }
+    UI.head(box, { title: `「${T.n}」を付ける`, body: '付ける人を選ぶ。外すこともできる。' });
+    if (G.mode !== 'custom' && !gateOk) {
+      box.append(U.h('p', { class: 'body ctr-gate' }, 'このゲームは通常モード。自作の特性を途中から付けると、このゲームはカスタム扱いになる（遊び方は変わらない）。'));
+      box.append(U.h('div', { class: 'ctr-bottom' }, btn('戻る', '', () => go('list')), U.h('button', { class: 'btn seal', style: { flex: 1 }, onclick: () => { G.mode = 'custom'; gateOk = true; R(); } }, 'カスタム扱いにして続ける')));
+      return;
+    }
+    const me = S.myOff();
+    const people = [me, ...G.me.army.subs.map(id => G.off[id]).filter(x => x && x.alive && x !== me)];
+    const list = U.h('div', { class: 'ctr-who' });
+    for (const x of people) {
+      const on = (x.tr || []).includes(who);
+      const info = x.player ? D.RANKS[G.me.rank].name : `${D.RANKS[x.r] ? D.RANKS[x.r].name : ''}${x.id === G.me.army.dep ? '・副官' : ''}　統${S.stat(x, 'tou')} 武${S.stat(x, 'bu')} 知${S.stat(x, 'chi')}`;
+      list.append(U.h('div', { class: 'ctr-wrow' }, U.h('div', { style: { minWidth: 0 } }, U.h('b', {}, x.player ? `${x.n}（自分）` : x.n), U.h('small', {}, info)),
+        btn(on ? '外す' : '付ける', on ? '' : 'pri', () => {
+          x.tr = on ? x.tr.filter(t => t !== who) : (x.tr || []).concat(who);
+          S.ctrSync();
+          UI.toast(on ? `${x.n}から「${T.n}」を外した` : `${x.n}に「${T.n}」を付けた`);
+          R();
+        })));
+    }
+    if (people.length === 1) list.append(U.h('p', { class: 'note', style: { color: '#5b4b31' } }, '部下がいれば、部下にも付けられる。'));
+    box.append(list);
+    box.append(U.h('div', { class: 'ctr-bottom' }, U.h('button', { class: 'btn seal', style: { flex: 1 }, onclick: () => go('list') }, '戻る')));
+  };
+  vList();
 });
 UI.startGame = async () => {
   const cfg = UI.cfg;
@@ -12743,9 +13110,22 @@ UI.sqRow = (s, gs) => {
     <input id="mv-r" type="range" min="1" max="${s.n}" step="1" value="${s.n}" aria-label="人数">
     <div class="mv-q">${[[0.25, '¼'], [0.5, '半分'], [0.75, '¾'], [1, '全部']].map(([f, l]) => `<button class="chip" data-q="${f}">${l}</button>`).join('')}</div>
     ${dsts.length ? `<div class="mv-row col"><span class="note">任せる先</span><div class="mv-dst">${dsts.map(g => `<button class="chip${g.id === sel ? ' on' : ''}" data-dst="${g.id}" aria-pressed="${g.id === sel}">${U.esc(g.id ? g.name : '直属（自分）')}</button>`).join('')}</div></div>` : `<p class="note" style="margin:0">移す先がない。部下が増えると兵を任せられる。</p>`}
-    <div class="mv-acts">${s.pv ? `<button class="btn sm ghost" data-disband>解散する</button>` : ''}<button class="btn sm seal" data-go ${dsts.length ? '' : 'disabled'}>移す</button></div>
+    <div class="mv-acts"><button class="btn sm seal" data-go ${dsts.length ? '' : 'disabled'}>移す</button></div>
+    ${UI.convHtml(s)}
+    ${s.pv ? `<div class="mv-acts"><button class="btn sm ghost" data-disband>解散する</button></div>` : ''}
   </div>`;
   return h;
+};
+// 兵種を変える（任務状は使わない）
+UI.allotTy = null;
+UI.convHtml = (s) => {
+  if (S.tier() < 2) return '';
+  const types = D.UT_TRAINABLE.filter(t => t !== s.t && A.canField(t));
+  if (!types.length) return `<p class="note" style="margin:0">兵種を変えるには厩舎・工房・鍛冶場が要る。</p>`;
+  if (!types.includes(UI.allotTy)) UI.allotTy = null;
+  return `<div class="mv-row col"><span class="note">兵種を変える（金がかかり、練度は6割になる）</span>
+    <div class="mv-ty">${types.map(t => `<button class="chip${t === UI.allotTy ? ' on' : ''}" data-ty="${t}" aria-pressed="${t === UI.allotTy}">${D.UT[t].n}<small> 金${A.convCost(t)}</small></button>`).join('')}</div></div>
+    <div class="mv-acts"><button class="btn sm pri" data-conv disabled>兵種を選ぶ</button></div>`;
 };
 UI.allotBind = (c) => {
   const A2 = G.me.army;
@@ -12763,6 +13143,27 @@ UI.allotBind = (c) => {
   rng.oninput = () => { inp.value = rng.value; };
   for (const b of U.$$('[data-q]', ed)) b.onclick = () => { inp.value = Math.max(1, Math.round(s.n * Number(b.dataset.q))); rng.value = inp.value; };
   for (const b of U.$$('[data-dst]', ed)) b.onclick = () => { UI.allotDst = b.dataset.dst; for (const x of U.$$('[data-dst]', ed)) { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); } };
+  // 兵種を変える
+  const cv = U.$('[data-conv]', ed);
+  const updConv = () => {
+    if (!cv) return;
+    const t = UI.allotTy, n = val();
+    if (!t) { cv.disabled = true; cv.textContent = '兵種を選ぶ'; return; }
+    const cost = n * A.convCost(t);
+    cv.disabled = n < 1 || cost > G.me.gold;
+    cv.textContent = cost > G.me.gold ? `金が足りない（金${U.fmt(cost)}）` : `${U.num(n)}人を${D.UT[t].n}に変える（金${U.fmt(cost)}）`;
+  };
+  for (const b of U.$$('[data-ty]', ed)) b.onclick = () => { UI.allotTy = UI.allotTy === b.dataset.ty ? null : b.dataset.ty; for (const x of U.$$('[data-ty]', ed)) { x.classList.toggle('on', x.dataset.ty === UI.allotTy); x.setAttribute('aria-pressed', String(x.dataset.ty === UI.allotTy)); } updConv(); };
+  inp.addEventListener('input', updConv); inp.addEventListener('change', updConv); rng.addEventListener('input', updConv);
+  for (const b of U.$$('[data-q]', ed)) b.addEventListener('click', updConv);
+  if (cv) cv.onclick = () => {
+    const t = UI.allotTy, n = val(); if (!t || n < 1) return;
+    const k = A.convertTroops(s.id, n, t);
+    if (k) { UI.toast(`${U.num(k)}人を${D.UT[t].n}に変えた（金-${U.fmt(k * A.convCost(t))}）`); S.log(`兵種転換：${U.num(k)}人を${D.UT[t].n}に変えた。`); UI.allotOpen = null; UI.allotTy = null; }
+    else UI.toast('変えられなかった');
+    redraw();
+  };
+  updConv();
   const go = U.$('[data-go]', ed);
   if (go) go.onclick = () => {
     const n = val(); if (n < 1) { UI.toast('人数を入れてください'); return; }
@@ -12890,10 +13291,11 @@ UI.pplTab = (c) => {
     <div class="sec-h">戦歴</div><div class="kv"><div><span>合戦</span><b>${me.rec.battles}</b></div><div><span>勝利</span><b>${me.rec.wins}</b></div><div><span>討った兵</span><b>${U.num(me.rec.kills)}</b></div><div><span>一騎打ち</span><b>${me.rec.duels}</b></div></div>
     ${me.rec.slain.length ? `<p class="note">討ち取った将：${me.rec.slain.slice(-12).map(U.esc).join('、')}</p>` : ''}
     <div class="sec-h">人物</div><div class="list">${rel(boss, '上官')}${gen && gen !== boss && gen.id !== o.id ? rel(gen, '所属軍の将') : ''}${ruler && ruler !== boss && !ruler.player ? rel(ruler, '君主') : ''}</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn sm" id="p-dir">人物録</button><button class="btn sm" id="p-items">持ち物</button></div>`;
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn sm pri" id="p-ctr">特性工房（自分で作る）</button><button class="btn sm" id="p-dir">人物録</button><button class="btn sm" id="p-items">持ち物</button></div>`;
   c.innerHTML = html;
   U.$('#p-dir').onclick = () => UI.directory();
   U.$('#p-items').onclick = () => UI.items();
+  U.$('#p-ctr').onclick = async () => { await UI.ctrWorkshop({ game: true }); UI.refresh(); };
 };
 UI.directory = () => UI.modal((box, close) => {
   UI.head(box, { title: '人物録' });
@@ -13303,6 +13705,7 @@ window.addEventListener('unhandledrejection', (e) => { try { UI.toast('エラー
 SAVE.ready = SAVE.initCloud();
 try { window.claude?.hot?.snapshot?.(() => (G ? { save: S.serialize(), tab: UI.curTab || 'map' } : {})); } catch (e) {}
 const boot = (data) => {
+  try { S.ctrBoot(); } catch (e) { console.warn(e); }
   try { MAP.init(); } catch (e) { console.warn(e); }
   try {
     if (data && data.save) { S.load(data.save); UI.main(data.tab || 'map'); return; }
