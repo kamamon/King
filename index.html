@@ -330,6 +330,50 @@ table.tbl th{color:var(--fg2);font-weight:500;font-size:12px}
   .bt-panel{left:auto;right:12px;bottom:12px;width:420px;border:1px solid var(--line);border-radius:12px;max-height:60%}
   .bt-hint{bottom:24px}
 }
+/* ---------- 部隊の割り振り ---------- */
+.al-bar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--bg3);border:1px solid var(--line);margin:2px 0 6px}
+.al-bar i{display:block;min-width:3px}
+.al-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--fg2);margin-bottom:10px}
+.al-leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+.ag{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.ag-h{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.ag-dot{width:6px;align-self:stretch;min-height:34px;border-radius:3px}
+.ag-who{min-width:0}
+.ag-who b{font-weight:700}
+.ag-who small{display:block;color:var(--fg2);font-size:12px;line-height:1.45}
+.ag-n{text-align:right;white-space:nowrap}
+.ag-n b{font-size:18px}
+.ag-n small{color:var(--fg2);font-size:12px;margin-left:2px}
+.ag-mode{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ag-ml{flex-basis:100%;font-size:12px;color:var(--fg2);letter-spacing:.04em}
+.ag-sqs{display:flex;flex-direction:column}
+.ag-f{display:flex;justify-content:flex-end}
+.sqr{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px 10px;align-items:center;padding:8px 0;border-top:1px dashed var(--line)}
+.sqr .ty{width:30px;height:30px;border-radius:6px;display:grid;place-items:center;font-family:var(--font-head);font-size:16px;background:var(--bg3);border:1px solid var(--line)}
+.sqr-m{min-width:0}
+.sqr-m small{display:block;color:var(--fg2);font-size:11.5px;line-height:1.4}
+.sqr-n b{font-size:16px}
+.sqr .btn.on{border-color:var(--jade)}
+.mv-ed{background:var(--bg3);border:1px solid var(--jade);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:10px;margin:2px 0 8px}
+.mv-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mv-row.col{flex-direction:column;align-items:stretch;gap:6px}
+.mv-row label{font-size:13px;color:var(--fg2)}
+.mv-row input[type=number]{width:8em;flex:none;text-align:right;font-size:17px;background:var(--bg2)}
+.mv-ed input[type=range]{width:100%;min-height:28px;padding:0;border:0;background:transparent}
+.mv-q,.mv-dst{display:flex;flex-wrap:wrap;gap:6px}
+.mv-acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.mv-acts .btn.warn{border-color:var(--bad);color:#f2a08c}
+.empty.sm{font-size:12.5px;padding:8px 0 2px;border-top:1px dashed var(--line)}
+.al-foot{display:flex;justify-content:flex-end;margin:2px 0 6px}
+.note.warn{color:var(--warn)}
+/* 数を入れる（竹簡） */
+.numask{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.na-row{display:flex;gap:8px;align-items:center}
+.modal .numask input[type=number]{background:rgba(255,250,232,.9);color:var(--ink);border-color:#9c8350;font-size:20px;text-align:right;width:9em;flex:none}
+.modal .numask input[type=range]{accent-color:#6b5228;width:100%;min-height:28px;padding:0;border:0;background:transparent}
+.na-unit{color:#5b4b31}
+.na-q{display:flex;gap:6px;flex-wrap:wrap}
+.na-info{font-weight:700;color:#1d150b}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <style>[hidden]{display:none!important}img{max-width:100%}</style>
@@ -3336,6 +3380,83 @@ S.squadName = s => {
   const ld = s.ld && G.off[s.ld] ? G.off[s.ld].n + '隊' : (s.pv ? '私兵' : '直属');
   return `${ut.n}（${ld}）`;
 };
+// 初期の兵糧（立場が上がるほど多い）
+S.startFood = (tier) => 1000 + 1000 * tier * tier;
+
+/* ---------- 軍の割り振り（任務状は使わない） ---------- */
+// 合戦での任せ方：self は主人公が自分で動かす。ほかは開戦と同時に隊長が判断して動かす
+S.ORDER_MODES = { self: '自ら指揮', attack: '攻勢', defend: '守勢', flank: '遊撃', follow: '追従' };
+S.ORDER_DESC = { self: '主人公が自分で動かす', attack: '敵を求めて攻める', defend: '持ち場を守る', flank: '敵の側背を突く（騎兵向き）', follow: '主人公の隊を守ってついて来る' };
+// 任せられる将か（統率60以上か知力65以上なら自ら判断して戦う）
+S.canLead = (x) => !!x && (S.stat(x, 'tou') >= 60 || S.stat(x, 'chi') >= 65);
+// 空の私兵の隊を消し、いなくなった部下の隊を直属に戻す
+S.tidyArmy = () => {
+  const A = G.me.army;
+  A.subs = (A.subs || []).filter(id => G.off[id] && G.off[id].alive);
+  for (const s of A.sq) {
+    if (s.pv) s.max = s.n;
+    if (s.ld && !A.subs.includes(s.ld)) s.ld = null;
+  }
+  A.sq = A.sq.filter(s => s.n > 0 || (!s.pv && s.max > 0));
+  if (A.dep && !A.subs.includes(A.dep)) A.dep = null;
+  if (A.orders) for (const id of Object.keys(A.orders)) if (!A.subs.includes(id)) delete A.orders[id];
+};
+// 隊 b を隊 a にまとめる（練度・装備は人数で平均）
+S.mergeInto = (a, b, n = b.n, share = b.max) => {
+  const tot = a.n + n;
+  if (tot > 0) {
+    a.tr = Math.round((a.tr * a.n + b.tr * n) / tot);
+    a.wl = Math.round((a.wl * a.n + b.wl * n) / tot);
+    a.al = Math.round((a.al * a.n + b.al * n) / tot);
+    a.xp = Math.round(((a.xp || 0) * a.n + (b.xp || 0) * n) / tot);
+  }
+  a.n = tot; a.max += share;
+};
+// 隊 sqId から n 人を ld（null は主人公の直属）へ移す。同じ兵種の隊があればまとめる
+S.moveTroops = (sqId, n, ld) => {
+  const A = G.me.army, s = A.sq.find(x => x.id === sqId);
+  ld = ld || null;
+  if (!s || (s.ld || null) === ld) return 0;
+  if (ld && !A.subs.includes(ld)) return 0;
+  n = Math.min(s.n, Math.max(0, Math.floor(n)));
+  if (!n) return 0;
+  const share = s.pv ? n : Math.min(s.max, Math.round(s.max * n / Math.max(1, s.n)));
+  let t = A.sq.find(x => x !== s && x.t === s.t && !!x.pv === !!s.pv && (x.ld || null) === ld);
+  if (!t) { t = S.newSquad(s.t, 0, { pv: s.pv, tr: s.tr, wl: s.wl, al: s.al, ld }); t.max = 0; t.xp = s.xp || 0; A.sq.push(t); }
+  S.mergeInto(t, s, n, share);
+  s.n -= n; s.max = Math.max(s.n, s.max - share);
+  S.tidyArmy();
+  return n;
+};
+// 同じ隊長・同じ兵種・国軍／私兵の別が同じ隊をまとめる
+S.mergeSquads = () => {
+  const A = G.me.army, seen = new Map(); let k = 0;
+  for (const s of A.sq) {
+    const key = [s.t, s.pv ? 1 : 0, s.ld || ''].join('|');
+    const a = seen.get(key);
+    if (!a) { seen.set(key, s); continue; }
+    S.mergeInto(a, s); s.n = 0; s.max = 0; k++;
+  }
+  S.tidyArmy();
+  return k;
+};
+// 私兵を解散する（領地へ帰農し、戸が少し増える）
+S.disband = (sqId, n) => {
+  const A = G.me.army, s = A.sq.find(x => x.id === sqId);
+  if (!s || !s.pv) return 0;
+  n = Math.min(s.n, Math.max(0, Math.floor(n)));
+  if (!n) return 0;
+  s.n -= n;
+  G.me.land.hh += Math.round(n / 5);
+  S.tidyArmy();
+  return n;
+};
+S.setOrder = (ld, mode) => {
+  const A = G.me.army;
+  if (!ld || !A.subs.includes(ld)) return;
+  A.orders = A.orders || {};
+  if (!mode || mode === 'self') delete A.orders[ld]; else A.orders[ld] = mode;
+};
 S.juePromote = () => {
   const me = G.me; let up = false;
   while (me.jue < 20 && me.merit >= D.JUE[me.jue + 1].m) { me.jue++; up = true; }
@@ -3367,7 +3488,7 @@ S.histOfficer = (h, late) => {
 };
 S.newGame = (cfg) => {
   G = {
-    v: 4, mode: cfg.mode || 'normal', custom: cfg.custom || null, year: D.START_YEAR, month: 1, turn: 0, diff: cfg.diff ?? 1,
+    v: 5, mode: cfg.mode || 'normal', custom: cfg.custom || null, year: D.START_YEAR, month: 1, turn: 0, diff: cfg.diff ?? 1,
     cty: {}, prov: {}, off: {}, nid: 1, dip: {}, log: [], hist: [], flags: {},
     offers: [], pend: [], reports: [], over: null, seed: Math.floor(Math.random() * 1e9),
   };
@@ -3472,9 +3593,9 @@ S.createPlayer = (cfg) => {
   const startGold = [0, 600, 1800, 4500, 10000, 22000, 45000, 100000, 220000, 450000, 2000000][tier];
   const me = G.me = {
     oid: o.id, rank: r, min: o.min, loc, boss: null, gen: null,
-    gold: startGold, food: 200 * tier * tier, ap: 0, merit: startMerit, jue, fame: 10 + tier * 8,
+    gold: startGold, food: S.startFood(tier), ap: 0, merit: startMerit, jue, fame: 10 + tier * 8,
     exp: { bu: 0, tou: 0, chi: 0, pol: 0, mi: 0 },
-    army: { sq: [], wu: [], subs: [], dep: null, stg: null },
+    army: { sq: [], wu: [], subs: [], dep: null, stg: null, orders: {} },
     land: { ha: 0, hh: 0, fac: {}, build: [], order: 60, loyal: 65, tax: 1, name: '' },
     jur: null, tac: [], tasks: [], items: [], eq: {},
     inj: 0, rec: { battles: 0, wins: 0, kills: 0, slain: [], duels: 0, prom: [] }, flags: {}, banner: cfg.banner || 0,
@@ -3512,6 +3633,7 @@ S.createPlayer = (cfg) => {
   const cu = cfg.custom;
   if (cu) {
     me.gold = Math.round(me.gold * (cu.gold || 1)) + (cu.gold > 1 ? 5000 * cu.gold : 0);
+    if (cu.food > 1) me.food = Math.round(me.food * cu.food);
     if (cu.troops > 1) for (const sq of me.army.sq) { if (me.army.wu.length && !sq.pv && !sq.ld) continue; sq.n = Math.round(sq.n * cu.troops); sq.max = Math.max(sq.max, sq.n); }
     if (cu.train) for (const sq of me.army.sq) sq.tr = Math.max(sq.tr, cu.train);
     if (cu.jue) { me.jue = Math.max(me.jue, cu.jue); o.jue = me.jue; S.applyJueLand(); }
@@ -3706,6 +3828,15 @@ S.migrate = () => {
     G.mode = G.mode || 'normal';
     G.v = 4;
   }
+  if (G.v < 5) {
+    // 軍の割り振り・私兵の枠の整理、初期兵糧の見直し
+    G.me.army.orders = G.me.army.orders || {};
+    S.tidyArmy();
+    const tier = D.RANKS[G.me.rank]?.tier || 1;
+    const bonus = Math.max(0, S.startFood(tier) - 200 * tier * tier);
+    if (bonus > 0) { G.me.food = (G.me.food || 0) + bonus; S.log(`兵糧の見直しで、蔵に兵糧${U.num(bonus)}石が届いた。`, 'good'); }
+    G.v = 5;
+  }
 };
 
 /* =========================================================
@@ -3718,6 +3849,8 @@ const HOOK = {
   choose: async (o) => (o.choices.find(c => !c.disabled) || o.choices[0]).v,
   info: async (o) => {},
   event: async (ev) => 0,
+  // 数を入れてもらう（画面では UI.askNumber）。テストでは既定値
+  number: async (o) => o.value ?? o.max,
 };
 
 /* ---------- 功績・昇進 ---------- */
@@ -3942,7 +4075,7 @@ W.playerEconomy = () => {
   if (cap > have && (L.fac.barracks > 0 || L.hh > 0)) {
     const add = Math.min(cap - have, Math.round(2 + L.fac.barracks * 6 + L.hh * 0.004));
     if (add > 0) {
-      let sq = me.army.sq.find(s => s.pv && s.t === 'inf');
+      let sq = me.army.sq.find(s => s.pv && s.t === 'inf' && !s.ld) || me.army.sq.find(s => s.pv && s.t === 'inf');
       if (!sq) { sq = S.newSquad('inf', 0, { pv: true, tr: 25 }); me.army.sq.push(sq); }
       sq.tr = Math.round((sq.tr * sq.n + 25 * add) / (sq.n + add)); sq.n += add; sq.max = Math.max(sq.max, sq.n);
       lines.push(`私兵が${add}人集まった（私兵 ${U.num(have + add)}／上限${U.num(cap)}）。`);
@@ -3961,6 +4094,7 @@ W.playerEconomy = () => {
       s.tr = Math.round((s.tr * s.n + 22 * add) / Math.max(1, s.n + add)); s.n += add;
     }
   }
+  S.tidyArmy();
   // 伍の負傷回復
   for (const w of me.army.wu) if (w.alive) w.hp = Math.min(100, w.hp + 25);
   if (me.inj > 0) { me.inj--; if (!me.inj) lines.push('傷が癒えた。'); }
@@ -4457,9 +4591,14 @@ W.playerUnits = (role, maxChunk) => {
   if (me.army.wu.length) { const main = me.army.sq.find(s => !s.pv && !s.ld) || me.army.sq[0]; if (main) { main.n = 1 + me.army.wu.filter(w => w.alive).length; main.max = 5; } }
   const sqs = me.army.sq.filter(s => s.n > 0);
   sqs.sort((a, b) => (a.ld ? 1 : 0) - (b.ld ? 1 : 0) || b.n - a.n);
+  const orders = me.army.orders || {};
   for (const s of sqs) {
     let n = s.n;
-    const ldSnap = s.ld && G.off[s.ld]?.alive ? W.snap(G.off[s.ld]) : null;
+    const ldOff = s.ld && G.off[s.ld]?.alive ? G.off[s.ld] : null;
+    const ldSnap = ldOff ? W.snap(ldOff) : null;
+    // 軍の割り振りで決めた任せ方（開戦と同時に隊長が動かす）
+    const mode = ldOff && orders[s.ld] && orders[s.ld] !== 'self' ? orders[s.ld] : null;
+    const pre = mode ? { mode, dep: { id: ldOff.id, n: ldOff.n, tou: S.stat(ldOff, 'tou'), chi: S.stat(ldOff, 'chi'), good: S.canLead(ldOff) } } : null;
     let first = true;
     while (n > 0) {
       const k = maxChunk && n > maxChunk * 1.4 ? maxChunk : n;
@@ -4468,6 +4607,7 @@ W.playerUnits = (role, maxChunk) => {
       if (isMain) { u.ld = W.snap(o); u.me = true; mainDone = true; if (me.army.wu.length) u.wu = me.army.wu.filter(w => w.alive).map(w => ({ id: w.id, n: w.n, bu: w.bu, hp: w.hp, tr: w.tr })); }
       else if (ldSnap && first) u.ld = ldSnap;
       else u.ld = W.tempLeader(o.c, Math.max(1, W.tierForSize(k)));
+      if (pre && !u.me) u.preDlg = pre;
       out.push(u);
       n -= k; first = false;
     }
@@ -4626,6 +4766,7 @@ W.applyBattleResult = (spec, br) => {
     s.xp = (s.xp || 0) + 1;
     for (const u of us) if (u.ldFate && u.ldFate !== 'ok' && s.ld && u.ldId === s.ld) { if (u.ldFate === 'slain') W.killOfficer(s.ld, '戦死'); }
   }
+  S.tidyArmy();
   // 伍
   for (const u of br.units) if (u.wu) for (const w of u.wu) {
     const m = me.army.wu.find(x => x.id === w.id); if (!m) continue;
@@ -5229,7 +5370,7 @@ A.def({ id: 'kenkin', cat: 'self', n: '献金', ap: 0, d: '私財を国庫に納
     W.gainMerit(Math.round(v / 60), '献金');
     return `金${U.fmt(v)}を国庫に納めた。`;
   } });
-A.def({ id: 'kaimono', cat: 'self', n: '市場', ap: 0, d: '武具・名馬・兵法書を買う。',
+A.def({ id: 'kaimono', cat: 'self', n: '市場', ap: 0, d: '兵糧・武具・名馬・兵法書を買う。',
   run: async () => UI.shop() });
 A.def({ id: 'jinzai', cat: 'self', n: '人材探索', ap: 1, d: '在野の人材を探して部下に迎える。', req: () => tier_() >= 3 ? true : '五百将・郷嗇夫以上',
   run: async () => {
@@ -5374,8 +5515,10 @@ A.def({ id: 'soubi', cat: 'army', n: '装備強化', ap: 1, d: '武器・防具�
     if (k === 'w') { me.gold -= cost(s.wl + 1); s.wl++; return `武器をLv${s.wl}にした。`; }
     me.gold -= cost(s.al + 1); s.al++; return `防具をLv${s.al}にした。`;
   } });
-A.def({ id: 'hensei', cat: 'army', n: '編成', ap: 1, d: '兵種の転換、隊長の任命、隊の分割と統合。', req: () => (hasArmy() && tier_() >= 2) || '百将以上',
-  run: async () => UI.organize() });
+A.def({ id: 'wariburi', cat: 'army', n: '部隊の割り振り', ap: 0, d: '誰にどれだけの兵を任せるかを人数で決める。合戦での任せ方も決められる。任務状は使わない。', req: () => (hasArmy() && (G.me.army.subs.length > 0 || G.me.army.sq.length > 1 || G.me.army.sq.some(s => s.pv))) || '部下か複数の隊が要る',
+  run: async () => { if (typeof UI !== 'undefined' && UI) { UI.curTab = 'army'; UI._scrollAllot = true; } return null; } });
+A.def({ id: 'hensei', cat: 'army', n: '兵種転換', ap: 1, d: '一部の兵を別の兵種に鍛え直す。金がかかり、練度が下がる。', req: () => (hasArmy() && tier_() >= 2) || '百将以上',
+  run: async () => A.convert() });
 A.def({ id: 'gono', cat: 'army', n: '伍の仲間', ap: 1, d: '伍の四人と語らい、一人を鍛える。', req: () => (G.me.army.wu.length > 0) || '伍長・里典のみ',
   run: async () => {
     const me = me_();
@@ -5756,15 +5899,46 @@ A.def({ id: 'shihei', cat: 'land', n: '私兵募集', ap: 1, d: '私領で兵を
   run: async () => {
     const me = me_(); const cap = S.pvCap(); const have = U.sum(me.army.sq.filter(s => s.pv), s => s.n);
     if (have >= cap) return `私兵は上限です（${U.num(cap)}人）。兵舎を建てると増やせる。`;
-    const add = Math.min(cap - have, Math.round(10 + me.land.fac.barracks * 25 + me.land.hh * 0.01));
-    const cost = add * 60;
-    if (!A.spend(cost)) return `金が足りない（${U.fmt(cost)}）。`;
-    const ty = await HOOK.choose({ title: '募る兵種', choices: D.UT_TRAINABLE.filter(t => A.canField(t)).map(t => ({ v: t, label: D.UT[t].n, sub: D.UT[t].desc })) }) || 'inf';
-    let sq = me.army.sq.find(s => s.pv && s.t === ty);
+    const per = A.PV_PRICE;
+    const lim = Math.min(cap - have, Math.round(10 + me.land.fac.barracks * 25 + me.land.hh * 0.01));
+    const maxN = Math.min(lim, Math.floor(me.gold / per));
+    if (maxN < 1) return `金が足りない（1人あたり金${per}）。`;
+    const ty = await HOOK.choose({ title: '募る兵種', choices: D.UT_TRAINABLE.filter(t => A.canField(t)).map(t => ({ v: t, label: D.UT[t].n, sub: D.UT[t].desc })).concat([{ v: null, label: 'やめる' }]) });
+    if (!ty) return null;
+    const add = await HOOK.number({ title: `${D.UT[ty].n}を何人募る？`, body: `一度に募れるのは${U.num(lim)}人まで（兵舎と食邑で増える）。1人あたり金${per}・毎月 兵糧2.5石と金15がかかる。\n私兵 ${U.num(have)}／上限${U.num(cap)}　金 ${U.fmt(me.gold)}`, min: 1, max: maxN, value: maxN, unit: '人', info: (n) => `金${U.fmt(n * per)}` });
+    if (!add) return null;
+    const n = Math.min(maxN, Math.max(1, Math.floor(add)));
+    me.gold -= n * per;
+    let sq = me.army.sq.find(s => s.pv && s.t === ty && !s.ld);
     if (!sq) { sq = S.newSquad(ty, 0, { pv: true, tr: 25 }); me.army.sq.push(sq); }
-    sq.tr = Math.round((sq.tr * sq.n + 25 * add) / (sq.n + add)); sq.n += add; sq.max = Math.max(sq.max, sq.n);
-    return `私兵${D.UT[ty].n}${add}人を募った（金-${U.fmt(cost)}）。`;
+    sq.tr = Math.round((sq.tr * sq.n + 25 * n) / (sq.n + n)); sq.n += n; sq.max = sq.n;
+    return `私兵の${D.UT[ty].n}を${U.num(n)}人募った（金-${U.fmt(n * per)}）。`;
   } });
+// 兵種転換（一部の兵を別の兵種へ）
+A.convert = async () => {
+  const me = G.me, A2 = me.army;
+  const s = await A.pickSquad('転換する部隊', false); if (!s || s === 'all') return null;
+  const types = D.UT_TRAINABLE.filter(t => t !== s.t && A.canField(t));
+  if (!types.length) return '転換できる兵種がない（厩舎・工房・鍛冶場で増える）。';
+  const t = await HOOK.choose({ title: '新しい兵種', body: '施設（厩舎・工房・鍛冶場）で選べる兵種が増える。', choices: types.map(t => ({ v: t, label: D.UT[t].n, sub: D.UT[t].desc + `　1人あたり金${Math.round(D.UT[t].cost * 40)}` })).concat([{ v: null, label: 'やめる' }]) });
+  if (!t) return null;
+  const per = Math.round(D.UT[t].cost * 40), maxN = Math.min(s.n, Math.floor(me.gold / per));
+  if (maxN < 1) return `金が足りない（1人あたり金${per}）。`;
+  const amt = await HOOK.number({ title: `何人を${D.UT[t].n}に転換する？`, body: `${S.squadName(s)}　${U.num(s.n)}人\n1人あたり金${per}。転換した兵の練度は6割になる。`, min: 1, max: maxN, value: maxN, unit: '人', info: (n) => `金${U.fmt(n * per)}` });
+  if (!amt) return null;
+  const n = Math.min(maxN, Math.max(1, Math.floor(amt)));
+  me.gold -= n * per;
+  const share = s.pv ? n : Math.min(s.max, Math.round(s.max * n / Math.max(1, s.n)));
+  const from = { tr: s.tr * 0.6, wl: s.wl, al: s.al, xp: s.xp || 0 };
+  s.n -= n; s.max = Math.max(s.n, s.max - share);
+  let ns = A2.sq.find(x => x.t === t && !!x.pv === !!s.pv && (x.ld || null) === (s.ld || null));
+  if (!ns) { ns = S.newSquad(t, 0, { pv: s.pv, tr: from.tr, wl: s.wl, al: s.al, ld: s.ld || null }); ns.max = 0; A2.sq.push(ns); }
+  S.mergeInto(ns, from, n, share);
+  S.tidyArmy();
+  return `${U.num(n)}人を${D.UT[t].n}に転換した。`;
+};
+A.PV_PRICE = 60;
+A.FOOD_PRICE = 8; // 市場の兵糧 1石あたりの金
 A.canField = (t) => {
   const req = D.UT_REQ[t]; if (!req) return true;
   const me = G.me;
@@ -6775,6 +6949,8 @@ B.aiFormations = (bt) => {
 B.start = (bt) => {
   if (bt.started) return;
   bt.started = true;
+  // 軍の割り振りで任せておいた隊は、開戦と同時に隊長が動かす
+  for (const u of bt.units) if (u.preDlg && u.side === 0 && !u.me && !u.delegate && B.alive(u)) B.delegate(bt, u, u.preDlg.mode, u.preDlg.dep);
   for (let s = 0; s < 2; s++) {
     const sd = bt.sides[s], foe = bt.sides[1 - s];
     if (sd.tactics.includes('ryugen')) { foe.mo -= 8; B.logMsg(bt, s === 0 ? '流言が敵陣に広まった。敵の士気が下がっている。' : '敵の流言で兵が動揺している……', s === 0 ? 'good' : 'bad'); }
@@ -6802,7 +6978,7 @@ B.mkUnit = (bt, su, id) => {
     mor: 70, morBase: 70, hidden: false, zone: null, zoneFired: {}, kills: 0, ldFate: 'ok', buffs: {}, cd: {}, routed: 0, dead: 0, out: false,
     spd: 0, aiT: Math.random() * 0.6, role: null, delegate: null, courier: null, attach: null, attOff: null, home: null,
     vis: [true, true], hitSide: { F: -9, L: -9, Rt: -9, R: -9 }, climb: null, onwall: null, impact: {}, routT: 0, pincerT: -99,
-    forced: null, wu: su.wu ? su.wu.map(w => Object.assign({ kills: 0, dead: false }, w)) : null, ldSnap: ld, mine: su.ctrl === 'player',
+    forced: null, wu: su.wu ? su.wu.map(w => Object.assign({ kills: 0, dead: false }, w)) : null, ldSnap: ld, mine: su.ctrl === 'player', preDlg: su.preDlg || null,
     heroAcc: 0, _eng: 0, _press: 0, lastOrderT: -99, feintT: 0, disT: 0, rgT: 0,
   };
   u.mv = ut.cls === 'cav' ? 1 : ut.cls === 'chr' ? 2 : ut.cls === 'sie' ? 3 : ((ut.mountain || (ld && ((ld.tr || []).includes('sangaku') || ld.mount))) ? 4 : 0);
@@ -10309,6 +10485,8 @@ V.showDeploy = (can) => {
   intel.push(`地勢：${D.TERRAIN_THEME[bt.spec.theme]?.n || ''}${bt.city ? (bt.city.pass ? '・関所' : '・城') : ''}${bt.maxDays > 1 ? `・最大${bt.maxDays}日` : ''}`);
   intel.push(`天候：${D.WEATHER[bt.weather]?.n || '晴れ'}`);
   if (sd.tactics.length) intel.push(`戦術：${sd.tactics.map(t => D.TACTICS[t].n).join('・')}`);
+  const pre = bt.units.filter(u => u.side === 0 && u.preDlg && B.alive(u));
+  if (pre.length) { const names = [...new Set(pre.map(u => u.preDlg.dep.n))]; intel.push(`任せた隊：${names.join('・')}の${pre.length}隊（開戦と同時に動く）`); }
   const role = bt.spec.role;
   const roleMsg = role === 'watch' ? '観戦：両軍ともAIが指揮する。' : role === 'unit' ? '上官の隊の最前列に付いている。命令を待つか、独断で動け。' : role === 'gunshi' ? '総軍師として全軍に指示を出せる。' : '総大将として全軍を指揮する。';
   el.innerHTML = `
@@ -11051,6 +11229,35 @@ UI.multiPick = (o) => UI.modal((box, close) => {
   row.append(cancel, ok); box.append(row);
   upd();
 });
+// 数を入れる（入力欄・つまみ・早押し）
+UI.askNumber = (o) => UI.modal((box, close) => {
+  UI.head(box, o);
+  const min = o.min ?? 0, max = Math.max(min, o.max ?? 0), step = o.step || 1;
+  let v = U.clamp(Math.round(o.value ?? max), min, max);
+  const inp = U.h('input', { type: 'number', inputmode: 'numeric', min, max, step, value: v, 'aria-label': o.title });
+  const rng = U.h('input', { type: 'range', min, max, step, value: v, 'aria-label': o.title });
+  const info = U.h('div', { class: 'na-info', 'aria-live': 'polite' });
+  const ok = U.h('button', { class: 'btn seal', style: { flex: 1 } }, '決定');
+  const upd = (nv, from) => {
+    v = U.clamp(Math.round(Number(nv) || 0), min, max);
+    if (from !== 'inp') inp.value = v;
+    if (from !== 'rng') rng.value = v;
+    info.textContent = `${U.num(v)}${o.unit || ''}${o.info ? '　' + o.info(v) : ''}`;
+    ok.disabled = v < Math.max(1, min);
+  };
+  inp.oninput = () => upd(inp.value, 'inp');
+  inp.onchange = () => upd(inp.value);
+  inp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); if (!ok.disabled) ok.click(); } };
+  rng.oninput = () => upd(rng.value, 'rng');
+  const q = U.h('div', { class: 'na-q' }, ...[[0.25, '¼'], [0.5, '半分'], [0.75, '¾'], [1, '最大']].map(([f, l]) => { const b = U.h('button', { class: 'chip' }, l); b.onclick = () => upd(Math.max(min, Math.round(max * f))); return b; }));
+  box.append(U.h('div', { class: 'numask' }, U.h('div', { class: 'na-row' }, inp, U.h('span', { class: 'na-unit' }, `／${U.num(max)}${o.unit || ''}`)), rng, q, info));
+  const cancel = U.h('button', { class: 'btn' }, 'やめる');
+  ok.onclick = () => { upd(inp.value); close(v); };
+  cancel.onclick = () => close(null);
+  box.append(U.h('div', { style: { display: 'flex', gap: '8px', marginTop: '14px' } }, cancel, ok));
+  upd(v);
+  if (window.matchMedia && window.matchMedia('(pointer: fine)').matches) setTimeout(() => { try { inp.focus({ preventScroll: true }); inp.select(); } catch (e) {} }, 40);
+});
 UI.copyBox = (o) => UI.modal((box, close) => {
   UI.head(box, o);
   const ta = U.h('textarea', { readonly: o.readonly ? true : null, id: 'copy-ta', 'aria-label': o.title });
@@ -11155,6 +11362,7 @@ UI.help = () => UI.info({
 `1. 国と立場（伍長〜君主、里典〜丞相）を選び、主人公の能力を決める。
 2. 毎月「任務状」の数だけ行動できる。立場ごとにできることが違う。
    ・武官：訓練・装備・出撃・戦場へ駆けつける
+   ・「軍」タブの「部隊の割り振り」で、部下に何人任せるかと合戦での任せ方を決められる（任務状は使わない）
    ・文官：管轄地の内政、大臣は国政、丞相・君主は国法・外交・戦争
 3. 行動を終えたら「月を進める」。各国が動き、戦や事件が起きる。
 4. 合戦はリアルタイム。部隊をタップして選び、地面で移動、敵で攻撃。
@@ -11275,9 +11483,10 @@ UI.defaultTactics = (cfg) => {
   for (const t of ok) if (!out.includes(t) && out.length < max) out.push(t);
   return out;
 };
-UI.customDefaults = () => ({ gold: 1, troops: 1, jue: 0, ap: 0, noDeath: false, noAge: false, hist: true, aggr: 1, train: 0 });
+UI.customDefaults = () => ({ gold: 1, food: 1, troops: 1, jue: 0, ap: 0, noDeath: false, noAge: false, hist: true, aggr: 1, train: 0 });
 UI.CUSTOM_OPTS = [
   { k: 'gold', n: '初期の金', o: [[1, '標準'], [5, '×5'], [20, '×20'], [100, '×100']] },
+  { k: 'food', n: '初期の兵糧', o: [[1, '標準'], [5, '×5'], [20, '×20'], [100, '×100']] },
   { k: 'troops', n: '初期の兵', o: [[1, '標準'], [2, '×2'], [5, '×5']] },
   { k: 'train', n: '兵の練度', o: [[0, '標準'], [60, '精鋭'], [85, '最精鋭']] },
   { k: 'ap', n: '任務状（毎月の行動）', o: [[0, '標準'], [1, '+1'], [2, '+2'], [3, '+3']] },
@@ -12456,35 +12665,120 @@ UI.actTab = (c) => {
 /* ---------- 軍 ---------- */
 UI.armyTab = (c) => {
   const me = G.me, o = S.myOff(), A2 = me.army;
+  S.tidyArmy();
   const tot = S.armyTotal(), cap = S.armyCap(), pv = U.sum(A2.sq.filter(s => s.pv), s => s.n);
   let html = `<div class="step-h" style="margin-top:0"><h2>軍</h2><small>${U.fmt(tot)}人（国軍 ${U.fmt(tot - pv)}／上限${U.fmt(cap)}・私兵 ${U.fmt(pv)}／${U.fmt(S.pvCap())}）</small></div>`;
   const quick = ['kunren', 'moukun', 'hojuu', 'soubi', 'hensei', 'gono', 'senjutsu'].map(id => A.list.find(a => a.id === id)).filter(a => a && A.status(a).show);
-  html += `<div style="display:flex;gap:6px;flex-wrap:wrap">${quick.map(a => `<button class="btn sm ${A.status(a).ok ? '' : ''}" data-a="${a.id}" ${A.status(a).ok ? '' : 'disabled'}>${a.n}${a.ap ? `（${a.ap}）` : ''}</button>`).join('')}</div>`;
+  html += `<div style="display:flex;gap:6px;flex-wrap:wrap">${quick.map(a => `<button class="btn sm" data-a="${a.id}" ${A.status(a).ok ? '' : 'disabled'}>${a.n}${a.ap ? `（${a.ap}）` : ''}</button>`).join('')}</div>`;
   if (A2.wu.length) {
     html += `<div class="sec-h">伍</div><div class="grid wide">`;
     html += `<div class="card wucard"><div class="face" style="border-color:var(--bronze)">${U.esc(o.sei)}</div><div><b>${U.esc(o.n)}（伍長）</b><div class="note">武${S.stat(o, 'bu')}　統${S.stat(o, 'tou')}</div></div></div>`;
     for (const w of A2.wu) html += `<div class="card wucard ${w.alive ? '' : 'dead'}"><div class="face">${U.esc(w.n.slice(0, 1))}</div><div style="min-width:0"><b>${U.esc(w.n)}${w.fresh ? ' <span class="pill">新兵</span>' : ''}</b><div class="note">武${w.bu}　体${Math.round(w.hp)}　絆${Math.round(w.bond)}${w.tr ? '　' + D.TRAITS[w.tr].n : ''}</div>${UI.bar(w.hp, 100, w.hp < 50 ? 'rd' : '')}</div></div>`;
     html += `</div>`;
   }
-  html += `<div class="sec-h">部隊</div><div class="list">`;
-  for (const s of A2.sq) {
-    const ut = D.UT[s.t];
-    const ld = s.ld && G.off[s.ld] ? G.off[s.ld] : null;
-    html += `<div class="card sq"><div class="ty">${ut.s}</div><div class="mid"><b>${ut.n}${s.pv ? ' <span class="pill">私兵</span>' : ''}</b><small>${ld ? `隊長 ${U.esc(ld.n)}（統${ld.tou}）` : '主人公の直属'}</small></div><div class="num" style="text-align:right"><b>${U.num(s.n)}</b><small class="note">/${U.num(s.max)}</small></div>
-      <div class="bars"><span>練度${Math.round(s.tr)}</span>${UI.bar(s.tr, 100, 'br')}<span>装備 武${s.wl}・防${s.al}</span>${UI.bar(s.wl + s.al, 10)}</div></div>`;
-  }
-  if (!A2.sq.length) html += '<p class="empty">兵はいない。</p>';
-  html += `</div>`;
-  if (A2.subs.length) {
-    html += `<div class="sec-h">副官・部下</div><div class="list">`;
-    for (const id of A2.subs) { const x = G.off[id]; if (!x || !x.alive) continue; const good = x.tou >= 60 || x.chi >= 65; html += `<div class="card" style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div style="min-width:0"><b>${U.esc(x.n)}</b>${id === A2.dep ? ' <span class="pill good">副官</span>' : ''}${good ? ' <span class="pill">任せられる</span>' : ''}<div class="note">武${x.bu} 統${x.tou} 知${x.chi} 政${x.pol} 魅${x.mi}${x.tr.length ? '　' + x.tr.map(t => D.TRAITS[t].n).join('・') : ''}</div></div><span class="note num">絆${Math.round(x.bond)}</span></div>`; }
-    html += `</div>`;
-  }
+  html += A2.sq.length || A2.subs.length ? UI.allotHtml() : `<div class="sec-h">部隊</div><p class="empty">兵はいない。</p>`;
   const tsm = me.tac.length > 10;
   html += `<div class="sec-h">会得した戦術 <small class="note">${me.tac.length}</small></div><div class="chipgrid">${me.tac.map(t => `<span class="tchip${tsm ? ' sm' : ''}" title="${U.esc(D.TACTICS[t].d)}"><b>${D.TACTICS[t].n}</b>${tsm ? '' : `<small>${D.TACTICS[t].d}</small>`}</span>`).join('') || '<p class="empty">まだない。「戦術研究」で会得できる。</p>'}</div>`;
   html += `<p class="note" style="margin-top:10px">合戦前の軍議で、会得した戦術から準備するものを選ぶ。準備できる数は総大将の知力で決まる。</p>`;
   c.innerHTML = html;
   for (const b of U.$$('[data-a]', c)) b.onclick = () => UI.runAct(b.dataset.a);
+  UI.allotBind(c);
+  if (UI._scrollAllot) { UI._scrollAllot = false; const el = U.$('#allot', c); if (el) requestAnimationFrame(() => el.scrollIntoView({ block: 'start' })); }
+};
+
+/* ---------- 部隊の割り振り（任務状は使わない） ---------- */
+UI.allotOpen = null;   // 開いている「移す」の隊
+UI.allotDst = null;    // 選んでいる移す先
+UI.ALLOT_COL = ['#62b39b', '#c9a14a', '#c47a52', '#8b9bd6', '#c48fb4', '#6fb0c9', '#a3b86a', '#d6a37a', '#9fa8a0'];
+UI.allotGroups = () => {
+  const A2 = G.me.army, o = S.myOff();
+  const gs = [{ id: '', off: o, name: o.n, role: '直属', sq: A2.sq.filter(s => !s.ld) }];
+  for (const id of A2.subs) {
+    const x = G.off[id]; if (!x || !x.alive) continue;
+    gs.push({ id, off: x, name: x.n, role: id === A2.dep ? '副官' : '部下', sq: A2.sq.filter(s => s.ld === id) });
+  }
+  gs.forEach((g, i) => { g.n = U.sum(g.sq, s => s.n); g.col = UI.ALLOT_COL[i % UI.ALLOT_COL.length]; });
+  return gs;
+};
+UI.allotHtml = () => {
+  const A2 = G.me.army, gs = UI.allotGroups(), orders = A2.orders || {};
+  const total = U.sum(gs, g => g.n);
+  let html = `<div class="sec-h" id="allot">部隊の割り振り <small class="note">任務状は使わない</small></div>`;
+  if (total > 0 && gs.length > 1) {
+    html += `<div class="al-bar" aria-hidden="true">${gs.filter(g => g.n).map(g => `<i style="flex:${g.n};background:${g.col}"></i>`).join('')}</div>`;
+    html += `<div class="al-leg">${gs.filter(g => g.n).map(g => `<span><i style="background:${g.col}"></i>${U.esc(g.id ? g.name : '直属')} ${Math.round(g.n / total * 100)}%</span>`).join('')}</div>`;
+  }
+  if (gs.length === 1 && G.me.army.wu.length === 0) html += `<p class="note" style="margin:0 0 8px">部下がいれば、ここで兵を任せられる（「人材探索」や昇進で部下が増える）。</p>`;
+  for (const g of gs) {
+    const x = g.off, me = !g.id;
+    const mode = me ? 'self' : (orders[g.id] || 'self');
+    html += `<div class="card ag" data-g="${g.id}"><div class="ag-h"><span class="ag-dot" style="background:${g.col}"></span>
+      <div class="ag-who"><b>${U.esc(g.name)}</b> <span class="pill${g.role === '副官' ? ' good' : ''}">${g.role}</span>
+      <small>${me ? '自ら率いる' : `統${S.stat(x, 'tou')} 武${S.stat(x, 'bu')} 知${S.stat(x, 'chi')}${(x.tr || []).length ? '・' + x.tr.slice(0, 2).map(t => D.TRAITS[t] ? D.TRAITS[t].n : '').filter(Boolean).join('・') : ''}`}</small></div>
+      <div class="ag-n num"><b>${U.num(g.n)}</b><small>人</small></div></div>`;
+    if (!me) {
+      html += `<div class="ag-mode" role="group" aria-label="${U.esc(g.name)}の合戦での任せ方"><span class="ag-ml">合戦での任せ方</span>${Object.entries(S.ORDER_MODES).map(([k, v]) => `<button class="chip${mode === k ? ' on' : ''}" data-om="${g.id}" data-mode="${k}" title="${S.ORDER_DESC[k]}" aria-pressed="${mode === k}">${v}</button>`).join('')}</div>`;
+      if (mode !== 'self') html += `<p class="note ${S.canLead(x) ? '' : 'warn'}" style="margin:0">${S.canLead(x) ? `開戦と同時に${U.esc(g.name)}が${S.ORDER_DESC[mode]}。` : '未熟なため、任せても持ち場を守るだけ（統率60か知力65以上で自ら判断する）。'}</p>`;
+    }
+    html += `<div class="ag-sqs">${g.sq.map(s => UI.sqRow(s, gs)).join('') || `<p class="empty sm">${me ? '直属の兵はいない。' : 'まだ兵を任せていない。'}</p>`}</div>`;
+    if (!me && g.role !== '副官') html += `<div class="ag-f"><button class="btn sm ghost" data-dep="${g.id}">副官にする</button></div>`;
+    html += `</div>`;
+  }
+  const canMerge = (() => { const k = new Set(); for (const s of A2.sq) { const key = [s.t, s.pv ? 1 : 0, s.ld || ''].join('|'); if (k.has(key)) return true; k.add(key); } return false; })();
+  if (canMerge) html += `<div class="al-foot"><button class="btn sm" data-merge>同じ隊長・同じ兵種の隊をまとめる</button></div>`;
+  return html;
+};
+UI.sqRow = (s, gs) => {
+  const ut = D.UT[s.t], open = UI.allotOpen === s.id;
+  let h = `<div class="sqr"><span class="ty">${ut.s}</span>
+    <div class="sqr-m"><b>${ut.n}</b>${s.pv ? ' <span class="pill">私兵</span>' : ''}<small>練度${Math.round(s.tr)}・武器${s.wl}・防具${s.al}${!s.pv && s.max > s.n ? `・欠員${U.num(s.max - s.n)}` : ''}</small></div>
+    <div class="sqr-n num"><b>${U.num(s.n)}</b></div>
+    <button class="btn sm${open ? ' on' : ''}" data-mv="${s.id}" aria-expanded="${open}" ${s.n > 0 ? '' : 'disabled'}>${open ? '閉じる' : '移す'}</button></div>`;
+  if (!open) return h;
+  const dsts = gs.filter(g => g.id !== (s.ld || ''));
+  const sel = dsts.some(g => g.id === UI.allotDst) ? UI.allotDst : (dsts[0] ? dsts[0].id : null);
+  UI.allotDst = sel;
+  h += `<div class="mv-ed" data-for="${s.id}">
+    <div class="mv-row"><label for="mv-n">人数</label><input id="mv-n" type="number" inputmode="numeric" min="1" max="${s.n}" step="1" value="${s.n}"><span class="note">／${U.num(s.n)}人</span></div>
+    <input id="mv-r" type="range" min="1" max="${s.n}" step="1" value="${s.n}" aria-label="人数">
+    <div class="mv-q">${[[0.25, '¼'], [0.5, '半分'], [0.75, '¾'], [1, '全部']].map(([f, l]) => `<button class="chip" data-q="${f}">${l}</button>`).join('')}</div>
+    ${dsts.length ? `<div class="mv-row col"><span class="note">任せる先</span><div class="mv-dst">${dsts.map(g => `<button class="chip${g.id === sel ? ' on' : ''}" data-dst="${g.id}" aria-pressed="${g.id === sel}">${U.esc(g.id ? g.name : '直属（自分）')}</button>`).join('')}</div></div>` : `<p class="note" style="margin:0">移す先がない。部下が増えると兵を任せられる。</p>`}
+    <div class="mv-acts">${s.pv ? `<button class="btn sm ghost" data-disband>解散する</button>` : ''}<button class="btn sm seal" data-go ${dsts.length ? '' : 'disabled'}>移す</button></div>
+  </div>`;
+  return h;
+};
+UI.allotBind = (c) => {
+  const A2 = G.me.army;
+  const redraw = () => UI.tab('army', true);
+  for (const b of U.$$('[data-mv]', c)) b.onclick = () => { UI.allotOpen = UI.allotOpen === b.dataset.mv ? null : b.dataset.mv; redraw(); };
+  for (const b of U.$$('[data-om]', c)) b.onclick = () => { S.setOrder(b.dataset.om, b.dataset.mode); redraw(); };
+  for (const b of U.$$('[data-dep]', c)) b.onclick = () => { A2.dep = b.dataset.dep; UI.toast(`${G.off[A2.dep].n}を副官にした`); redraw(); };
+  const mg = U.$('[data-merge]', c); if (mg) mg.onclick = () => { const k = S.mergeSquads(); UI.toast(k ? `${k}隊をまとめた` : 'まとめられる隊はない'); redraw(); };
+  const ed = U.$('.mv-ed', c); if (!ed) return;
+  const s = A2.sq.find(x => x.id === ed.dataset.for); if (!s) return;
+  const inp = U.$('#mv-n', ed), rng = U.$('#mv-r', ed);
+  const val = () => U.clamp(Math.floor(Number(inp.value) || 0), 0, s.n);
+  inp.oninput = () => { rng.value = val() || 1; };
+  inp.onchange = () => { inp.value = Math.max(1, val()); rng.value = inp.value; };
+  rng.oninput = () => { inp.value = rng.value; };
+  for (const b of U.$$('[data-q]', ed)) b.onclick = () => { inp.value = Math.max(1, Math.round(s.n * Number(b.dataset.q))); rng.value = inp.value; };
+  for (const b of U.$$('[data-dst]', ed)) b.onclick = () => { UI.allotDst = b.dataset.dst; for (const x of U.$$('[data-dst]', ed)) { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); } };
+  const go = U.$('[data-go]', ed);
+  if (go) go.onclick = () => {
+    const n = val(); if (n < 1) { UI.toast('人数を入れてください'); return; }
+    const dst = UI.allotDst || null, who = dst ? G.off[dst].n : '直属';
+    const moved = S.moveTroops(s.id, n, dst);
+    if (moved) { UI.toast(`${D.UT[s.t].n}${U.num(moved)}人を${who}${dst ? 'に任せた' : 'に戻した'}`); UI.allotOpen = null; }
+    redraw();
+  };
+  const db = U.$('[data-disband]', ed);
+  if (db) db.onclick = () => {
+    const n = val(); if (n < 1) { UI.toast('人数を入れてください'); return; }
+    if (db.dataset.sure !== '1') { db.dataset.sure = '1'; db.textContent = `${U.num(n)}人を解散する（もう一度押す）`; db.classList.add('warn'); return; }
+    const k = S.disband(s.id, n);
+    if (k) { UI.toast(`私兵${U.num(k)}人を解散した。領地へ帰った`); S.log(`私兵${U.num(k)}人を解散し、領地へ帰した。`); UI.allotOpen = null; }
+    redraw();
+  };
 };
 
 /* ---------- 領地・国 ---------- */
@@ -12627,64 +12921,21 @@ UI.items = async () => {
 UI.shop = async () => {
   const me = G.me;
   const stock = D.SHOP_BASE.filter(k => !me.items.includes(k));
-  const pick = await UI.choose({ title: `市場（金 ${U.fmt(me.gold)}）`, choices: stock.map(k => ({ v: k, label: `${D.ITEMS[k].n}　金${U.fmt(D.ITEMS[k].price)}`, sub: D.ITEMS[k].d + '　' + UI.itemEff(k), disabled: me.gold < D.ITEMS[k].price })).concat([{ v: null, label: '店を出る' }]) });
+  const fp = A.FOOD_PRICE;
+  const pick = await UI.choose({ title: `市場（金 ${U.fmt(me.gold)}・兵糧 ${U.fmt(me.food)}石）`, choices: [{ v: '_food', label: `兵糧を買う　1石 金${fp}`, sub: '私兵の食い扶持や民への施しに使う', disabled: me.gold < fp }].concat(stock.map(k => ({ v: k, label: `${D.ITEMS[k].n}　金${U.fmt(D.ITEMS[k].price)}`, sub: D.ITEMS[k].d + '　' + UI.itemEff(k), disabled: me.gold < D.ITEMS[k].price }))).concat([{ v: null, label: '店を出る' }]) });
   if (!pick) return null;
+  if (pick === '_food') {
+    const maxN = Math.floor(me.gold / fp);
+    const pvN = U.sum(me.army.sq.filter(s => s.pv), s => s.n);
+    const want = U.clamp(Math.round(pvN * 2.5 * 6 / 100) * 100, 100, maxN);
+    const n = await HOOK.number({ title: '兵糧を何石買う？', body: `1石 金${fp}。いまの蓄え ${U.fmt(me.food)}石${pvN ? `（私兵${U.num(pvN)}人で月に${U.fmt(pvN * 2.5)}石ほど減る）` : ''}`, min: 1, max: maxN, value: want, unit: '石', info: (k) => `金${U.fmt(k * fp)}` });
+    if (!n) return null;
+    const k = Math.min(maxN, Math.max(1, Math.floor(n)));
+    me.gold -= k * fp; me.food += k;
+    return `兵糧${U.num(k)}石を買った（金-${U.fmt(k * fp)}）。`;
+  }
   me.gold -= D.ITEMS[pick].price; me.items.push(pick); me.eq[D.ITEMS[pick].k] = pick;
   return `「${D.ITEMS[pick].n}」を買って身につけた。`;
-};
-UI.organize = async () => {
-  const me = G.me, A2 = me.army;
-  const k = await UI.choose({ title: '編成', choices: [
-    { v: 'conv', label: '兵種を転換する', sub: '一部の兵を別の兵種に鍛え直す（金がかかり、練度が下がる）' },
-    { v: 'lead', label: '隊長を任命する', sub: '部下を部隊の長にする' },
-    { v: 'dep', label: '副官を選ぶ', sub: '合戦で部隊を任せられる者' },
-    { v: 'merge', label: '同じ兵種の隊をまとめる' },
-    { v: null, label: 'やめる' },
-  ] });
-  if (!k) return null;
-  if (k === 'conv') {
-    const s = await A.pickSquad('転換する部隊', false); if (!s || s === 'all') return null;
-    const types = D.UT_TRAINABLE.filter(t => t !== s.t && A.canField(t));
-    const t = await UI.choose({ title: '新しい兵種', body: '施設（厩舎・工房・鍛冶場）で選べる兵種が増える。', choices: types.map(t => ({ v: t, label: D.UT[t].n, sub: D.UT[t].desc + `　1人あたり金${Math.round(D.UT[t].cost * 40)}` })).concat([{ v: null, label: 'やめる' }]) });
-    if (!t) return null;
-    const amt = await UI.choose({ title: '何人を転換する？', choices: [0.25, 0.5, 1].map(f => ({ v: Math.max(1, Math.round(s.n * f)), label: `${U.num(Math.max(1, Math.round(s.n * f)))}人`, sub: `金${U.fmt(Math.round(s.n * f * D.UT[t].cost * 40))}`, disabled: me.gold < Math.round(s.n * f * D.UT[t].cost * 40) })).concat([{ v: null, label: 'やめる' }]) });
-    if (!amt) return null;
-    me.gold -= Math.round(amt * D.UT[t].cost * 40);
-    s.n -= amt; const mx = Math.min(s.max, amt); s.max -= mx;
-    let ns = A2.sq.find(x => x.t === t && x.pv === s.pv && x.ld === s.ld);
-    if (!ns) { ns = S.newSquad(t, 0, { pv: s.pv, tr: s.tr * 0.6, wl: s.wl, al: s.al, ld: null }); A2.sq.push(ns); }
-    ns.tr = Math.round((ns.tr * ns.n + s.tr * 0.6 * amt) / (ns.n + amt)); ns.n += amt; ns.max += mx;
-    A2.sq = A2.sq.filter(x => x.n > 0 || x.max > 0);
-    return `${U.num(amt)}人を${D.UT[t].n}に転換した。`;
-  }
-  if (k === 'lead') {
-    const s = await A.pickSquad('隊長を任命する部隊', false); if (!s || s === 'all') return null;
-    const subs = A2.subs.map(id => G.off[id]).filter(x => x && x.alive);
-    const p = await UI.choose({ title: '隊長', choices: [{ v: '_me', label: '主人公の直属にする' }, ...subs.map(x => ({ v: x.id, label: x.n, sub: `武${x.bu} 統${x.tou} 知${x.chi}` }))].concat([{ v: null, label: 'やめる' }]) });
-    if (!p) return null;
-    for (const q of A2.sq) if (q.ld === p) q.ld = null;
-    s.ld = p === '_me' ? null : p;
-    return '隊長を任命した。';
-  }
-  if (k === 'dep') {
-    const subs = A2.subs.map(id => G.off[id]).filter(x => x && x.alive);
-    if (!subs.length) return '部下がいない。';
-    const p = await UI.choose({ title: '副官', choices: subs.map(x => ({ v: x.id, label: x.n, sub: `統${x.tou} 知${x.chi}${x.tou >= 60 || x.chi >= 65 ? '　任せられる' : ''}` })).concat([{ v: null, label: 'やめる' }]) });
-    if (!p) return null;
-    A2.dep = p; return `${G.off[p].n}を副官にした。`;
-  }
-  if (k === 'merge') {
-    let n = 0;
-    for (const t of Object.keys(D.UT)) {
-      const list = A2.sq.filter(s => s.t === t && !s.pv);
-      if (list.length < 2) continue;
-      const a = list[0];
-      for (const b of list.slice(1)) { a.tr = Math.round((a.tr * a.n + b.tr * b.n) / Math.max(1, a.n + b.n)); a.wl = Math.min(a.wl, b.wl); a.al = Math.min(a.al, b.al); a.n += b.n; a.max += b.max; b.n = 0; b.max = 0; n++; }
-    }
-    A2.sq = A2.sq.filter(s => s.max > 0);
-    return n ? `${n}隊をまとめた。` : 'まとめられる隊はない。';
-  }
-  return null;
 };
 UI.appoint = async () => {
   const o = S.myOff(), c = o.c, cc = G.cty[c];
@@ -13043,6 +13294,7 @@ HOOK.battle = async (spec) => {
 };
 HOOK.choose = (o) => UI.choose(o);
 HOOK.info = (o) => UI.info(o);
+HOOK.number = (o) => UI.askNumber(o);
 HOOK.duel = (o) => UI.duel(o);
 
 /* ---------- 起動 ---------- */
