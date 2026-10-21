@@ -3540,7 +3540,8 @@ S.genOfficer = (c, r, opt = {}) => {
 };
 S.officersOf = (c, filt) => Object.values(G.off).filter(o => o.c === c && o.alive && !o.ret && (!filt || filt(o)));
 S.bestGeneral = (c, exclude = []) => {
-  const gs = S.officersOf(c, o => ['dais', 'shog', 'goz', 'gunshi'].includes(o.r) && !exclude.includes(o.id) && o.id !== G.me.oid);
+  const mySubs = G.me && G.me.army ? G.me.army.subs : [];
+  const gs = S.officersOf(c, o => ['dais', 'shog', 'goz', 'gunshi'].includes(o.r) && !exclude.includes(o.id) && o.id !== G.me.oid && !mySubs.includes(o.id));
   return U.maxBy(gs, o => o.tou * 1.2 + o.bu * 0.4 + o.chi * 0.6 + (o.r === 'dais' ? 25 : o.r === 'shog' ? 12 : 0));
 };
 
@@ -4509,7 +4510,8 @@ W.makeCampaign = (c, plan) => {
   return { id: U.uid(), atk: c, def: tgt.o, src: plan.src, tgt: plan.tgt, atkTroops: plan.atk, defTroops: tgt.troops, atkCmd: atkCmd?.id, defCmd: defCmd?.id, kind };
 };
 W.pickCommander = (c, pid) => {
-  const local = S.officersOf(c, o => ['dais', 'shog', 'goz'].includes(o.r) && o.loc === pid && o.id !== G.me.oid);
+  const mySubs = G.me && G.me.army ? G.me.army.subs : [];
+  const local = S.officersOf(c, o => ['dais', 'shog', 'goz'].includes(o.r) && o.loc === pid && o.id !== G.me.oid && !mySubs.includes(o.id));
   return U.maxBy(local, o => o.tou + (o.r === 'dais' ? 20 : 0)) || S.bestGeneral(c) || G.off[G.cty[c].ruler];
 };
 
@@ -4760,38 +4762,52 @@ W.groupFor = t => {
   return U.ch(0.7) ? 'front' : (U.ch(0.5) ? 'left' : 'right');
 };
 
-W.playerUnits = (role, maxChunk) => {
+// 主人公の軍を合戦の部隊にする。割り振りのとおりに出し、勝手に分けない：
+// 同じ隊長・同じ兵種の隊は一つの部隊（国軍と私兵も合わせる）。兵のいない部下は出ない。
+W.playerUnits = (role) => {
   const me = G.me, o = S.myOff();
   const out = [];
-  let mainDone = false;
   if (me.army.wu.length) { const main = me.army.sq.find(s => !s.pv && !s.ld) || me.army.sq[0]; if (main) { main.n = 1 + me.army.wu.filter(w => w.alive).length; main.max = 5; } }
-  const sqs = me.army.sq.filter(s => s.n > 0);
-  sqs.sort((a, b) => (a.ld ? 1 : 0) - (b.ld ? 1 : 0) || b.n - a.n);
-  const orders = me.army.orders || {};
-  for (const s of sqs) {
-    let n = s.n;
-    const ldOff = s.ld && G.off[s.ld]?.alive ? G.off[s.ld] : null;
-    const ldSnap = ldOff ? W.snap(ldOff) : null;
-    // 軍の割り振りで決めた任せ方（開戦と同時に隊長が動かす）
-    const mode = ldOff && orders[s.ld] && orders[s.ld] !== 'self' ? orders[s.ld] : null;
-    const pre = mode ? { mode, dep: { id: ldOff.id, n: ldOff.n, tou: S.stat(ldOff, 'tou'), chi: S.stat(ldOff, 'chi'), good: S.canLead(ldOff) } } : null;
-    let first = true;
-    while (n > 0) {
-      const k = maxChunk && n > maxChunk * 1.4 ? maxChunk : n;
-      const isMain = !mainDone && !s.ld;
-      const u = { t: s.t, n: k, tr: s.tr, wl: s.wl, al: s.al, sq: s.id, ctrl: 'player', grp: 'player' };
-      if (isMain) { u.ld = W.snap(o); u.me = true; mainDone = true; if (me.army.wu.length) u.wu = me.army.wu.filter(w => w.alive).map(w => ({ id: w.id, n: w.n, bu: w.bu, hp: w.hp, tr: w.tr })); }
-      else if (ldSnap && first) u.ld = ldSnap;
-      else u.ld = W.tempLeader(o.c, Math.max(1, W.tierForSize(k)));
-      if (pre && !u.me) u.preDlg = pre;
-      out.push(u);
-      n -= k; first = false;
-    }
+  const groups = new Map();
+  for (const s of me.army.sq) {
+    if (s.n <= 0) continue;
+    const ld = s.ld && G.off[s.ld] && G.off[s.ld].alive ? s.ld : '';
+    const key = ld + '|' + s.t;
+    let g = groups.get(key);
+    if (!g) { g = { ld, t: s.t, sqs: [] }; groups.set(key, g); }
+    g.sqs.push(s);
   }
-  if (!mainDone && out.length) { out[0].ld = W.snap(o); out[0].me = true; }
-  // 主人公が兵を持たない場合（文官など）：護衛
-  if (!out.length) out.push({ t: 'guard', n: 5, tr: 50, wl: 1, al: 1, ctrl: 'player', grp: 'player', ld: W.snap(o), me: true, escort: true });
+  const list = [...groups.values()].map(g => {
+    const n = U.sum(g.sqs, s => s.n);
+    const avg = (k) => U.sum(g.sqs, s => (s[k] || 0) * s.n) / Math.max(1, n);
+    return Object.assign(g, { n, tr: Math.round(avg('tr')), wl: Math.round(avg('wl')), al: Math.round(avg('al')) });
+  });
+  // 主人公は直属で一番大きい部隊を率いる
+  list.sort((a, b) => (a.ld ? 1 : 0) - (b.ld ? 1 : 0) || b.n - a.n);
+  const orders = me.army.orders || {};
+  const led = new Set();
+  let mainDone = false;
+  for (const g of list) {
+    const off = g.ld ? G.off[g.ld] : null;
+    const u = { t: g.t, n: g.n, tr: g.tr, wl: g.wl, al: g.al, sq: g.sqs[0].id, sqs: g.sqs.length > 1 ? g.sqs.map(s => ({ id: s.id, n: s.n })) : null, ctrl: 'player', grp: 'player' };
+    if (!off && !mainDone) { u.ld = W.snap(o); u.me = true; mainDone = true; if (me.army.wu.length) u.wu = me.army.wu.filter(w => w.alive).map(w => ({ id: w.id, n: w.n, bu: w.bu, hp: w.hp, tr: w.tr })); }
+    else if (off && !led.has(g.ld)) { u.ld = W.snap(off); led.add(g.ld); }
+    else u.ld = W.retainer(off || o, o.c, g.n, !off);
+    // 軍の割り振りで決めた任せ方（開戦と同時に隊長が動かす）
+    const mode = off && orders[g.ld] && orders[g.ld] !== 'self' ? orders[g.ld] : null;
+    if (mode && !u.me) u.preDlg = { mode, dep: { id: off.id, n: off.n, tou: S.stat(off, 'tou'), chi: S.stat(off, 'chi'), good: S.canLead(off) } };
+    out.push(u);
+  }
+  // 直属の兵がいない（全部を部下に任せた・文官など）：主人公は護衛だけを連れて出る
+  if (!mainDone) out.unshift({ t: 'guard', n: out.length ? 20 : 5, tr: 50, wl: 1, al: 1, ctrl: 'player', grp: 'player', ld: W.snap(o), me: true, escort: true });
   return out;
+};
+// 主人公や部下の二つ目以降の兵種を率いる者（名のない隊長）
+W.retainer = (of, c, n, direct) => {
+  const cap = Math.max(1, (D.RANKS[of.r] ? D.RANKS[of.r].tier : 3) - 1);
+  const t = W.tempLeader(c, Math.max(1, Math.min(W.tierForSize(n), cap)));
+  t.n = `${of.n}${direct ? 'の直属' : 'の配下'}`; t.sei = of.sei || of.n.slice(0, 1); t.ret = true;
+  return t;
 };
 
 W.siegeKit = (units, c, total, side) => {
@@ -4854,7 +4870,7 @@ W.buildSpec = (o) => {
     let remain = X.troops;
     let units = [];
     if (isMe) {
-      const pu = W.playerUnits(o.role, Math.max(500, Math.ceil(total / unitCountTarget)));
+      const pu = W.playerUnits(o.role);
       const pTotal = U.sum(pu, u => u.n);
       remain = Math.max(0, remain - pTotal);
       for (const u of pu) { u.side = si; units.push(u); }
@@ -4872,8 +4888,10 @@ W.buildSpec = (o) => {
       if (o.role === 'commander' || o.role === 'gunshi' || o.role === 'top') sd.known = me.tac.slice();
       sd.cmd = o.role === 'commander' || o.role === 'top' ? W.snap(myOff) : sd.cmd;
     }
-    const offs = (X.officers || []).filter(x => x && x.alive && !x.player);
-    if (cmd && !cmd.player && !offs.includes(cmd)) offs.unshift(cmd);
+    // 主人公の部下は主人公の軍でだけ戦う（兵を任せていなければ出ない）
+    const mySubs = G.me && G.me.army ? G.me.army.subs : [];
+    const offs = (X.officers || []).filter(x => x && x.alive && !x.player && !mySubs.includes(x.id));
+    if (cmd && !cmd.player && !offs.includes(cmd) && !mySubs.includes(cmd.id)) offs.unshift(cmd);
     const au = W.armyUnits(X.c, Math.round(remain), { bandit: X.bandit, nomad: X.nomad, officers: offs, maxUnits: unitCountTarget, tr: X.tr });
     for (const u of au) { u.side = si; units.push(u); }
     // 本陣（総大将の隊）
@@ -4895,7 +4913,9 @@ W.buildSpec = (o) => {
   else if (meSide && me.army.stg && G.off[me.army.stg]?.alive) spec.sides[0].gunshi = W.snap(G.off[me.army.stg]);
   // 委任できる部下
   if (meSide && o.role !== 'watch') {
-    const ids = [me.army.dep, me.army.stg, ...me.army.subs].filter((x, i, a) => x && a.indexOf(x) === i);
+    // 委任できるのは、この合戦で兵を率いている部下だけ
+    const leading = new Set(spec.units.filter(u => u.ld && u.ld.id && u.ctrl === 'player' && !u.me).map(u => u.ld.id));
+    const ids = [me.army.dep, me.army.stg, ...me.army.subs].filter((x, i, a) => x && a.indexOf(x) === i && leading.has(x));
     spec.deputies = ids.map(id => G.off[id]).filter(x => x && x.alive).slice(0, 8).map(x => ({ id: x.id, n: x.n, tou: S.stat(x, 'tou'), chi: S.stat(x, 'chi'), bu: S.stat(x, 'bu') }));
   }
   spec.courier = G.flags.courier !== false;
@@ -4931,7 +4951,13 @@ W.applyBattleResult = (spec, br) => {
   // 兵の損害（主人公の部隊）
   const heal = 0.25 * (1 + S.fx(o, 'heal') + (br.healFx || 0));
   const bySq = {};
-  for (const u of br.units) if (u.sq) { (bySq[u.sq] = bySq[u.sq] || []).push(u); }
+  for (const u of br.units) {
+    if (u.sqs && u.sqs.length) {
+      // 一つにまとめて出した隊は、人数の割合で損害を分ける
+      const tot = U.sum(u.sqs, x => x.n) || 1;
+      for (const x of u.sqs) { const f = x.n / tot; (bySq[x.id] = bySq[x.id] || []).push({ n0: u.n0 * f, alive: u.alive * f, routed: u.routed * f, ldFate: u.ldFate, ldId: u.ldId }); }
+    } else if (u.sq) (bySq[u.sq] = bySq[u.sq] || []).push(u);
+  }
   for (const s of me.army.sq) {
     const us = bySq[s.id]; if (!us) continue;
     const n0 = U.sum(us, u => u.n0), alive = U.sum(us, u => u.alive), routed = U.sum(us, u => u.routed), dead = Math.max(0, n0 - alive - routed);
@@ -7159,7 +7185,7 @@ B.mkUnit = (bt, su, id) => {
   const ld = su.ld || null;
   const u = {
     id, side: su.side, t: su.t, ut, cls: ut.cls, n: su.n, n0: su.n, tr: su.tr ?? 40, wl: su.wl ?? 1, al: su.al ?? 1,
-    ld, ctrl: su.ctrl || 'ai', grp: su.grp || 'front', me: !!su.me, hq: !!su.hq, parentOfMe: !!su.parentOfMe, sq: su.sq || null, escort: !!su.escort,
+    ld, ctrl: su.ctrl || 'ai', grp: su.grp || 'front', me: !!su.me, hq: !!su.hq, parentOfMe: !!su.parentOfMe, sq: su.sq || null, sqs: su.sqs || null, escort: !!su.escort,
     x: 0, y: 0, a: su.side === 0 ? 0 : Math.PI, form: B.defaultForm(su.t), cells: [], cols: 1, rows: 1, w: 2, h: 2, fp: 1, per: 5,
     state: 'idle', order: null, path: null, pi: 0, pathT: -9, eng: [], engT: 0, chaos: false, fat: 0, ammo: ut.ammo || 0, reload: Math.random() * 3,
     mor: 70, morBase: 70, hidden: false, zone: null, zoneFired: {}, kills: 0, ldFate: 'ok', buffs: {}, cd: {}, routed: 0, dead: 0, out: false,
@@ -7598,7 +7624,9 @@ B.addCatapults = (bt, s) => {
     B.unitFx(bt, u);
   }
 };
-B.unitName = (bt, u) => `${u.ld ? u.ld.n : '無名'}隊（${D.UT[u.t].n}）`;
+B.unitName = (bt, u) => `${u.ld ? (u.ld.ret ? u.ld.n : u.ld.n + '隊') : '無名隊'}（${D.UT[u.t].n}）`;
+// 名のない隊長は「○○の直属の隊長」と呼ぶ
+B.ldName = (ld) => (ld ? (ld.ret ? ld.n + 'の隊長' : ld.n) : '');
 B.dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 B.edgeDist = (a, b) => Math.max(0, B.dist(a, b) - (Math.min(a.w, a.h) + Math.min(b.w, b.h)) * 0.5);
 B.sight = (bt, u) => { let s = (u.cls === 'cav' ? 260 : 190) * bt.p * (1 + B.F(u, 'sight')); const t = B.groundT(bt, u.x, u.y); if (t === D.T.HILL || t === D.T.ROCK) s *= 1.35; if (t === D.T.FOREST || t === D.T.VILLAGE) s *= 0.75; else if (t === D.T.GROVE) s *= 0.88; if (u.onwall) s *= 1.3; if (bt.weather === 'fog') s *= 0.55; else if (bt.weather === 'rain' || bt.weather === 'snow') s *= 0.85; return s; };
@@ -8328,7 +8356,7 @@ B.leaderHit = (bt, u, killer) => {
   if (!u.ld || u.ldFate !== 'ok') return;
   if (u.ld.player) { B.playerHit(bt, u, killer, false); return; }
   const bu = u.ld.bu || 40;
-  if (Math.random() < 0.35 + bu / 300 + B.F(u, 'lead_surv') * 0.3 + B.F(u, 'luck') * 0.2) { B.logMsg(bt, `${u.ld.n}が負傷した！`, u.side === 0 ? 'bad' : 'good'); B.morHit(bt, u, 10); return; }
+  if (Math.random() < 0.35 + bu / 300 + B.F(u, 'lead_surv') * 0.3 + B.F(u, 'luck') * 0.2) { B.logMsg(bt, `${B.ldName(u.ld)}が負傷した！`, u.side === 0 ? 'bad' : 'good'); B.morHit(bt, u, 10); return; }
   B.leaderLost(bt, u, killer, Math.random() < 0.8 - (killer ? B.F(killer, 'capture') * 0.5 : 0));
 };
 B.leaderLost = (bt, u, killer, killed) => {
@@ -8337,8 +8365,8 @@ B.leaderLost = (bt, u, killer, killed) => {
   const side = bt.sides[u.side];
   const isCmd = u.hq || (side.cmd && ld.n === side.cmd.n);
   const tier = ld.r ? (D.RANKS[ld.r]?.tier || 3) : 3;
-  B.text(bt, u.x, u.y, killed ? `${ld.n} 討ち取ったり！` : `${ld.n}を捕縛！`, u.side === 0 ? 'bad' : 'good');
-  B.logMsg(bt, `${S_cname(bt, u.side)}の${ld.n}が${killed ? '討たれた' : '捕らえられた'}！`, u.side === 0 ? 'bad' : 'good');
+  B.text(bt, u.x, u.y, killed ? `${B.ldName(ld)} 討ち取ったり！` : `${B.ldName(ld)}を捕縛！`, u.side === 0 ? 'bad' : 'good');
+  B.logMsg(bt, `${S_cname(bt, u.side)}の${B.ldName(ld)}が${killed ? '討たれた' : '捕らえられた'}！`, u.side === 0 ? 'bad' : 'good');
   for (const c of u.cells) c.mor -= 30;
   side.mo -= isCmd ? 28 * (killer && killer.fx && killer.fx.vs_hq ? 1.3 : 1) : Math.min(14, 3 + tier * 1.4);
   bt.sides[1 - u.side].mo += isCmd ? 10 : 3;
@@ -9458,7 +9486,7 @@ B.result = (bt) => {
     out.sides.push({ start: bt.sides[s].start, alive, routed, dead: Math.max(0, bt.sides[s].start - alive - routed) });
   }
   for (const u of bt.units) {
-    out.units.push({ side: u.side, t: u.t, sq: u.sq, n0: u.n0, alive: u.n, routed: u.routed, kills: u.kills, ldId: u.ldSnap?.id || null, ldFate: u.ldFate, wu: u.wu ? u.wu.map(w => ({ id: w.id, dead: !!w.dead, hp: w.out ? 15 : (w.hp ?? 100), kills: w.kills || 0 })) : null, me: u.me });
+    out.units.push({ side: u.side, t: u.t, sq: u.sq, sqs: u.sqs || null, n0: u.n0, alive: u.n, routed: u.routed, kills: u.kills, ldId: u.ldSnap?.id || null, ldFate: u.ldFate, wu: u.wu ? u.wu.map(w => ({ id: w.id, dead: !!w.dead, hp: w.out ? 15 : (w.hp ?? 100), kills: w.kills || 0 })) : null, me: u.me });
   }
   let offMerit = 0;
   for (const x of bt.stat.slain) {
@@ -10672,6 +10700,8 @@ V.showDeploy = (can) => {
   intel.push(`地勢：${D.TERRAIN_THEME[bt.spec.theme]?.n || ''}${bt.city ? (bt.city.pass ? '・関所' : '・城') : ''}${bt.maxDays > 1 ? `・最大${bt.maxDays}日` : ''}`);
   intel.push(`天候：${D.WEATHER[bt.weather]?.n || '晴れ'}`);
   if (sd.tactics.length) intel.push(`戦術：${sd.tactics.map(t => D.TACTICS[t].n).join('・')}`);
+  const own = bt.units.filter(u => u.side === 0 && u.mine && !u.escort && u.sq && B.alive(u));
+  if (own.length) intel.push(`自軍：${own.slice(0, 6).map(u => `${u.ld ? u.ld.n : ''}（${D.UT[u.t].n}${U.fmt(u.n)}）`).join('・')}${own.length > 6 ? ` ほか${own.length - 6}隊` : ''}`);
   const pre = bt.units.filter(u => u.side === 0 && u.preDlg && B.alive(u));
   if (pre.length) { const names = [...new Set(pre.map(u => u.preDlg.dep.n))]; intel.push(`任せた隊：${names.join('・')}の${pre.length}隊（開戦と同時に動く）`); }
   const role = bt.spec.role;
