@@ -252,6 +252,35 @@ table.tbl th{color:var(--fg2);font-weight:500;font-size:12px}
 .lrow .gr{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
 .lrow .gr span{font-size:11px;border:1px solid currentColor;border-radius:999px;padding:0 7px;opacity:.65}
 .lrow .gr span.on{opacity:1;background:var(--bronze);color:#1e160a;border-color:var(--bronze)}
+/* 郡の拠点 */
+.sec-h.sm{font-size:13.5px;margin:14px 0 6px}
+.hbar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:0 0 8px;border:1px solid var(--line)}
+.hbar i{display:block;height:100%}
+.hrows{display:flex;flex-direction:column;gap:4px}
+.hrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg2);min-height:40px}
+.hrow .cseal{flex:none}
+.hrow.big{border-color:var(--bronze2)}
+.hrow.fx{border-color:rgba(194,69,47,.7);background:rgba(194,69,47,.08)}
+.hrow.sel{box-shadow:inset 0 0 0 1px var(--bronze)}
+.hr-m{min-width:0}.hr-m b{font-size:14px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.hr-m small{color:var(--fg2);font-size:11.5px;display:block;line-height:1.4}
+.hr-d{font-size:12px;color:var(--fg2);white-space:nowrap}
+/* 出撃する部隊 */
+.sortie-rows{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.so-row{border:1px solid #9c8350;border-radius:8px;padding:8px 10px;background:rgba(255,250,232,.5);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
+.so-l{min-width:0}.so-l b{display:block;font-size:14px}.so-l small{color:#5b4b31;font-size:12px}
+.so-n{display:flex;align-items:center;gap:4px}
+.so-n input{width:6.5em;padding:6px;border:1px solid #9c8350;border-radius:6px;background:rgba(255,250,232,.85);color:var(--ink);font:inherit;text-align:right;min-height:36px}
+.so-n small{color:#5b4b31;font-size:12px}
+.so-row input[type=range]{width:100%;min-width:0;accent-color:#6b5228;margin:0}
+.so-q{display:flex;gap:4px;justify-content:flex-end}
+.so-q .chip{padding:3px 9px;min-height:30px;font-size:12.5px}
+.so-row.off{opacity:.6}
+.so-foot{position:sticky;bottom:calc(-18px - env(safe-area-inset-bottom,0px));margin:12px calc(-1 * var(--gut-r)) calc(-18px - env(safe-area-inset-bottom,0px)) calc(-1 * var(--gut-l));padding:10px var(--gut-r) calc(14px + env(safe-area-inset-bottom,0px)) var(--gut-l);background:linear-gradient(180deg,rgba(216,199,147,.9),#d8c793 30%);border-top:1px solid rgba(107,82,40,.45)}
+.so-foot .body{margin-top:0!important}
+.sortie-rem{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;line-height:1.5}
+.sortie-rem input{width:18px;height:18px;accent-color:#2e4a3f;flex:none}
+.sortie-pref{margin-top:10px}.sortie-pref .seg{margin-top:6px}
 /* 昇進の条件 */
 .conds{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--fg2)}
 .conds li{display:flex;align-items:baseline;gap:3px}
@@ -389,7 +418,8 @@ table.tbl th{color:var(--fg2);font-weight:500;font-size:12px}
 .ag-mode{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .ag-ml{flex-basis:100%;font-size:12px;color:var(--fg2);letter-spacing:.04em}
 .ag-sqs{display:flex;flex-direction:column}
-.ag-f{display:flex;justify-content:flex-end}
+.ag-f{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.ag-f .btn.warn{border-color:var(--bad);color:#f2a08c}
 .sqr{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px 10px;align-items:center;padding:8px 0;border-top:1px dashed var(--line)}
 .sqr .ty{width:30px;height:30px;border-radius:6px;display:grid;place-items:center;font-family:var(--font-head);font-size:16px;background:var(--bg3);border:1px solid var(--line)}
 .sqr-m{min-width:0}
@@ -2824,10 +2854,13 @@ GEO.site = (pid, opt = {}) => {
   const cs = GEO.byProv[pid] || [];
   let x = P.x, y = P.y, town = cs[0] || null;
   const rnd = opt.rng || Math.random;
-  if (opt.from) {
+  if (opt.from && !opt.at) {
     // 国境寄り：二つの郡の間
     const F = D.PROVINCES.find(p => p.id === opt.from);
     if (F) { const t = 0.35 + rnd() * 0.25; x = P.x + (F.x - P.x) * t; y = P.y + (F.y - P.y) * t; town = U.minBy(cs, c => Math.hypot(c.x - x, c.y - y)); }
+  } else if (opt.at) {
+    // 決まった場所（拠点）
+    x = opt.at.x; y = opt.at.y; town = U.minBy(cs, c => Math.hypot(c.x - x, c.y - y)) || town;
   } else if (opt.county) {
     const c = GEO.county(opt.county); if (c) { x = c.x; y = c.y; town = c; }
   } else if (opt.field && cs.length > 1) {
@@ -3470,11 +3503,11 @@ S.dip = (a, b) => {
 S.atWar = (a, b) => a !== b && S.dip(a, b).st === 'war';
 S.allied = (a, b) => a === b || S.dip(a, b).st === 'ally';
 S.ownedProvs = c => Object.values(G.prov).filter(p => p.o === c);
-S.countryTroops = c => U.sum(S.ownedProvs(c), p => p.troops);
+S.countryTroops = c => U.sum(S.ownedProvs(c), p => p.troops) + (G.hold ? S.garrisonOf(c) : 0);
 S.countryPop = c => U.sum(S.ownedProvs(c), p => p.pop);
 S.countryPower = c => {
   const ps = S.ownedProvs(c); if (!ps.length) return 0;
-  const tr = U.sum(ps, p => p.troops);
+  const tr = U.sum(ps, p => p.troops) + (G.hold ? S.garrisonOf(c) : 0);
   const gens = Object.values(G.off).filter(o => o.c === c && o.alive && !o.ret && ['dais', 'shog'].includes(o.r));
   const gq = gens.length ? U.avg(gens.slice(0, 6), o => o.tou) : 50;
   return tr * (0.6 + gq / 200);
@@ -3738,6 +3771,21 @@ S.disband = (sqId, n) => {
   S.tidyArmy();
   return n;
 };
+// 部下を解任する（任せていた兵は直属に戻る。本人は国の将に戻り、主人公を恨む）
+S.dismissSub = (id) => {
+  const A = G.me.army, x = G.off[id];
+  if (!A.subs.includes(id)) return false;
+  A.subs = A.subs.filter(v => v !== id);
+  for (const s of A.sq) if (s.ld === id) s.ld = null;
+  if (A.dep === id) A.dep = null;
+  if (A.stg === id) A.stg = null;
+  if (A.orders) delete A.orders[id];
+  if (x) { x.lord = null; x.bond = Math.min(x.bond || 0, -20); }
+  // 残る部下は少し不安になる
+  for (const sid of A.subs) { const y = G.off[sid]; if (y) y.bond = Math.max(-100, (y.bond || 0) - 2); }
+  S.mergeSquads();
+  return true;
+};
 S.setOrder = (ld, mode) => {
   const A = G.me.army;
   if (!ld || !A.subs.includes(ld)) return;
@@ -3865,7 +3913,7 @@ S.histOfficer = (h, late) => {
 };
 S.newGame = (cfg) => {
   G = {
-    v: 6, mode: cfg.mode || 'normal', custom: cfg.custom || null, year: D.START_YEAR, month: 1, turn: 0, diff: cfg.diff ?? 1,
+    v: 7, mode: cfg.mode || 'normal', custom: cfg.custom || null, year: D.START_YEAR, month: 1, turn: 0, diff: cfg.diff ?? 1,
     cty: {}, prov: {}, off: {}, nid: 1, dip: {}, log: [], hist: [], flags: {},
     offers: [], pend: [], reports: [], over: null, seed: Math.floor(Math.random() * 1e9),
   };
@@ -3885,6 +3933,8 @@ S.newGame = (cfg) => {
     if (p.pass) pv.troops = 25000;
     G.prov[p.id] = pv;
   }
+  // 拠点（中都市・小都市・地域）
+  S.initHoldings();
   // economy
   for (const id of D.CORDER) {
     const pop = S.countryPop(id);
@@ -4247,6 +4297,12 @@ S.migrate = () => {
     me.epi = me.epi || []; me.epiSel = me.epiSel ?? null; me.feats = me.feats || {};
     S.log(`官職に三等〜一等の等級ができ、爵も下・中・上の三段に分かれた。今は${S.rankLabel()}・${S.jueLabel()}。`, 'good');
     G.v = 6;
+  }
+  if (G.v < 7) {
+    // 郡を大都市・中都市・小都市・地域に分ける（はじめは郡の持ち主のもの）
+    if (!G.hold) S.initHoldings();
+    S.log('郡が大都市・中都市・小都市・地域に分かれた。大都市は遠征で、ほかは一つずつ攻め取る。', 'good');
+    G.v = 7;
   }
 };
 
@@ -4668,12 +4724,14 @@ W.countryEconomy = (c) => {
   const harvest = G.month === 9 ? 4.5 : G.month === 10 ? 1.6 : 0.55;
   let gold = 0, food = 0;
   const qi = c === 'qi' ? 1.2 : 1;
-  for (const p of ps) {
-    const persons = p.pop * 10000;
+  // 郡の実りは、拠点を持つ割合で分け合う（敵に奪われた県や郷の分は入らない）
+  for (const p of Object.values(G.prov)) {
+    const sh = S.shareOf(p, c); if (sh <= 0) continue;
+    const persons = p.pop * 10000 * sh;
     gold += persons * 12 * (0.3 + p.comm / 100) * (cc.tax / 0.15) * S.lawMul(c, 'comm') * S.lawMul(c, 'gold') * qi * (0.6 + p.order / 250);
     food += persons * 2.5 * (0.5 + p.agri / 100) * 0.1 * harvest * S.lawMul(c, 'agri');
   }
-  const troops = U.sum(ps, p => p.troops);
+  const troops = U.sum(ps, p => p.troops) + S.garrisonOf(c);
   food -= troops * 2.5 * S.lawMul(c, 'upkeep');
   gold -= troops * 14 + S.officersOf(c).length * 9000;
   cc.gold = Math.round(cc.gold + gold);
@@ -4702,8 +4760,9 @@ W.develop = (c) => {
     const k = (isPlayerJur ? 0.25 : 1) * (gp / 70) * dev * (pol === 'develop' ? 1.6 : 1) * (cc.gold > 0 ? 1 : 0.3);
     p.agri = Math.min(100, p.agri + 0.22 * k * S.fxm(gv, 'agri') * (c === 'qin' && S.lawOn(c, 'junou') ? 1.2 : 1) * Math.max(0.1, 1 - p.agri / 110));
     p.comm = Math.min(100, p.comm + 0.18 * k * S.fxm(gv, 'comm') * Math.max(0.1, 1 - p.comm / 110));
-    const tOrder = 58 + lawOrder + (pol === 'order' ? 10 : 0) + S.fx(gv, 'order') * 12 - (cc.weary || 0) * 12;
-    const tLoyal = 60 + lawLoyal - (cc.tax - 0.15) * 120 + S.fx(gv, 'loyal') * 12;
+    const fs = S.foreignShare(p, true);
+    const tOrder = 58 + lawOrder + (pol === 'order' ? 10 : 0) + S.fx(gv, 'order') * 12 - (cc.weary || 0) * 12 - fs * 25;
+    const tLoyal = 60 + lawLoyal - (cc.tax - 0.15) * 120 + S.fx(gv, 'loyal') * 12 - fs * 15;
     p.order = U.clamp(p.order + (tOrder - p.order) * 0.05 + U.rf(-1, 1), 5, 100);
     p.loyal = U.clamp(p.loyal + (tLoyal - p.loyal) * 0.04 + U.rf(-1, 1), 5, 100);
     p.wall = Math.min(100, p.wall + (S.P[p.id].pass ? 0.3 : 0.08) * (pol === 'military' ? 2 : 1));
@@ -4711,7 +4770,7 @@ W.develop = (c) => {
     const grow = 0.0007 * (p.loyal / 60) * S.lawMul(c, 'grow') * (cc.food > 0 ? 1 : -1);
     p.pop = Math.max(1, p.pop * (1 + grow));
     // 徴兵
-    const persons = p.pop * 10000;
+    const persons = p.pop * 10000 * (1 - S.foreignShare(p));
     const allOut = ps.length <= 2 ? 1.25 : 1; // 存亡の危機：総動員
     const cap = persons * 0.075 * S.lawMul(c, 'recruit') * (pol === 'military' ? 1.1 : 1) * (S.P[p.id].pass ? 3 : 1) * allOut;
     if (p.troops < cap && cc.food > U.sum(ps, q => q.troops) * 3 && cc.gold > 0) {
@@ -4853,7 +4912,7 @@ W.campaignPlans = (c, all) => {
       if (tgt.o === c || !S.atWar(c, tgt.o)) continue;
       const atk = src.troops * 0.68;
       if (atk < 3000 && !all) continue;
-      const def = tgt.troops * W.fortMul(q) * W.renownFear(q);
+      const def = tgt.troops * W.fortMul(q) * W.renownFear(q) * W.isolation(q);
       const odds = atk / Math.max(1, def);
       plans.push({ src: src.id, tgt: q, atk: Math.round(atk), def: tgt.troops, odds });
     }
@@ -4920,37 +4979,6 @@ W.autoResolve = (atkTroops, defTroops, atkC, defC, atkCmd, defCmd, fort = 1) => 
   return { win, atkLoss: Math.round(atkLoss), defLoss: Math.round(defLoss), ratio: r, slain, capture: win === 'atk' && r > 1.1 };
 };
 
-W.applyCampaign = (camp, res) => {
-  const src = G.prov[camp.src], tgt = G.prov[camp.tgt];
-  const atkLeft = Math.max(0, camp.atkTroops - res.atkLoss);
-  const defLeft = Math.max(0, camp.defTroops - res.defLoss);
-  // 合従軍の兵は各国の郡からすでに引いてある。生き残りは出した国へ返す
-  const pool = camp.contrib || null;
-  if (!pool) src.troops = Math.max(0, src.troops - camp.atkTroops);
-  const giveBack = (n) => {
-    if (!pool) { src.troops += n; return; }
-    const tot = U.sum(Object.values(pool), x => x) || 1;
-    for (const c in pool) {
-      if (!G.cty[c] || !G.cty[c].alive) continue;
-      const ps = S.ownedProvs(c); if (!ps.length) continue;
-      const home = ps.find(p => S.adj(p.id).includes(camp.tgt)) || G.prov[W.capital(c)] || ps[0];
-      home.troops += Math.round(n * pool[c] / tot);
-    }
-  };
-  for (const id of res.slain || []) W.killOfficer(id, '戦死');
-  if (res.capture && tgt.o === camp.def) {
-    W.capture(camp.tgt, camp.atk, camp.def);
-    tgt.troops = Math.round(atkLeft * (pool ? 0.4 : 0.7));
-    giveBack(Math.round(atkLeft * (pool ? 0.6 : 0.3)));
-    // 敗残兵は隣の自領へ
-    const retreat = S.adj(camp.tgt).map(q => G.prov[q]).find(p => p.o === camp.def);
-    if (retreat) retreat.troops += Math.round(defLeft * 0.5);
-  } else {
-    giveBack(atkLeft);
-    tgt.troops = defLeft;
-  }
-};
-
 W.capture = (pid, c, from) => {
   const p = G.prov[pid];
   const prev = p.o;
@@ -4959,6 +4987,14 @@ W.capture = (pid, c, from) => {
   const g = G.off[p.gov];
   if (g && g.c === prev && !g.player) { if (U.ch(0.3)) { W.killOfficer(g.id, '討死'); } else g.loc = D.COUNTRIES[prev]?.cap; }
   const ng = S.genOfficer(c, 'guns', { loc: pid }); p.gov = ng.id;
+  // 郡の拠点：攻め手の拠点は郡に合流、元の持ち主の拠点は降る（中都市はときに残って抵抗する）
+  const holdOut = S.ownedProvs(prev).length > 0 && S.adj(pid).some(q => G.prov[q].o === prev);
+  for (const h of S.holdsIn(pid)) {
+    if (h.o === c) { p.troops += Math.round(h.g || 0); h.g = 0; continue; }
+    if (h.o !== prev) continue;
+    if (h.k === 'mid' && holdOut && U.ch(0.25)) { h.g = Math.round(D.HOLDK.mid.floor * U.rf(1, 2.5)); continue; }
+    h.o = c; h.g = 0;
+  }
   // 敵将の所在を退避
   for (const o of Object.values(G.off)) if (o.alive && o.c === prev && o.loc === pid) { const back = S.adj(pid).find(q => G.prov[q].o === prev); o.loc = back || D.COUNTRIES[prev]?.cap; }
   // 厭戦：急な拡大は国を疲れさせる
@@ -4990,6 +5026,8 @@ W.killCountry = (c, by) => {
     else o.ret = true;
   }
   for (const k in G.dip) if (k.includes(c)) G.dip[k].st = 'peace';
+  // 残った拠点は、その郡の持ち主に降る
+  for (const h of S.holdAll()) if (h.o === c) { h.o = G.prov[h.pid].o; h.g = 0; }
   if (S.myOff().c === c) G.flags.homeFallen = by;
 };
 
@@ -5053,53 +5091,8 @@ W.involvement = (camp) => {
   return null;
 };
 
-W.resolveCampaign = async (camp) => {
-  const inv = W.involvement(camp);
-  const nameA = S.cname(camp.atk), nameD = S.cname(camp.def);
-  const tgtName = S.P[camp.tgt].name;
-  let res;
-  if (inv) {
-    let mode = 'fight';
-    const me = G.me;
-    if (inv.role === 'top') {
-      mode = await HOOK.choose({
-        title: `${nameA}軍が${tgtName}に侵攻！`,
-        body: `${nameA}軍 ${U.fmt(camp.atkTroops)}（${G.off[camp.atkCmd]?.n || '－'}）が${tgtName}へ攻め寄せた。守備兵は${U.fmt(camp.defTroops)}。`,
-        choices: [{ v: 'lead', label: '自ら指揮を執る（親征）' }, { v: 'watch', label: '将に任せて観戦する' }, { v: 'auto', label: '将に任せる（結果のみ）' }],
-      });
-    } else {
-      const cmdN = G.off[inv.side === 'atk' ? camp.atkCmd : camp.defCmd]?.n || '総大将';
-      const rolestr = inv.role === 'commander' ? '貴殿を総大将に任ずる' : inv.role === 'gunshi' ? '総軍師として策を練れ' : `${cmdN}の軍に加わり戦え`;
-      await HOOK.info({
-        title: inv.side === 'atk' ? `出陣命令：${tgtName}攻略` : `敵襲：${tgtName}防衛`,
-        seal: '軍令',
-        body: `${nameA}軍 ${U.fmt(camp.atkTroops)} 対 ${nameD}軍 ${U.fmt(camp.defTroops)}。\n${rolestr}。`,
-      });
-    }
-    if (mode === 'auto') res = null;
-    else {
-      const spec = W.campaignSpec(camp, inv, mode === 'watch');
-      const br = await HOOK.battle(spec);
-      res = W.applyBattleResult(spec, br);
-      res.fromBattle = true;
-    }
-  }
-  if (!res) {
-    const cmdA = G.off[camp.atkCmd], cmdD = G.off[camp.defCmd];
-    const pl = camp.atk === S.myOff().c && S.isTop();
-    const fort = camp.kind === 'field' ? 1.05 * (W.lastStand(camp.def) ? 1.1 : 1) * (pl ? 1 : W.histMul(camp.tgt)) : W.fortMul(camp.tgt, pl);
-    res = W.autoResolve(camp.atkTroops, camp.defTroops, camp.atk, camp.def, cmdA, cmdD, fort);
-  }
-  W.applyCampaign(camp, res);
-  const my = S.myOff().c;
-  if (!res.fromBattle && (camp.atk === my || camp.def === my)) {
-    const won = (res.win === 'atk') === (camp.atk === my);
-    S.log(`${tgtName}の戦い：${nameA}軍${U.fmt(camp.atkTroops)} vs ${nameD}軍${U.fmt(camp.defTroops)} → ${won ? '勝利' : '敗北'}（損害 ${U.fmt(camp.atk === my ? res.atkLoss : res.defLoss)}）`, won ? 'good' : 'bad');
-  } else if (!res.fromBattle) {
-    S.log(`${tgtName}の戦い：${nameA}軍が${res.win === 'atk' ? '勝利' : '敗退'}。`);
-  }
-  return res;
-};
+// 郡（大都市）を攻める戦は、みな遠征（前哨戦・野戦・攻城戦）として進む
+W.resolveCampaign = (camp) => W.runExpedition(camp);
 
 /* ---------- 合戦の構成 ---------- */
 W.snap = (o, extra) => o ? Object.assign({ id: o.id, n: o.n, sei: o.sei || o.n.slice(0, 1), bu: S.stat(o, 'bu'), tou: S.stat(o, 'tou'), chi: S.stat(o, 'chi'), pol: S.stat(o, 'pol'), mi: S.stat(o, 'mi'), tr: o.tr || [], tac: (o.player ? G.me.tac : o.tac) || [], st: o.st || 'bal', r: o.r, player: !!o.player, hist: !!o.hist, mount: !!o.mount, xfx: o.player ? S.playerXfx() : null }, extra || {}) : null;
@@ -5153,26 +5146,44 @@ W.groupFor = t => {
   return U.ch(0.7) ? 'front' : (U.ch(0.5) ? 'left' : 'right');
 };
 
-// 主人公の軍を合戦の部隊にする。割り振りのとおりに出し、勝手に分けない：
-// 同じ隊長・同じ兵種の隊は一つの部隊（国軍と私兵も合わせる）。兵のいない部下は出ない。
-W.playerUnits = (role) => {
-  const me = G.me, o = S.myOff();
-  const out = [];
-  if (me.army.wu.length) { const main = me.army.sq.find(s => !s.pv && !s.ld) || me.army.sq[0]; if (main) { main.n = 1 + me.army.wu.filter(w => w.alive).length; main.max = 5; } }
-  const groups = new Map();
+// 主人公の軍の部隊（同じ隊長・同じ兵種で一つ。key は 'ld|t'）
+W.playerGroups = () => {
+  const me = G.me, groups = new Map();
   for (const s of me.army.sq) {
     if (s.n <= 0) continue;
     const ld = s.ld && G.off[s.ld] && G.off[s.ld].alive ? s.ld : '';
     const key = ld + '|' + s.t;
     let g = groups.get(key);
-    if (!g) { g = { ld, t: s.t, sqs: [] }; groups.set(key, g); }
+    if (!g) { g = { key, ld, t: s.t, sqs: [] }; groups.set(key, g); }
     g.sqs.push(s);
   }
-  const list = [...groups.values()].map(g => {
-    const n = U.sum(g.sqs, s => s.n);
-    const avg = (k) => U.sum(g.sqs, s => (s[k] || 0) * s.n) / Math.max(1, n);
-    return Object.assign(g, { n, tr: Math.round(avg('tr')), wl: Math.round(avg('wl')), al: Math.round(avg('al')) });
-  });
+  return [...groups.values()].map(g => { g.n = U.sum(g.sqs, s => s.n); g.tr = Math.round(U.sum(g.sqs, s => s.tr * s.n) / Math.max(1, g.n)); return g; });
+};
+// 出撃する部隊のおまかせ（all 全軍・auto 敵の倍まで・direct 直属だけ）
+W.sortiePick = (spec, preset) => {
+  const gs = W.playerGroups(), pick = {};
+  if (preset === 'all') { for (const g of gs) pick[g.key] = g.n; return pick; }
+  if (preset === 'direct') { for (const g of gs) pick[g.key] = g.ld ? 0 : g.n; return pick; }
+  const enemy = U.sum((spec && spec.units || []).filter(u => u.side === 1), u => u.n);
+  let need = Math.max(300, enemy * 2);
+  // 主人公の直属の一番大きい隊から、あとは練度の高い隊から
+  const main = U.maxBy(gs.filter(g => !g.ld), g => g.n);
+  const order = gs.slice().sort((a, b) => (b === main ? 1 : 0) - (a === main ? 1 : 0) || b.tr - a.tr || b.n - a.n);
+  for (const g of order) { const k = Math.min(g.n, Math.max(0, need)); pick[g.key] = Math.round(k); need -= k; }
+  return pick;
+};
+// 主人公の軍を合戦の部隊にする。割り振りのとおりに出し、勝手に分けない：
+// 同じ隊長・同じ兵種の隊は一つの部隊（国軍と私兵も合わせる）。兵のいない部下は出ない。
+// sortie: 出撃する人数（{ 'ld|t': 人数 }）。なければ全軍
+W.playerUnits = (role, sortie) => {
+  const me = G.me, o = S.myOff();
+  const out = [];
+  if (me.army.wu.length) { const main = me.army.sq.find(s => !s.pv && !s.ld) || me.army.sq[0]; if (main) { main.n = 1 + me.army.wu.filter(w => w.alive).length; main.max = 5; } }
+  const list = W.playerGroups().map(g => {
+    const n = sortie ? Math.max(0, Math.min(g.n, Math.round(sortie[g.key] ?? 0))) : g.n;
+    const avg = (k) => U.sum(g.sqs, s => (s[k] || 0) * s.n) / Math.max(1, g.n);
+    return Object.assign(g, { use: n, tr: Math.round(avg('tr')), wl: Math.round(avg('wl')), al: Math.round(avg('al')) });
+  }).filter(g => g.use > 0);
   // 主人公は直属で一番大きい部隊を率いる
   list.sort((a, b) => (a.ld ? 1 : 0) - (b.ld ? 1 : 0) || b.n - a.n);
   const orders = me.army.orders || {};
@@ -5180,10 +5191,10 @@ W.playerUnits = (role) => {
   let mainDone = false;
   for (const g of list) {
     const off = g.ld ? G.off[g.ld] : null;
-    const u = { t: g.t, n: g.n, tr: g.tr, wl: g.wl, al: g.al, sq: g.sqs[0].id, sqs: g.sqs.length > 1 ? g.sqs.map(s => ({ id: s.id, n: s.n })) : null, ctrl: 'player', grp: 'player' };
+    const u = { t: g.t, n: g.use, tr: g.tr, wl: g.wl, al: g.al, sq: g.sqs[0].id, sqs: g.sqs.length > 1 ? g.sqs.map(s => ({ id: s.id, n: s.n })) : null, ctrl: 'player', grp: 'player' };
     if (!off && !mainDone) { u.ld = W.snap(o); u.me = true; mainDone = true; if (me.army.wu.length) u.wu = me.army.wu.filter(w => w.alive).map(w => ({ id: w.id, n: w.n, bu: w.bu, hp: w.hp, tr: w.tr })); }
     else if (off && !led.has(g.ld)) { u.ld = W.snap(off); led.add(g.ld); }
-    else u.ld = W.retainer(off || o, o.c, g.n, !off);
+    else u.ld = W.retainer(off || o, o.c, g.use, !off);
     // 軍の割り振りで決めた任せ方（開戦と同時に隊長が動かす）
     const mode = off && orders[g.ld] && orders[g.ld] !== 'self' ? orders[g.ld] : null;
     if (mode && !u.me) u.preDlg = { mode, dep: { id: off.id, n: off.n, tou: S.stat(off, 'tou'), chi: S.stat(off, 'chi'), good: S.canLead(off) } };
@@ -5230,7 +5241,7 @@ W.buildSpec = (o) => {
   const total = (o.A.troops || 0) + (o.B.troops || 0);
   const spec = {
     kind: o.kind, pid: o.pid, title: o.title, theme: o.theme || S.P[o.pid]?.t || 'plain',
-    seed: Math.floor(Math.random() * 1e9), sides: [], units: [], role: o.role || 'watch',
+    seed: o.seed ?? Math.floor(Math.random() * 1e9), sides: [], units: [], role: o.role || 'watch',
     city: o.cityOf ? (sideKeys[0] === o.cityOf ? 0 : 1) : -1,
     wall: o.wall ?? (o.pid ? G.prov[o.pid].wall : 50),
     maxDays: o.maxDays || (o.kind === 'siege' ? (total > 60000 ? 7 : 4) : o.kind === 'pass' ? 5 : total >= 120000 ? 5 : total >= 40000 ? 3 : total >= 6000 ? 2 : 1),
@@ -5240,7 +5251,7 @@ W.buildSpec = (o) => {
   if (typeof GEO !== 'undefined' && GEO.built && o.pid && S.P[o.pid]) {
     try {
       const fieldLike = !['siege', 'pass'].includes(spec.kind);
-      const site = GEO.site(o.pid, { from: o.from && o.from !== o.pid ? o.from : null, field: fieldLike && !o.from, rng: U.rng(spec.seed) });
+      const site = GEO.site(o.pid, { at: o.at || null, from: !o.at && o.from && o.from !== o.pid ? o.from : null, field: fieldLike && !o.from && !o.at, rng: U.rng(spec.seed) });
       if (site) { spec.site = site; if (fieldLike && !o.theme) spec.theme = GEO.siteTheme(site); }
     } catch (e) { console.warn(e); }
   }
@@ -5261,9 +5272,10 @@ W.buildSpec = (o) => {
     let remain = X.troops;
     let units = [];
     if (isMe) {
-      const pu = W.playerUnits(o.role);
+      const pu = W.playerUnits(o.role, o.sortie);
       const pTotal = U.sum(pu, u => u.n);
-      remain = Math.max(0, remain - pTotal);
+      // addMe：X.troops は味方の援軍だけ（主人公の兵はその上に足す）。ふつうは主人公の兵も X.troops に含まれる
+      remain = X.addMe ? remain : Math.max(0, remain - pTotal);
       for (const u of pu) { u.side = si; units.push(u); }
       // 上官の隊（低い階級）
       const tier = S.tier();
@@ -5315,27 +5327,12 @@ W.buildSpec = (o) => {
     spec.deputies = ids.map(id => G.off[id]).filter(x => x && x.alive).slice(0, 8).map(x => ({ id: x.id, n: x.n, tou: S.stat(x, 'tou'), chi: S.stat(x, 'chi'), bu: S.stat(x, 'bu') }));
   }
   spec.courier = G.flags.courier !== false;
+  // 出撃する部隊を選び直すときのために、作り方を覚えておく
+  spec.args = Object.assign({}, o, { seed: spec.seed, weather: spec.weather });
   return spec;
 };
-
-W.campaignSpec = (camp, inv, watch) => {
-  const atkOffs = S.officersOf(camp.atk, x => ['dais', 'shog', 'goz'].includes(x.r) && (x.loc === camp.src)).slice(0, 5);
-  const defOffs = S.officersOf(camp.def, x => ['dais', 'shog', 'goz'].includes(x.r) && (x.loc === camp.tgt)).slice(0, 5);
-  const me = G.me;
-  let role = watch ? 'watch' : inv.role;
-  if (role === 'top') role = 'commander';
-  const A = { c: camp.atk, troops: camp.atkTroops, cmd: G.off[camp.atkCmd], officers: atkOffs };
-  const Bd = { c: camp.def, troops: camp.defTroops, cmd: G.off[camp.defCmd], officers: defOffs };
-  if (inv.side === 'atk' && role === 'commander') A.cmd = S.myOff();
-  if (inv.side === 'def' && role === 'commander') Bd.cmd = S.myOff();
-  const kind = camp.kind;
-  return W.buildSpec({
-    kind, pid: camp.tgt, from: camp.src, title: `${S.P[camp.tgt].name}の戦い`,
-    A, B: Bd, me: watch ? (inv.side === 'atk' ? 'A' : 'B') : (inv.side === 'atk' ? 'A' : 'B'), role,
-    cityOf: kind === 'siege' || kind === 'pass' ? 'B' : null, wall: G.prov[camp.tgt].wall,
-    ctx: { camp: camp.id, side: inv.side },
-  });
-};
+// 出撃する部隊（pick: { 'ld|t': 人数 }）を選んで、合戦を作り直す
+W.rebuildSpec = (spec, pick) => spec && spec.args ? W.buildSpec(Object.assign({}, spec.args, { sortie: pick })) : spec;
 
 /* ---------- 合戦結果の反映 ---------- */
 // br: B.result()
@@ -5443,6 +5440,11 @@ W.genOffers = () => {
       G.offers.push({ id: U.uid(), kind: 'skirmish', pid: me.loc, from: q, ec, foe, ally, title: `${S.P[q].name}方面の小競り合い`, desc: `${S.cname(ec)}軍 約${U.fmt(foe)}が国境を侵している。` });
     }
   }
+  // 隣の敵の拠点を奪う好機（低い身分なら上官の兵と一緒に）
+  if (canFight && rk.track !== 'civ' && G.hold) {
+    const ts = W.playerHoldTargets(true).filter(h => (D.HOLD_TIER[h.k] || 9) <= rk.tier + 1);
+    if (ts.length && U.ch(0.55)) G.offers.push(W.holdOffer(U.pick(ts)));
+  }
   // 盗賊
   const jb = me.jur ? me.jur.bandits : 0;
   if ((canFight || rk.track === 'civ') && (jb > 0 || U.ch(0.25 + (100 - P.order) / 250))) {
@@ -5463,10 +5465,25 @@ W.offerSpec = (of) => {
   const boss = G.off[me.boss];
   const role = S.tier() <= 5 && of.ally > force ? 'unit' : 'commander';
   const ec = of.ec;
+  if (of.kind === 'hold') {
+    // 中都市・小都市・地域を攻め取る
+    const h = G.hold[of.hid];
+    const kind = h.k === 'mid' ? 'siege' : 'field';
+    of.foe = Math.max(20, S.holdDef(h));
+    const foeCmd = h.o === G.prov[h.pid].o && U.ch(0.6) ? U.pick(S.officersOf(h.o, x => ['senn', 'sanz', 'goz'].includes(x.r))) || null : null;
+    return W.buildSpec({
+      kind, pid: h.pid, at: { x: h.x, y: h.y }, from: of.from, title: of.title,
+      A: { c, troops: of.ally, addMe: true, cmd: role === 'unit' ? boss : o, officers: [] },
+      B: { c: h.o, troops: of.foe, cmd: foeCmd },
+      me: 'A', role, cityOf: kind === 'siege' ? 'B' : null, wall: h.w || 10,
+      maxDays: kind === 'siege' ? 2 : 1,
+      ctx: { offer: of.id, kind: 'hold', hid: h.id, ec: h.o },
+    });
+  }
   const foeCmd = ec === 'bandit' || ec === 'nomad' ? null : U.pick(S.officersOf(ec, x => ['goz', 'sanz', 'senn', 'shog'].includes(x.r)) || [null]);
   return W.buildSpec({
     kind: of.kind === 'skirmish' ? 'skirmish' : of.kind, pid: of.pid, from: of.from, title: of.title, theme: typeof GEO !== 'undefined' && GEO.built ? undefined : S.P[of.from || of.pid]?.t,
-    A: { c, troops: force + of.ally, cmd: role === 'unit' ? boss : o, officers: [] },
+    A: { c, troops: of.ally, addMe: true, cmd: role === 'unit' ? boss : o, officers: [] },
     B: { c: ec === 'bandit' || ec === 'nomad' ? c : ec, troops: of.foe, cmd: foeCmd, bandit: ec === 'bandit', nomad: ec === 'nomad', tr: ec === 'bandit' ? 20 : undefined },
     me: 'A', role,
     maxDays: 1,
@@ -5488,6 +5505,26 @@ W.afterOffer = (of, res) => {
     const fp = G.prov[of.from];
     if (won) { fp.troops = Math.max(0, fp.troops - Math.round(of.foe * 0.4)); }
     else G.prov[of.pid].troops = Math.max(0, G.prov[of.pid].troops - Math.round(S.armyTotal() * 0.2));
+  }
+  if (of.kind === 'hold') {
+    const h = G.hold[of.hid];
+    if (h) {
+      const myC = S.myOff().c, s0 = br.sides[0], s1 = br.sides[1];
+      const defLoss = Math.max(0, s1.start - s1.alive - s1.routed * 0.6);
+      const allyLoss = of.ally ? Math.round(of.ally * Math.max(0, s0.start - s0.alive - s0.routed * 0.6) / Math.max(1, s0.start)) : 0;
+      const home = G.prov[of.from];
+      if (home && home.o === myC) home.troops = Math.max(0, home.troops - allyLoss);
+      W.holdLoss(h, defLoss);
+      const taken = won && (h.k !== 'mid' || br.cityTaken || br.winner === 0);
+      if (taken && h.o !== myC && S.atWar(myC, h.o)) {
+        // 守備兵は駐屯地の軍から出す
+        let gar = 0;
+        if (home && home.o === myC && home.id !== h.pid) { gar = Math.round(Math.min(D.HOLDK[h.k].cap, home.troops * 0.03, Math.max(D.HOLDK[h.k].floor, (of.ally - allyLoss) * 0.5))); home.troops -= gar; }
+        W.takeHold(h, myC, gar);
+        W.gainMerit(D.HOLDK[h.k].merit * S.tier(), `${S.holdLabel(h)}を奪った`);
+        for (const t of me.tasks) if (t.k === 'hold' && t.hid === h.id) t.done = true;
+      }
+    }
   }
   if (of.kind === 'raid') {
     const tp = G.prov[of.tgt];
@@ -5518,6 +5555,8 @@ W.taskTemplates = () => {
     if (tier >= 2) T.push({ k: 'troops', target: Math.round(S.armyTotal() * 1.0 + 1), desc: `兵を欠員なく揃えよ（${U.fmt(S.armyCap())}）`, due, rew: base * 0.7, full: true });
     const enemyAdj = S.adj(me.loc).filter(q => S.atWar(c, G.prov[q].o));
     if (enemyAdj.length) { const q = U.pick(enemyAdj); T.push({ k: 'scout', pid: q, desc: `${S.P[q].name}の敵情を偵察せよ`, due, rew: base * 0.9 }); }
+    const hts = G.hold ? W.playerHoldTargets() : [];
+    if (tier >= 2 && tier <= 6 && hts.length) { const h = U.pick(hts); T.push({ k: 'hold', hid: h.id, pid: h.pid, desc: `${S.P[h.pid].name}の${S.holdLabel(h)}を奪え`, due, rew: base * 1.3 }); }
     if (tier >= 7 && enemyAdj.length) { const q = U.pick(enemyAdj); T.push({ k: 'conquer', pid: q, desc: `${S.P[q].name}を攻略せよ（攻略の許可を与える）`, due: G.turn + 4, rew: base * 3 }); }
   }
   if (me.rank === 'daij' && me.min === 'tenkaku' || me.rank === 'josh') {
@@ -5545,6 +5584,7 @@ W.checkTasks = async () => {
       if (t.k === 'gold' && (me.flags.paid || 0) - (t.paid0 || 0) >= t.amount) done = true;
       if (t.k === 'diplo' && S.dip(S.myOff().c, t.cty).rel >= t.target) done = true;
       if (t.k === 'conquer' && G.prov[t.pid].o === S.myOff().c) done = true;
+      if (t.k === 'hold' && G.hold && G.hold[t.hid] && G.hold[t.hid].o === S.myOff().c) done = true;
     }
     if (done) { t.res = 'ok'; out.push(t); }
     else if (G.turn >= t.due) { t.res = 'fail'; out.push(t); }
@@ -5696,8 +5736,10 @@ W.runCoalition = async (pc) => {
   if (tgt.o !== pc.dom) return;
   const leadCmd = S.bestGeneral(pc.leadC);
   const camp = { id: U.uid(), atk: pc.leadC, def: pc.dom, src: pc.src, tgt: pc.tgt, atkTroops: pc.total, defTroops: Math.round(tgt.troops + S.countryTroops(pc.dom) * 0.35), atkCmd: leadCmd?.id, defCmd: W.pickCommander(pc.dom, pc.tgt)?.id, kind: S.P[pc.tgt].pass ? 'pass' : 'field', coalition: pc.members, contrib: pc.contrib || Object.fromEntries(pc.members.map(m => [m, 1])) };
-  // 防衛側は増援を集める
-  for (const p of S.ownedProvs(pc.dom)) if (p.id !== pc.tgt) p.troops = Math.round(p.troops * 0.65);
+  // 防衛側は増援を集める（狙われた郡へ）
+  let reinf = 0;
+  for (const p of S.ownedProvs(pc.dom)) if (p.id !== pc.tgt) { const mv = Math.round(p.troops * 0.35); p.troops -= mv; reinf += mv; }
+  tgt.troops += reinf;
   const myC = S.myOff().c;
   if (pc.members.includes(myC) && myC !== pc.leadC) { camp.atk = myC; camp.atkCmd = W.pickCommander(myC, G.me.loc)?.id || camp.atkCmd; camp.src = G.me.loc; }
   const res = await W.resolveCampaign(camp);
@@ -5735,6 +5777,10 @@ W.endMonth = async () => {
   }
   for (const pc of coalitions) { if (G.over) break; await W.runCoalition(pc); }
   if (G.over) return;
+  // 中都市・小都市・地域の奪い合い
+  W.localWarAI();
+  W.holdUpkeep();
+  const lr = W.landReport(); if (lr) rep(lr);
   // 5. 事件
   await EV.monthly();
   if (G.over) return;
@@ -5802,39 +5848,457 @@ W.checkUnification = () => {
 };
 
 /* ---------- 遠征（主人公の命令） ---------- */
-W.launchPlayerCampaign = async (tgt, troops, opts = {}) => {
-  // 君主・丞相の出兵／大将軍・将軍の許可を得た攻略
+W.launchPlayerCampaign = (tgt, troops, opts = {}) => W.launchExpedition(tgt, troops, opts);
+
+/* =========================================================
+   七雄覇道 — 拠点（大都市・中都市・小都市・地域）と遠征
+   郡は「大都市」（郡の都）と、いくつもの中都市（県城）・小都市（郷の町）・地域（村々と野）からなる。
+   ・中都市・小都市・地域は、小さな戦で一つずつ奪い合う
+   ・大都市は「遠征」でしか取れない：前哨戦・野戦を経て攻城戦。野戦で敵の主力を殲滅すれば城は開く
+   郡の持ち主（G.prov[pid].o）は大都市の持ち主。郡の実り・徴兵は、拠点を持つ割合で分け合う
+   ========================================================= */
+
+// 拠点の種類。w: 郡の中での取り分の重み、K: 郡の兵のうち守りに付く割合、floor: 最低の守り、cap: 占領した時の守備兵の上限、fort: 守りやすさ
+D.HOLDK = {
+  big:   { n: '大都市', s: '大' },
+  mid:   { n: '中都市', s: '中', w: 3,   K: 0.07,  floor: 400, cap: 1600, fort: 1.25, merit: 40 },
+  small: { n: '小都市', s: '小', w: 1.5, K: 0.025, floor: 150, cap: 700,  fort: 1.12, merit: 20 },
+  area:  { n: '地域',   s: '域', w: 1,   K: 0.012, floor: 60,  cap: 300,  fort: 1.0,  merit: 10 },
+};
+// 主人公が攻め取れる拠点（格ごと）
+D.HOLD_TIER = { area: 2, small: 3, mid: 4 };
+
+/* ---------- 拠点をつくる（全体マップの県と郷から） ---------- */
+S.areaName = (v) => {
+  const stem = v.n.slice(0, -1);
+  const e = GEO.elev(v.x, v.y), cv = GEO.cover(v.x, v.y, e);
+  if (e > 0.55) return stem + '山地';
+  if (cv.marsh > 0.3) return stem + '沢';
+  if (cv.forest > 0.45) return stem + 'の森';
+  if (cv.steppe > 0.4) return stem + 'の原';
+  return stem + 'の野';
+};
+S.genHoldings = () => {
+  if (typeof GEO === 'undefined') return {};
+  if (!GEO.built) GEO.build();
+  const out = {};
+  for (const P of D.PROVINCES) {
+    const cs = (GEO.byProv[P.id] || []).slice().sort((a, b) => a.k - b.k);
+    const p = G.prov[P.id];
+    const list = [];
+    // 中都市：郡の都のほかの県城
+    for (const c of cs) if (c.k > 0) list.push({ id: `${P.id}:m${c.k}`, k: 'mid', n: c.n, x: c.x, y: c.y, ck: c.k });
+    const used = new Set();
+    if (!P.pass) {
+      const nS = Math.max(1, Math.round(cs.length * 0.6)), nA = Math.max(1, Math.round(cs.length * 0.6));
+      // 小都市：郷・聚のうち大きな町（郡の都に近い県から）
+      let made = 0;
+      for (const c of cs) {
+        if (made >= nS) break;
+        const v = U.maxBy(c.vil.filter(v => /[郷聚]$/.test(v.n) && Math.hypot(v.x - c.x, v.y - c.y) > 2.2), v => v.s);
+        if (!v) continue;
+        used.add(v); list.push({ id: `${P.id}:s${c.k}`, k: 'small', n: v.n, x: v.x, y: v.y, ck: c.k }); made++;
+      }
+      // 地域：里・亭の散らばる田舎（外れの県から）
+      made = 0;
+      for (const c of cs.slice().reverse()) {
+        if (made >= nA) break;
+        const vs = c.vil.filter(v => !used.has(v) && !/[郷聚]$/.test(v.n));
+        if (!vs.length) continue;
+        const v = U.maxBy(vs, v => Math.hypot(v.x - c.x, v.y - c.y));
+        used.add(v); list.push({ id: `${P.id}:a${c.k}`, k: 'area', n: S.areaName(v), x: v.x, y: v.y, ck: c.k }); made++;
+      }
+    } else {
+      // 関の外の険しい道
+      const c = cs[cs.length - 1], v = c && c.vil[0];
+      if (v) list.push({ id: `${P.id}:a${c.k}`, k: 'area', n: S.areaName(v), x: v.x, y: v.y, ck: c.k });
+    }
+    // 郡の中での取り分（大都市が残りを持つ）
+    const bigSh = P.pass ? 0.7 : 0.35;
+    const wsum = U.sum(list, h => D.HOLDK[h.k].w) || 1;
+    for (const h of list) {
+      h.pid = P.id;
+      h.sh = Math.round((1 - bigSh) * D.HOLDK[h.k].w / wsum * 1000) / 1000;
+      const vr = (GEO.hash(h.ck * 7 + 3, h.k.length, D.PROVINCES.indexOf(P) + 11) - 0.5) * 2;
+      h.w = h.k === 'mid' ? Math.max(10, Math.round(p.wall * 0.5 + 8 + vr * 10)) : h.k === 'small' ? Math.max(4, Math.round(p.wall * 0.2 + 4 + vr * 5)) : 0;
+      h.o = p.o; h.g = 0;
+      h.x = Math.round(h.x * 10) / 10; h.y = Math.round(h.y * 10) / 10;
+      out[h.id] = h;
+    }
+  }
+  return out;
+};
+S.initHoldings = () => { G.hold = S.genHoldings(); S._hbpG = null; };
+// 郡ごとの拠点（G が替わったら作り直す）
+S.holdsIn = (pid) => {
+  if (S._hbpG !== G || S._hbpN !== Object.keys(G.hold || {}).length) {
+    S._hbp = {}; S._hbpG = G; S._hbpN = Object.keys(G.hold || {}).length;
+    for (const h of Object.values(G.hold || {})) (S._hbp[h.pid] = S._hbp[h.pid] || []).push(h);
+    for (const k in S._hbp) S._hbp[k].sort((a, b) => ({ mid: 0, small: 1, area: 2 })[a.k] - ({ mid: 0, small: 1, area: 2 })[b.k] || a.ck - b.ck);
+  }
+  return S._hbp[pid] || [];
+};
+S.holdAll = () => Object.values(G.hold || {});
+// 大都市（郡の都）の名
+S.bigName = (pid) => (typeof GEO !== 'undefined' && GEO.built && GEO.byProv[pid] && GEO.byProv[pid][0] ? GEO.byProv[pid][0].n : S.P[pid].name);
+S.holdKind = (h) => D.HOLDK[h.k].n;
+S.holdLabel = (h) => `${h.n}（${D.HOLDK[h.k].n}）`;
+// 郡の中で、郡の持ち主でない国が持つ取り分
+S.foreignShare = (p, warOnly) => { let s = 0; for (const h of S.holdsIn(p.id)) if (h.o !== p.o && (!warOnly || S.atWar(h.o, p.o))) s += h.sh; return Math.min(0.9, s); };
+// 国 c がこの郡から得る取り分（0〜1）
+S.shareOf = (p, c) => {
+  if (p.o === c) return 1 - S.foreignShare(p);
+  let s = 0; for (const h of S.holdsIn(p.id)) if (h.o === c) s += h.sh; return s;
+};
+// 郡の外に置いた守備兵（占領した拠点）
+S.garrisonOf = (c) => { let n = 0; for (const h of S.holdAll()) if (h.o === c && h.o !== G.prov[h.pid].o) n += h.g || 0; return n; };
+// 拠点の守り（人数）と守りやすさ。奪った拠点は、隣の自領の軍がすぐ駆けつけて支える
+S.holdSupport = (h) => { const sup = U.maxBy(S.adj(h.pid).map(q => G.prov[q]).filter(q => q.o === h.o), q => q.troops); return sup ? Math.round(sup.troops * 0.08) : 0; };
+S.holdDef = (h) => {
+  const K = D.HOLDK[h.k], p = G.prov[h.pid];
+  if (h.o === p.o) return Math.round(Math.max(K.floor, p.troops * K.K));
+  return Math.round(Math.max(K.floor * 0.4, h.g || 0) + S.holdSupport(h));
+};
+S.holdFort = (h) => D.HOLDK[h.k].fort * (1 + (h.w || 0) / 200);
+
+/* ---------- 拠点の取り合い ---------- */
+// 守りの損害を、郡の兵か守備兵から引く
+W.holdLoss = (h, n) => {
+  const p = G.prov[h.pid];
+  if (h.o === p.o) { p.troops = Math.max(0, Math.round(p.troops - n)); return; }
+  // 守備兵と、駆けつけた隣の軍とで損害を分ける
+  const g = Math.max(1, h.g || 0), sup = S.holdSupport(h), tot = g + sup;
+  const fromG = Math.round(n * g / tot);
+  h.g = Math.max(0, Math.round((h.g || 0) - fromG));
+  if (sup > 0) { const sp = U.maxBy(S.adj(h.pid).map(q => G.prov[q]).filter(q => q.o === h.o), q => q.troops); if (sp) sp.troops = Math.max(0, sp.troops - (n - fromG)); }
+};
+// 拠点が国 c のものになる（gar: 残す守備兵）
+W.takeHold = (h, c, gar = 0) => {
+  const p = G.prov[h.pid], prev = h.o, my = S.myOff().c;
+  h.o = c;
+  if (c === p.o) { p.troops += Math.round(h.g || 0); h.g = 0; }
+  else { h.g = Math.max(0, Math.round(gar)); p.order = Math.max(5, p.order - 3); p.loyal = Math.max(5, p.loyal - 2); }
+  h.w = Math.max(0, Math.round((h.w || 0) * 0.85));
+  G.landStat = G.landStat || {};
+  const st = (G.landStat[G.turn] = G.landStat[G.turn] || {});
+  st[c] = (st[c] || 0) + 1; st[prev] = (st[prev] || 0) - 1;
+  if ((c === my || prev === my) && (h.k !== 'area' || h.pid === G.me.loc)) S.log(`${S.cname(c)}が${S.P[h.pid].name}の${S.holdLabel(h)}を${S.cname(prev)}から奪った。`, c === my ? 'good' : 'bad');
+  // 主人公の管轄の県が奪われた
+  const j = G.me.jur;
+  if (j && j.county && j.county === `${h.pid}_${h.ck}` && h.k === 'mid' && prev === my && c !== my) { j.order = Math.max(5, j.order - 15); j.loyal = Math.max(5, j.loyal - 15); S.log(`管轄の${h.n}県が敵の手に落ちた。民が動揺している。`, 'bad'); }
+};
+// 占領した拠点の守備兵：隣の自領から補い、孤立すれば痩せて降る
+W.holdUpkeep = () => {
+  for (const h of S.holdAll()) {
+    const p = G.prov[h.pid];
+    if (h.o === p.o) { h.g = 0; continue; }
+    const cc = G.cty[h.o];
+    if (!cc || !cc.alive) { h.o = p.o; h.g = 0; continue; }
+    const K = D.HOLDK[h.k];
+    const want = Math.round(Math.max(K.floor, Math.min(K.cap, p.troops * K.K * 1.2)));
+    const sup = U.maxBy(S.adj(h.pid).map(q => G.prov[q]).filter(q => q.o === h.o), q => q.troops);
+    if (sup) {
+      const add = Math.min(Math.max(0, want - (h.g || 0)), Math.round(sup.troops * 0.02));
+      if (add > 0) { h.g = (h.g || 0) + add; sup.troops -= add; }
+    } else {
+      h.g = Math.round((h.g || 0) * 0.95);
+      if (h.g < K.floor * 0.3 && S.atWar(h.o, p.o)) {
+        const was = h.o; h.o = p.o; h.g = 0;
+        if (was === S.myOff().c || p.o === S.myOff().c) S.log(`孤立した${S.P[h.pid].name}の${S.holdLabel(h)}は${S.cname(p.o)}に降った。`, p.o === S.myOff().c ? 'good' : 'bad');
+      }
+    }
+  }
+};
+// 拠点を一つ攻める（自動で決着）。src: 兵を出す郡
+W.resolveLocal = (c, h, src, force) => {
+  const p = G.prov[h.pid], prev = h.o;
+  force = Math.max(0, Math.min(Math.round(force), src.troops));
+  if (force < 50) return null;
+  src.troops -= force;
+  const cmdA = W.pickCommander(c, src.id), cmdD = h.o === p.o ? W.pickCommander(h.o, h.pid) : null;
+  const def = S.holdDef(h);
+  const r = W.autoResolve(force, def, c, prev, cmdA && U.ch(0.35) ? cmdA : null, cmdD && U.ch(0.35) ? cmdD : null, S.holdFort(h));
+  W.holdLoss(h, r.defLoss);
+  const left = Math.max(0, force - r.atkLoss);
+  if (r.win === 'atk') {
+    const gar = c === p.o ? 0 : Math.round(Math.min(D.HOLDK[h.k].cap, left * 0.5));
+    W.takeHold(h, c, gar);
+    src.troops += left - gar;
+  } else src.troops += left;
+  return r;
+};
+// 国ごとの拠点の奪い合い（毎月）
+W.localWarAI = () => {
+  for (const c of U.shuffle(D.CORDER.filter(x => G.cty[x].alive))) {
+    const cc = G.cty[c];
+    if (cc.food <= 0) continue;
+    const enemies = D.CORDER.filter(x => x !== c && G.cty[x].alive && S.atWar(c, x));
+    if (!enemies.length) continue;
+    const own = S.ownedProvs(c);
+    const seen = new Set(), cands = [];
+    const consider = (pid) => {
+      if (seen.has(pid)) return; seen.add(pid);
+      const p = G.prov[pid];
+      for (const h of S.holdsIn(pid)) {
+        if (h.o === c || !enemies.includes(h.o)) continue;
+        const src = p.o === c ? p : U.maxBy(S.adj(pid).map(q => G.prov[q]).filter(q => q.o === c), q => q.troops);
+        if (!src) continue;
+        const def = S.holdDef(h) * S.holdFort(h);
+        const avail = src.troops * (src.id === pid ? 0.2 : 0.12);
+        const odds = avail / Math.max(1, def);
+        if (odds < 1.4) continue;
+        const pri = Math.min(odds, 4) * (p.o === c ? 2.4 : 1) * ({ area: 1.2, small: 1, mid: 0.9 })[h.k] * U.rf(0.7, 1.3);
+        cands.push({ h, src, def, pri, retake: p.o === c });
+      }
+    };
+    for (const p of own) { consider(p.id); for (const q of S.adj(p.id)) consider(q); }
+    if (!cands.length) continue;
+    cands.sort((a, b) => b.pri - a.pri);
+    const wr = cc.weary || 0;
+    let budget = (U.ch(0.55 * (1 - wr * 0.6)) ? 1 : 0) + (cc.policy === 'expand' && U.ch(0.5) ? 1 : 0) + (cands.some(x => x.retake) ? 1 : 0);
+    const done = new Set();
+    for (const x of cands) {
+      if (budget <= 0) break;
+      if (done.has(x.h.id) || x.h.o === c) continue;
+      done.add(x.h.id); budget--;
+      W.resolveLocal(c, x.h, x.src, Math.min(x.src.troops * (x.src.id === x.h.pid ? 0.2 : 0.12), x.def * U.rf(1.6, 2.4)));
+    }
+  }
+};
+// 今月の拠点の増減（主人公の国）を報告に
+W.landReport = () => {
+  const st = (G.landStat || {})[G.turn]; if (!st) return null;
+  const my = S.myOff().c, n = st[my] || 0;
+  G.landStat = {};
+  return n ? `今月、${S.cname(my)}は拠点を差し引き${n > 0 ? n + 'つ得た' : -n + 'つ失った'}。` : null;
+};
+
+/* ---------- 遠征（大都市を取る） ---------- */
+// 郡の大都市に寄せる城の守りやすさ：周りの拠点を敵に取られるほど孤立して弱る
+W.isolation = (pid) => 1 - 0.45 * S.foreignShare(G.prov[pid], true);
+// 前哨戦の相手：攻め手がこの郡に拠点を持たないとき、攻め手の来る方角に一番近い、郡の持ち主の拠点
+W.gateHold = (tgt, atk, src) => {
+  const p = G.prov[tgt], hs = S.holdsIn(tgt);
+  if (hs.some(h => h.o === atk)) return null;
+  const F = S.P[src] || S.P[tgt];
+  return U.minBy(hs.filter(h => h.o === p.o), h => Math.hypot(h.x - F.x, h.y - F.y)) || null;
+};
+// 遠征の一つの合戦の構成
+W.expSpec = (camp, stage, inv, aT, dT, kind, x, title) => {
+  const atkOffs = S.officersOf(camp.atk, o => ['dais', 'shog', 'goz'].includes(o.r) && o.loc === camp.src).slice(0, stage === 'gate' ? 2 : 5);
+  const defOffs = stage === 'gate' ? [] : S.officersOf(camp.def, o => ['dais', 'shog', 'goz'].includes(o.r) && o.loc === camp.tgt).slice(0, 5);
+  let role = inv.role === 'top' ? 'commander' : inv.role;
+  const A = { c: camp.atk, troops: aT, cmd: G.off[camp.atkCmd], officers: atkOffs };
+  const B = { c: camp.def, troops: dT, cmd: G.off[camp.defCmd], officers: defOffs };
+  if (inv.side === 'atk' && role === 'commander') A.cmd = S.myOff();
+  if (inv.side === 'def' && role === 'commander') B.cmd = S.myOff();
+  const seat = typeof GEO !== 'undefined' && GEO.built ? (GEO.byProv[camp.tgt] || [])[0] : null;
+  const at = stage === 'gate' ? { x: x.hold.x, y: x.hold.y } : stage === 'siege' && seat ? { x: seat.x, y: seat.y } : null;
+  return W.buildSpec({
+    kind, pid: camp.tgt, from: stage === 'field' ? camp.src : null, at, title,
+    A, B, me: inv.side === 'atk' ? 'A' : 'B', role,
+    cityOf: kind === 'field' ? null : 'B', wall: stage === 'gate' ? (x.hold.w || 10) : G.prov[camp.tgt].wall,
+    maxDays: stage === 'gate' ? (kind === 'siege' ? 2 : 1) : stage === 'field' ? (aT + dT >= 60000 ? 2 : 1) : undefined,
+    ctx: { camp: camp.id, side: inv.side, stage },
+  });
+};
+// 守り手が城を出て野戦に出る兵（0 なら籠城）
+W.sallyForce = (camp, atk) => {
+  const P = G.prov[camp.tgt];
+  if (S.P[camp.tgt].pass) return 0;
+  const field = Math.round(P.troops * 0.65), ratio = field / Math.max(1, atk);
+  const iso = W.isolation(camp.tgt);
+  const p = ratio >= 0.9 ? 0.85 : ratio >= 0.55 ? 0.45 : 0.05;
+  return U.ch(p * (iso < 0.8 ? 0.7 : 1)) ? field : 0;
+};
+/*
+  遠征を進める。camp: { id, atk, def, src, tgt, atkTroops, atkCmd, defCmd, contrib?, drawn?, playerLed?, inv? }
+  戻り値: { win: 'atk'|'def', capture, atkLoss, defLoss, surrender, stages: [...] }
+*/
+W.runExpedition = async (camp) => {
+  const P = G.prov[camp.tgt], my = S.myOff().c;
+  const out = { win: 'def', capture: false, atkLoss: 0, defLoss: 0, surrender: false, stages: [] };
+  if (!P || P.o !== camp.def || !G.prov[camp.src]) return out;
+  const tgtName = S.P[camp.tgt].name, big = S.bigName(camp.tgt);
+  const nameA = S.cname(camp.atk), nameD = S.cname(camp.def);
+  // 兵を出す（合従軍の兵は各国からすでに引いてある）
+  const pool = camp.contrib || null;
+  if (!pool && !camp.drawn) G.prov[camp.src].troops = Math.max(0, G.prov[camp.src].troops - camp.atkTroops);
+  let atk = camp.atkTroops;
+  const giveBack = (n) => {
+    n = Math.max(0, Math.round(n));
+    if (!pool) { G.prov[camp.src].troops += n; return; }
+    const tot = U.sum(Object.values(pool), x => x) || 1;
+    for (const c in pool) {
+      if (!G.cty[c] || !G.cty[c].alive) continue;
+      const ps = S.ownedProvs(c); if (!ps.length) continue;
+      const home = ps.find(p => S.adj(p.id).includes(camp.tgt)) || G.prov[W.capital(c)] || ps[0];
+      home.troops += Math.round(n * pool[c] / tot);
+    }
+  };
+  // 主人公の関わり
+  let inv = camp.inv !== undefined ? camp.inv : W.involvement(camp);
+  if (inv && !camp.playerLed) {
+    if (inv.role === 'top') {
+      const mode = await HOOK.choose({
+        title: `${nameA}軍が${tgtName}へ遠征！`, seal: '遠征',
+        body: `${nameA}軍 ${U.fmt(camp.atkTroops)}（${G.off[camp.atkCmd]?.n || '－'}）が${tgtName}の${big}をめざして攻め寄せた。守る兵は${U.fmt(P.troops)}。`,
+        choices: [{ v: 'lead', label: '自ら指揮を執る（親征）' }, { v: 'watch', label: '将に任せて観戦する' }, { v: 'auto', label: '将に任せる（結果のみ）' }],
+      });
+      if (mode === 'auto') inv = null; else if (mode === 'watch') inv = { side: inv.side, role: 'watch' };
+    } else {
+      const cmdN = G.off[inv.side === 'atk' ? camp.atkCmd : camp.defCmd]?.n || '総大将';
+      const rolestr = inv.role === 'commander' ? '貴殿を総大将に任ずる' : inv.role === 'gunshi' ? '総軍師として策を練れ' : `${cmdN}の軍に加わり戦え`;
+      await HOOK.info({
+        title: inv.side === 'atk' ? `遠征：${tgtName}の${big}へ` : `敵襲：${tgtName}の${big}防衛`, seal: '軍令',
+        body: `${nameA}軍 ${U.fmt(camp.atkTroops)} 対 ${nameD}軍 ${U.fmt(P.troops)}。\n大都市を取るには、前哨戦と野戦を経て城を攻める。野戦で敵の主力を殲滅すれば、城は戦わずに開く。\n${rolestr}。`,
+      });
+    }
+  }
+  const cmdA = G.off[camp.atkCmd], cmdD = G.off[camp.defCmd];
+  const playerAtk = inv && inv.side === 'atk' && inv.role !== 'watch';
+  // 主人公が攻め手の采配を握るか（握らなければ、進むか退くかは総大将が決める）
+  const playerCmd = playerAtk && ['commander', 'gunshi', 'top'].includes(inv.role);
+  // 一つの戦い
+  const fight = async (stage, aT, dT, kind, x, title) => {
+    const join = inv && (inv.side === 'atk' || stage !== 'gate');
+    if (join) {
+      const spec = W.expSpec(camp, stage, inv, aT, dT, kind, x, title);
+      const br = await HOOK.battle(spec);
+      const res = W.applyBattleResult(spec, br);
+      const di = inv.side === 'atk' ? 1 : 0, sd = br.sides && br.sides[di];
+      const annih = stage === 'field' && res.win === 'atk' && sd && sd.alive / Math.max(1, sd.start) < 0.3;
+      return { win: res.win === 'atk' ? 'atk' : 'def', atkLoss: Math.min(aT, res.atkLoss || 0), defLoss: Math.min(dT, res.defLoss || 0), annih, battle: true, ratio: 1 };
+    }
+    const fort = stage === 'siege' ? x.fort : stage === 'gate' ? S.holdFort(x.hold) : 1.05 * (W.lastStand(camp.def) ? 1.1 : 1);
+    const r = W.autoResolve(aT, dT, camp.atk, camp.def, cmdA, cmdD, fort);
+    for (const id of r.slain || []) W.killOfficer(id, '戦死');
+    const annih = stage === 'field' && r.win === 'atk' && r.defLoss >= dT * 0.6;
+    return { win: r.win, atkLoss: r.atkLoss, defLoss: r.defLoss, annih, ratio: r.ratio };
+  };
+  const goOn = async (body, foe) => {
+    if (!playerCmd) return true;
+    const k = await HOOK.choose({ title: '遠征の軍議', seal: '軍議', body, choices: [{ v: 1, label: '進軍を続ける', sub: `味方 ${U.fmt(atk)}　敵 約${U.fmt(foe)}` }, { v: 0, label: '兵を退く', sub: '遠征をやめて自領へ戻る' }] });
+    return !!k;
+  };
+  const finish = (capture, why) => {
+    if (capture) {
+      const g = Math.round(atk * (pool ? 0.4 : 0.7));
+      G.prov[camp.tgt].troops = g;
+      W.capture(camp.tgt, camp.atk, camp.def);
+      giveBack(atk - g);
+      out.win = 'atk'; out.capture = true;
+    } else giveBack(atk);
+    out.why = why;
+    // 主人公の国が関わる遠征の知らせ
+    if (camp.atk === my || camp.def === my) {
+      const st = out.stages.map(s => `${s.n}${s.win === 'atk' ? '○' : '●'}`).join(' → ');
+      const won = (out.win === 'atk') === (camp.atk === my);
+      S.log(`${tgtName}への遠征（${nameA}軍）：${st || '－'}${out.surrender ? ' → 開城' : ''}。${capture ? `${nameA}が${big}を落とした。` : `${nameA}軍は退いた。`}`, won ? 'good' : 'bad');
+    }
+    return out;
+  };
+  // 1. 前哨戦：攻め手の来る方角の拠点
+  const gate = W.gateHold(camp.tgt, camp.atk, camp.src);
+  if (gate) {
+    const gd = Math.round(S.holdDef(gate) + (gate.o === P.o ? P.troops * 0.06 : 0));
+    const r = await fight('gate', atk, gd, gate.k === 'mid' ? 'siege' : 'field', { hold: gate }, `${gate.n}の戦い（前哨戦）`);
+    if (G.over) return out;
+    atk -= r.atkLoss; out.atkLoss += r.atkLoss; out.defLoss += r.defLoss;
+    W.holdLoss(gate, r.defLoss);
+    out.stages.push({ n: '前哨戦', win: r.win, at: gate.n });
+    if (r.win !== 'atk' || atk <= 0) return finish(false, 'gate');
+    const gar = Math.round(Math.min(D.HOLDK[gate.k].cap, atk * 0.04));
+    W.takeHold(gate, camp.atk, gar); atk -= gar;
+    // 攻め手のAI：大きく劣るなら退く
+    if (!playerCmd && atk < P.troops * W.fortMul(camp.tgt) * W.isolation(camp.tgt) * 0.55) return finish(false, 'retreat');
+    if (!(await goOn(`前哨戦に勝ち、${gate.n}を奪った。${tgtName}の${big}には敵 約${U.fmt(P.troops)} が控えている。`, P.troops))) return finish(false, 'retreat');
+  }
+  // 2. 野戦：守り手の主力が城を出て迎え撃つか
+  let sally;
+  if (inv && inv.side === 'def' && (inv.role === 'commander' || inv.role === 'top') && !S.P[camp.tgt].pass) {
+    const k = await HOOK.choose({ title: `${big}の守り`, seal: '軍議', body: `${nameA}軍 約${U.fmt(atk)} が迫る。城の兵は${U.fmt(P.troops)}。`, choices: [{ v: 'sally', label: '城を出て迎え撃つ（野戦）', sub: '勝てば敵を退け、大敗すれば城を失う' }, { v: 'hold', label: '籠城する', sub: '城壁を頼りに攻城戦で守る' }] });
+    sally = k === 'sally' ? Math.round(P.troops * 0.7) : 0;
+  } else sally = W.sallyForce(camp, atk);
+  if (sally > 0) {
+    const r = await fight('field', atk, sally, 'field', {}, `${tgtName}郊外の野戦`);
+    if (G.over) return out;
+    atk -= r.atkLoss; P.troops = Math.max(0, P.troops - r.defLoss); out.atkLoss += r.atkLoss; out.defLoss += r.defLoss;
+    out.stages.push({ n: '野戦', win: r.win });
+    if (r.win !== 'atk' || atk <= 0) return finish(false, 'field');
+    // 殲滅：主力の大半を失い、城を守る兵が足りなければ城は開く
+    if (r.annih || P.troops < Math.max(800, atk * 0.15) || ((r.ratio || 0) >= 2.2 && U.ch(0.5))) {
+      out.surrender = true;
+      S.log(`${tgtName}の${big}は主力を失い、城門を開いた。`, camp.atk === my ? 'good' : camp.def === my ? 'bad' : 'info');
+      if (inv && inv.role !== 'watch') await HOOK.info({ title: '開城', seal: '開城', body: `野戦で敵の主力を殲滅した。${big}は戦わずに城門を開いた。` });
+      return finish(true, 'surrender');
+    }
+    if (!playerCmd && atk < P.troops * W.fortMul(camp.tgt) * W.isolation(camp.tgt) * 0.6) return finish(false, 'retreat');
+    if (!(await goOn(`野戦に勝った。敵の残兵 約${U.fmt(P.troops)} が${big}に籠もった。城を攻めるか。`, P.troops))) return finish(false, 'retreat');
+  }
+  // 3. 攻城戦
+  const pl = camp.atk === my && (camp.playerLed || S.isTop());
+  const fort = W.fortMul(camp.tgt, pl) * W.isolation(camp.tgt);
+  const r = await fight('siege', atk, P.troops, S.P[camp.tgt].pass ? 'pass' : 'siege', { fort }, `${big}攻城戦`);
+  if (G.over) return out;
+  atk -= r.atkLoss; P.troops = Math.max(0, P.troops - r.defLoss); out.atkLoss += r.atkLoss; out.defLoss += r.defLoss;
+  out.stages.push({ n: '攻城戦', win: r.win });
+  if (r.win === 'atk' && atk > 0) {
+    // 敗残兵は隣の自領へ
+    const back = S.adj(camp.tgt).map(q => G.prov[q]).find(p => p.o === camp.def);
+    if (back) back.troops += Math.round(P.troops * 0.5);
+    return finish(true, 'siege');
+  }
+  return finish(false, 'siege');
+};
+
+/* ---------- 主人公の遠征（君主・丞相の命、または許しを得た将） ---------- */
+W.launchExpedition = async (tgt, troops, opts = {}) => {
   const me = G.me, o = S.myOff(), c = o.c;
   const src = opts.src || S.adj(tgt).filter(q => G.prov[q].o === c).sort((a, b) => G.prov[b].troops - G.prov[a].troops)[0];
   if (!src) return null;
   const P = G.prov[tgt];
   const lead = opts.lead !== false;
-  const kind = S.P[tgt].pass ? 'pass' : (P.wall >= 55 || S.P[tgt].cap ? 'siege' : 'field');
-  const camp = { id: U.uid(), atk: c, def: P.o, src, tgt, atkTroops: troops, defTroops: P.troops, atkCmd: lead ? o.id : opts.cmd, defCmd: W.pickCommander(P.o, tgt)?.id, kind };
-  // 兵の調達：近隣の州から
-  let need = troops;
-  const pool = [src, ...S.adj(src).filter(q => G.prov[q].o === c)];
-  for (const q of pool) { const p = G.prov[q]; const take = Math.min(need, Math.round(p.troops * 0.7)); p.troops -= take; need -= take; if (need <= 0) break; }
-  camp.atkTroops = troops - Math.max(0, need);
-  G.prov[src].troops += camp.atkTroops; // applyCampaign で差し引くため一度戻す
-  let res;
-  if (lead) {
-    const asGunshi = S.isStaff() && S.tier() >= 7 && G.off[me.boss] && G.off[me.boss].alive;
-    const spec = W.buildSpec({ kind, pid: tgt, from: src, title: `${S.P[tgt].name}攻略戦`, A: { c, troops: camp.atkTroops, cmd: asGunshi ? G.off[me.boss] : o, officers: S.officersOf(c, x => ['shog', 'goz'].includes(x.r) && x.loc === src).slice(0, 4) }, B: { c: P.o, troops: P.troops, cmd: G.off[camp.defCmd], officers: S.officersOf(P.o, x => ['shog', 'goz', 'dais'].includes(x.r) && x.loc === tgt).slice(0, 4) }, me: 'A', role: asGunshi ? 'gunshi' : 'commander', cityOf: kind === 'field' ? null : 'B', ctx: { camp: camp.id, side: 'atk' } });
-    const br = await HOOK.battle(spec);
-    res = W.applyBattleResult(spec, br);
-    res.fromBattle = true;
-  } else if (opts.watch) {
-    const spec = W.buildSpec({ kind, pid: tgt, from: src, title: `${S.P[tgt].name}攻略戦`, A: { c, troops: camp.atkTroops, cmd: G.off[opts.cmd] }, B: { c: P.o, troops: P.troops, cmd: G.off[camp.defCmd] }, me: 'A', role: 'watch', cityOf: kind === 'field' ? null : 'B', ctx: { camp: camp.id, side: 'atk' } });
-    const br = await HOOK.battle(spec);
-    res = W.applyBattleResult(spec, br); res.fromBattle = true;
-  } else {
-    res = W.autoResolve(camp.atkTroops, camp.defTroops, c, P.o, G.off[camp.atkCmd], G.off[camp.defCmd], kind === 'field' ? 1.05 : W.fortMul(tgt, true));
-  }
-  W.applyCampaign(camp, res);
-  if (!res.fromBattle) S.log(`${S.P[tgt].name}攻略：${res.win === 'atk' ? '勝利' : '敗北'}（損害 ${U.fmt(res.atkLoss)}）`, res.win === 'atk' ? 'good' : 'bad');
+  const asGunshi = lead && S.isStaff() && S.tier() >= 7 && G.off[me.boss] && G.off[me.boss].alive;
+  // 兵の調達：近隣の郡から
+  let need = troops, got = 0;
+  for (const q of [src, ...S.adj(src).filter(q => G.prov[q].o === c)]) { const p = G.prov[q]; const take = Math.min(need, Math.round(p.troops * 0.7)); p.troops -= take; need -= take; got += take; if (need <= 0) break; }
+  const camp = {
+    id: U.uid(), atk: c, def: P.o, src, tgt, atkTroops: got, drawn: true,
+    atkCmd: lead ? (asGunshi ? me.boss : o.id) : opts.cmd, defCmd: W.pickCommander(P.o, tgt)?.id,
+    playerLed: lead,
+    inv: lead ? { side: 'atk', role: asGunshi ? 'gunshi' : 'commander' } : (opts.watch ? { side: 'atk', role: 'watch' } : null),
+  };
+  const res = await W.runExpedition(camp);
   W.taskEvent('conquer', tgt, G.prov[tgt].o === c);
+  if (lead && res.capture && !G.over) W.gainMerit(Math.round(60 * S.tier()), `${S.P[tgt].name}の${S.bigName(tgt)}を落とした`);
   return res;
+};
+
+/* ---------- 主人公が攻め取れる拠点 ---------- */
+// 今いる郡（自領の中の敵の拠点）と、隣の郡の敵の拠点
+W.playerHoldTargets = (ignoreTier) => {
+  const me = G.me, myC = S.myOff().c, tier = S.tier();
+  const out = [];
+  for (const pid of [me.loc, ...S.adj(me.loc)]) {
+    for (const h of S.holdsIn(pid)) {
+      if (h.o === myC || !S.atWar(myC, h.o)) continue;
+      if (!ignoreTier && tier < (D.HOLD_TIER[h.k] || 9)) continue;
+      out.push(h);
+    }
+  }
+  return out;
+};
+// 拠点を攻める戦の報せ（主人公が加わる）
+W.holdOffer = (h, opt = {}) => {
+  const me = G.me, myC = S.myOff().c;
+  const force = Math.max(5, S.armyTotal());
+  const foe = Math.max(20, S.holdDef(h));
+  const home = G.prov[me.loc];
+  const supMax = home && home.o === myC ? Math.round(home.troops * 0.1) : 0;
+  const want = Math.round(foe * S.holdFort(h) * U.rf(1.15, 1.6));
+  const ally = Math.max(0, Math.min(supMax, want - force));
+  return { id: U.uid(), kind: 'hold', hid: h.id, pid: h.pid, from: me.loc, ec: h.o, foe, ally, title: `${h.n}攻略（${D.HOLDK[h.k].n}）`, desc: `${S.cname(h.o)}の${S.P[h.pid].name}・${S.holdLabel(h)}を攻め取る好機。守り 約${U.fmt(foe)}。`, auto: !!opt.auto };
 };
 
 /* =========================================================
@@ -5878,6 +6342,14 @@ A.pickProv = async (title, provs, subf) => {
   if (A._pre) { const ids = provs.map(p => p.id || p); const v = A._pre; A._pre = null; if (ids.includes(v)) return v; }
   if (!provs.length) return null;
   const ch = provs.map(p => ({ v: p.id || p, label: S.P[p.id || p].name, sub: subf ? subf(G.prov[p.id || p]) : '' }));
+  ch.push({ v: null, label: 'やめる' });
+  return await HOOK.choose({ title, choices: ch });
+};
+// 拠点を選ぶ（A._preHold があればそれ）
+A._preHold = null;
+A.pickHold = async (title, hs) => {
+  if (A._preHold) { const v = A._preHold; A._preHold = null; if (hs.some(h => h.id === v)) return v; }
+  const ch = hs.map(h => ({ v: h.id, label: `${S.P[h.pid].name}・${h.n}（${D.HOLDK[h.k].n}）`, sub: `${S.cname(h.o)}　守り 約${U.fmt(S.holdDef(h))}${h.w ? `・城壁${h.w}` : ''}` }));
   ch.push({ v: null, label: 'やめる' });
   return await HOOK.choose({ title, choices: ch });
 };
@@ -5998,7 +6470,7 @@ A.def({ id: 'jousou', cat: 'self', n: '上奏・献策', ap: 1, d: '上官や君
   run: async () => {
     const me = me_(), o = mo_(), c = o.c, cc = cty_();
     const ch = [];
-    if (tier_() >= 7 && isMilLike()) ch.push({ v: 'war', label: '攻略の許可を求める', sub: '許可が出れば、自ら軍を率いて隣国の郡を攻める' });
+    if (tier_() >= 7 && isMilLike()) ch.push({ v: 'war', label: '遠征の許可を求める', sub: '許可が出れば、自ら遠征軍を率いて隣国の大都市を攻める（前哨戦・野戦・攻城戦）' });
     if (isMilLike()) ch.push({ v: 'troops', label: '兵の補充を求める', sub: '欠員を国軍からすぐに埋める' });
     if (tier_() >= 6) ch.push({ v: 'policy', label: '国の方針を献策する', sub: '評定の方針を変えさせる' });
     if (track_() === 'civ' || rank_() === 'josh') ch.push({ v: 'budget', label: '予算を求める', sub: '内政の資金を国庫から引き出す' });
@@ -6026,23 +6498,23 @@ A.def({ id: 'jousou', cat: 'self', n: '上奏・献策', ap: 1, d: '上官や君
       const tg = S.adj(me.loc).concat(...S.adj(me.loc).map(q => S.adj(q))).filter((q, i, a) => a.indexOf(q) === i && G.prov[q].o !== c && G.prov[q].o && G.cty[G.prov[q].o]?.alive);
       const adjT = [...new Set(S.ownedProvs(c).flatMap(p => S.adj(p.id)).filter(q => G.prov[q].o !== c))];
       const opts = adjT.filter(q => tg.includes(q) || S.adj(q).includes(me.loc));
-      const pid = await A.pickProv('攻める郡', opts.length ? opts : adjT, p => `${S.cname(p.o)}　守備${U.fmt(p.troops)}　${A.relStr(p.o)}`);
+      const pid = await A.pickProv('遠征先（大都市）', opts.length ? opts : adjT, p => `${S.bigName(p.id)}（${S.cname(p.o)}）　守備${U.fmt(p.troops)}　${A.relStr(p.o)}`);
       if (!pid) return null;
       const tc = G.prov[pid].o;
       const ruler = G.off[cc.ruler];
       const pr = S.countryPower(c) / Math.max(1, S.countryPower(tc));
       let chance = 0.25 + (res > 0 ? 0.35 : res < 0 ? -0.2 : 0) + bondB + (ruler?.bond || 0) / 300 + (pr - 1) * 0.15 + (cc.policy === 'expand' ? 0.2 : 0) + (S.atWar(c, tc) ? 0.15 : -0.2);
       if (S.allied(c, tc)) chance = 0.02;
-      if (!U.ch(U.clamp(chance, 0.03, 0.95))) return '攻略の許可は下りなかった。';
+      if (!U.ch(U.clamp(chance, 0.03, 0.95))) return '遠征の許可は下りなかった。';
       if (!S.atWar(c, tc)) W.declareWar(c, tc);
       const maxT = { tenka: 600000, dais: 300000, shog: 100000, dgun: 150000 }[rank_()] || 80000;
       const avail = U.sum([...new Set([...S.adj(pid).filter(q => G.prov[q].o === c), me.loc])].map(q => G.prov[q]), p => p.o === c ? p.troops * 0.7 : 0);
       const troops = Math.round(Math.max(S.armyTotal(), Math.min(maxT, avail + S.armyTotal())));
-      await HOOK.info({ title: '攻略の許可が下りた', seal: '王命', body: `${S.P[pid].name}を攻めよ。動員兵力 ${U.fmt(troops)}。` });
+      await HOOK.info({ title: '遠征の許可が下りた', seal: '王命', body: `${S.P[pid].name}の${S.bigName(pid)}を攻めよ。動員兵力 ${U.fmt(troops)}。\n前哨戦・野戦を経て城を攻める。野戦で敵の主力を殲滅すれば、城は戦わずに開く。` });
       if (isGunshi()) {
         const boss = G.off[me.boss];
         await W.launchPlayerCampaign(pid, troops, { lead: true });
-        return boss ? `${boss.n}の軍の総軍師として戦った。` : '';
+        return boss ? `${boss.n}の遠征軍の総軍師として戦った。` : '';
       }
       await W.launchPlayerCampaign(pid, troops, { lead: true });
       return '';
@@ -6209,6 +6681,19 @@ A.def({ id: 'shutsugeki', cat: 'ops', n: '出撃（小規模戦闘）', ap: 2, d
     const of = { id: U.uid(), kind: 'raid', pid, tgt: pid, from: pid, ec: p.o, foe, ally: 0, title: `${S.P[pid].name}への出撃`, desc: '' };
     G.offers.push(of);
     return await A.runOffer(of);
+  } });
+A.def({ id: 'kyoten', cat: 'ops', n: '拠点攻略', ap: 2, d: '隣の敵の中都市・小都市・地域を攻め取る。駐屯地の軍も援軍を出す。地域は屯長、小都市は三百将、中都市は千人将から。',
+  req: () => !isMilLike() ? '武官・軍師のみ' : tier_() < 2 ? '屯長以上のみ' : !hasArmy() ? '兵がいない' : (W.playerHoldTargets().length ? true : '攻め取れる敵の拠点が近くにない'),
+  run: async () => {
+    const hs = W.playerHoldTargets();
+    const hid = await A.pickHold('攻め取る拠点', hs);
+    if (!hid) return null;
+    const of = W.holdOffer(G.hold[hid]);
+    G.offers.push(of);
+    await A.runOffer(of);
+    if (G.over) return '';
+    const h = G.hold[hid];
+    return h.o === mo_().c ? `${S.P[h.pid].name}の${S.holdLabel(h)}を奪った。` : `${S.holdLabel(h)}は落ちなかった。`;
   } });
 A.def({ id: 'shigan', cat: 'ops', n: '従軍志願', ap: 1, d: '近くで戦が起きたら必ず加わる（来月）。', req: () => (isMilLike() && tier_() <= 6) || '将軍より下の武官・軍師のみ',
   run: async () => { me_().flags.volunteer = G.turn + 1; return '次の戦に志願した。'; } });
@@ -6466,20 +6951,20 @@ A.def({ id: 'd_kofuku', cat: 'dip', n: '降伏勧告', ap: 1, d: '弱った国�
   } });
 
 /* ======== 軍令（丞相・君主） ======== */
-A.def({ id: 'shuppei', cat: 'war', n: '出兵', ap: 1, d: '交戦中の国の郡へ軍を送る。自ら率いる（親征）こともできる。', req: topOK,
+A.def({ id: 'shuppei', cat: 'war', n: '遠征', ap: 1, d: '交戦中の国の大都市（郡の都）へ遠征軍を送る。前哨戦・野戦を経て攻城戦。野戦で敵の主力を殲滅すれば城は開く。自ら率いる（親征）こともできる。', req: topOK,
   run: async () => {
     const c = mo_().c;
     const plans = W.campaignPlans(c);
     const tgts = [...new Set(plans.map(p => p.tgt))];
-    if (!tgts.length) return '攻められる敵地がない（交戦中の国と接していない）。';
-    const pid = await A.pickProv('攻める郡', tgts, p => { const pl = plans.find(x => x.tgt === p.id); return `${S.cname(p.o)}　守備${U.fmt(p.troops)}　城壁${Math.round(p.wall)}　動員可能${U.fmt(pl.atk)}`; });
+    if (!tgts.length) return '遠征できる敵の大都市がない（交戦中の国と接していない）。';
+    const pid = await A.pickProv('遠征先（大都市）', tgts, p => { const pl = plans.find(x => x.tgt === p.id); const fs = S.foreignShare(p, true); return `${S.bigName(p.id)}（${S.cname(p.o)}）　守備${U.fmt(p.troops)}　城壁${Math.round(p.wall)}${fs > 0 ? `　周りの拠点${Math.round(fs * 100)}%を確保` : ''}　動員可能${U.fmt(pl.atk)}`; });
     if (!pid) return null;
     const pl = plans.find(x => x.tgt === pid);
     const avail = Math.round(U.sum([...new Set([pl.src, ...S.adj(pid).filter(q => G.prov[q].o === c)])].map(q => G.prov[q]), p => p.troops * 0.7));
     const amt = await HOOK.choose({ title: '動員する兵力', choices: [0.4, 0.7, 1].map(f => ({ v: Math.round(avail * f), label: U.fmt(avail * f) + '人' })).concat([{ v: null, label: 'やめる' }]) });
     if (!amt) return null;
     const gens = S.officersOf(c, x => ['dais', 'shog'].includes(x.r)).sort((a, b) => b.tou - a.tou).slice(0, 6);
-    const who = await HOOK.choose({ title: '総大将', choices: [{ v: 'me', label: '自ら率いる（親征）', sub: '合戦を指揮する' }, ...gens.map(x => ({ v: x.id, label: x.n, sub: `統${x.tou} 武${x.bu} 知${x.chi}（観戦できる）` }))] });
+    const who = await HOOK.choose({ title: '遠征軍の総大将', choices: [{ v: 'me', label: '自ら率いる（親征）', sub: '前哨戦・野戦・攻城戦を指揮する' }, ...gens.map(x => ({ v: x.id, label: x.n, sub: `統${x.tou} 武${x.bu} 知${x.chi}（観戦できる）` }))] });
     if (!who) return null;
     if (who === 'me') { await W.launchPlayerCampaign(pid, amt, { lead: true, src: pl.src }); return ''; }
     const watch = await HOOK.choose({ title: '戦の見届け', choices: [{ v: true, label: '観戦する' }, { v: false, label: '結果だけ聞く' }] });
@@ -11863,6 +12348,62 @@ UI.fame = (o) => UI.modal((box, close) => {
   b.onclick = () => close(true);
   box.append(b);
 });
+// 出撃する部隊と人数を選ぶ（合戦の前）
+UI.wantSortie = (spec) => {
+  if (!G || !spec || !spec.args || spec.role === 'watch' || !spec.sides[0] || !spec.sides[0].player) return false;
+  const gs = W.playerGroups(), tot = U.sum(gs, g => g.n);
+  return tot >= 600 && (gs.length >= 2 || tot >= 3000);
+};
+UI.sortie = (spec) => UI.modal((box, close) => {
+  const A2 = G.me.army, gs = W.playerGroups();
+  const meKey = spec.args.me || 'A', X = spec.args[meKey] || {};
+  const enemy = U.sum(spec.units.filter(u => u.side === 1), u => u.n);
+  const total = U.sum(gs, g => g.n);
+  let preset = A2.sortiePre || 'auto';
+  let pick = W.sortiePick(spec, preset);
+  UI.head(box, { title: '出撃する部隊', seal: '出陣', body: `${spec.title}　敵 約${U.fmt(enemy)}` });
+  const pre = U.h('div', { class: 'seg sm', role: 'group', 'aria-label': 'おまかせ', style: { marginTop: '10px' } });
+  const rows = U.h('div', { class: 'sortie-rows' });
+  const sum = U.h('div', { class: 'body', style: { marginTop: '10px', fontSize: '13.5px' } });
+  const remember = U.h('label', { class: 'sortie-rem' }, U.h('input', { type: 'checkbox', id: 'so-rem' }), U.h('span', {}, '次からこの選び方で、聞かずに出る（「軍」で変えられる）'));
+  const go = U.h('button', { class: 'btn seal wide', style: { marginTop: '12px' } }, 'この陣容で出陣');
+  const brought = () => U.sum(gs, g => pick[g.key] || 0);
+  const allies = () => X.addMe ? (X.troops || 0) : Math.max(0, (X.troops || 0) - brought());
+  const upd = () => {
+    const b = brought(), al = allies();
+    sum.textContent = `出撃 ${U.num(b)}人（全軍 ${U.num(total)}人）${al ? `　味方の援軍 約${U.fmt(al)}` : ''}　→ 味方 約${U.fmt(b + al)} 対 敵 約${U.fmt(enemy)}`;
+    for (const x of pre.querySelectorAll('button')) x.classList.toggle('on', x.dataset.p === preset);
+    remember.querySelector('input').disabled = preset === 'custom';
+    // 直属を出さないと、主人公は護衛だけを連れて出る
+    const mainOut = gs.some(g => !g.ld && (pick[g.key] || 0) > 0);
+    go.textContent = !b ? '護衛だけを連れて出る' : mainOut ? 'この陣容で出陣' : 'この陣容で出陣（自分は護衛と出る）';
+  };
+  const renderRows = () => {
+    rows.innerHTML = '';
+    for (const g of gs) {
+      const who = g.ld ? (G.off[g.ld]?.n || '部下') : '直属';
+      const row = U.h('div', { class: 'so-row' });
+      const lab = U.h('div', { class: 'so-l' }, U.h('b', {}, `${who}・${D.UT[g.t].n}`), U.h('small', {}, `${U.num(g.n)}人・練度${g.tr}`));
+      const num = U.h('input', { type: 'number', inputmode: 'numeric', min: '0', max: String(g.n), step: '1', value: String(pick[g.key] || 0), 'aria-label': `${who}の${D.UT[g.t].n}の出撃人数` });
+      const rng = U.h('input', { type: 'range', min: '0', max: String(g.n), step: String(Math.max(1, Math.round(g.n / 200))), value: String(pick[g.key] || 0), 'aria-label': `${who}の${D.UT[g.t].n}の出撃人数` });
+      const set = (v) => { v = U.clamp(Math.round(Number(v) || 0), 0, g.n); pick[g.key] = v; num.value = String(v); rng.value = String(v); row.classList.toggle('off', !v); preset = 'custom'; upd(); };
+      num.onchange = () => set(num.value); rng.oninput = () => set(rng.value);
+      const q = U.h('div', { class: 'so-q' }, ...[[0, '留守'], [0.5, '半分'], [1, '全部']].map(([f, l]) => U.h('button', { class: 'chip', onclick: () => set(g.n * f) }, l)));
+      row.append(lab, U.h('div', { class: 'so-n' }, num, U.h('small', {}, `／${U.num(g.n)}`)), rng, q);
+      row.classList.toggle('off', !(pick[g.key] > 0));
+      rows.append(row);
+    }
+  };
+  for (const [k, n] of [['auto', '敵の倍まで'], ['direct', '直属だけ'], ['all', '全軍']]) pre.append(U.h('button', { 'data-p': k, onclick: () => { preset = k; pick = W.sortiePick(spec, k); renderRows(); upd(); } }, n));
+  renderRows(); upd();
+  go.onclick = () => {
+    if (remember.querySelector('input').checked && preset !== 'custom') { A2.sortieAsk = false; A2.sortiePre = preset; }
+    else if (preset !== 'custom') A2.sortiePre = preset;
+    close(Object.assign({}, pick));
+  };
+  const foot = U.h('div', { class: 'so-foot' }, sum, remember, go);
+  box.append(pre, rows, foot);
+});
 UI.multiPick = (o) => UI.modal((box, close) => {
   UI.head(box, o);
   const sel = new Set(o.chosen || []);
@@ -12016,8 +12557,9 @@ UI.help = () => UI.info({
   title: '遊び方', body:
 `1. 国と立場（伍長〜大将軍、軍吏〜大軍師、里典〜御史大夫、丞相・君主）を選び、主人公の能力を決める。
 2. 毎月「任務状」の数だけ行動できる。立場ごとにできることが違う。
-   ・武官：訓練・装備・出撃・戦場へ駆けつける
-   ・「軍」タブの「部隊の割り振り」で、部下に何人任せるか・合戦での任せ方・兵種の転換を決められる（任務状は使わない）
+   ・武官：訓練・装備・拠点攻略・遠征・戦場へ駆けつける
+   ・「軍」タブの「部隊の割り振り」で、部下に何人任せるか・合戦での任せ方・兵種の転換を決められる（任務状は使わない）。気に入らない部下は解任できる（兵は直属に戻るが、本人は恨み、ほかの部下も少し不安がる）
+   ・「軍」タブの「合戦に出る部隊」で、合戦のたびに連れて行く兵を選ぶか、「敵の倍まで」「直属だけ」「全軍」から決めておける。出なかった兵は留守で、損害を受けない
    ・「人物」タブの「特性工房」で、自分だけの特性を作って付けられる
    ・文官：管轄地の内政、大臣は国政、丞相・君主は国法・外交・戦争
 3. 行動を終えたら「月を進める」。各国が動き、戦や事件が起きる。
@@ -12026,10 +12568,14 @@ UI.help = () => UI.info({
 5. 功績を挙げると昇進する。官職は三等→二等→一等と一段ずつ進み、一段ごとに在任期間が要る。上の官職には名声や戦歴も要る。
    ・将軍・大将軍は功績に応じて率いる兵が増える（将軍は最大十万、大将軍は最大五十万）。
    ・爵（二十等爵）は下・中・上の三段に分かれ、一か月に一段ずつ上がる。爵が上がると田宅（私領）が増える。
-6. 大きな戦で活躍すると武名が上がり、「〇〇の鬼神」のような異名で呼ばれる。名が天下に轟けば、合戦で敵がひるむ。武官の頂点は「天下の大将軍」。
-7. 自国が天下を統一すれば終幕。
+6. 土地は郡（大都市）の下に中都市・小都市・地域があり、ひとつずつ奪い合う。
+   ・中都市・小都市・地域は「拠点攻略」（地図で拠点をタップ→攻略）で取る。小さな拠点から順に、位が上がるほど大きな拠点を任される。奪った拠点の実りはこちらのものになり、拠点を奪われた郡は治安と民心が下がり、守りも弱る。
+   ・郡そのもの（大都市）は「遠征」で取る。前哨戦で拠点を破り、敵が城を出てくれば野戦、城に籠もれば攻城戦。野戦で敵の主力を殲滅すれば、攻城戦の前に開城させられる。大都市が落ちると、その郡の拠点の多くも降る。
+7. 大きな戦で活躍すると武名が上がり、「〇〇の鬼神」のような異名で呼ばれる。名が天下に轟けば、合戦で敵がひるむ。武官の頂点は「天下の大将軍」。
+8. 自国が天下を統一すれば終幕。
 
-・地図は二本指（またはホイール）で拡大できる。寄るほど県・郷・里、川や道まで細かく見える。郡をタップすると県の一覧。
+・地図は二本指（またはホイール）で拡大できる。寄るほど県・郷・里、川や道まで細かく見える。郡をタップすると県と拠点の一覧。
+・他国に奪われた拠点は白い縁の印と、奪った国の色のにじみで示される。自国の拠点の印は、郡を選ぶか大きく寄ると出る。
 ・合戦の戦場は、全体マップのその土地の地形（川・森・田畑・村・道）からつくられる。
 ・三か月ごとに評定があり、上官から任務を受けられる。
 ・九月末に上計（年度の考課）があり、一年の働きが評価される。
@@ -13204,6 +13750,22 @@ UI.map = {
         g.strokeStyle = this.ccol(this.ownerOf(pi), 0.55); g.lineWidth = Math.min(14, Math.max(7, s * 2.2)) * px; g.lineCap = 'round'; g.lineJoin = 'round'; g.stroke();
         g.restore();
       }
+      // 奪われた拠点のまわりを、奪った国の色で
+      if (G.hold) {
+        const byP = {};
+        for (const h of S.holdAll()) { if (h.o === G.prov[h.pid].o) continue; if (h.x < view[0] - 10 || h.x > view[2] + 10 || h.y < view[1] - 10 || h.y > view[3] + 10) continue; (byP[h.pid] = byP[h.pid] || []).push(h); }
+        for (const pid in byP) {
+          const pi = D.PROVINCES.findIndex(P => P.id === pid); if (pi < 0) continue;
+          g.save(); g.clip(paths[pi].P, 'evenodd');
+          for (const h of byP[pid]) {
+            const r = { mid: 8, small: 5.5, area: 6.5 }[h.k] || 6;
+            const gr = g.createRadialGradient(h.x, h.y, r * 0.1, h.x, h.y, r);
+            gr.addColorStop(0, this.ccol(h.o, 0.62)); gr.addColorStop(0.6, this.ccol(h.o, 0.38)); gr.addColorStop(1, this.ccol(h.o, 0));
+            g.fillStyle = gr; g.beginPath(); g.arc(h.x, h.y, r, 0, 6.2832); g.fill();
+          }
+          g.restore();
+        }
+      }
       g.restore();
       // 2. 境界線
       g.lineCap = 'round'; g.lineJoin = 'round';
@@ -13325,6 +13887,28 @@ UI.map = {
         label(v.n, v.x, v.y + 0.9 + 7 / s, { font: `10px ${BODY}`, size: 10, color: '#4b3a28', hw: 2.5 });
       }
     }
+    // 拠点の印（中都市は□、小都市は小さな□、地域は◇。奪われた拠点は白い縁）
+    if (ready && G.hold && z >= 1.5) {
+      // 自国の拠点は、選んだ郡か、十分に寄ったときだけ（地図が込み合わないように）
+      const list = S.holdAll().filter(h => this.holdVis(h, z)).sort((a, b) => (a.o !== G.prov[a.pid].o) - (b.o !== G.prov[b.pid].o));
+      for (const h of list) {
+        const foreign = h.o !== G.prov[h.pid].o;
+        const [sx, sy] = this.w2s(h.x, h.y);
+        if (sx < -12 || sy < -12 || sx > vw + 12 || sy > vh + 12) continue;
+        const col = D.COUNTRIES[h.o]?.mapc || '#777', fill = col === '#3a3a44' ? '#2b2b33' : col;
+        const r = (h.k === 'mid' ? 4.6 : h.k === 'small' ? 3.6 : 3.4) * (foreign ? 1.1 : 0.85) * (z >= 6 ? 1.25 : 1);
+        g.globalAlpha = foreign || this.sel === h.pid ? 1 : 0.72;
+        g.fillStyle = fill; g.strokeStyle = foreign ? '#fff4e6' : '#231c13'; g.lineWidth = foreign ? 2 : 1;
+        g.beginPath();
+        if (h.k === 'area') { g.moveTo(sx, sy - r * 1.25); g.lineTo(sx + r * 1.25, sy); g.lineTo(sx, sy + r * 1.25); g.lineTo(sx - r * 1.25, sy); g.closePath(); }
+        else g.rect(sx - r, sy - r, r * 2, r * 2);
+        g.fill(); g.stroke();
+        if (foreign) { g.strokeStyle = 'rgba(35,28,19,.55)'; g.lineWidth = 1; g.stroke(); }
+        g.globalAlpha = 1;
+        if (this.selHold === h.id) { g.strokeStyle = '#c2452f'; g.lineWidth = 2.5; g.beginPath(); g.arc(sx, sy, r * 2.4, 0, 6.2832); g.stroke(); }
+        if (z >= 5 && h.k !== 'mid') label(h.n, h.x, h.y + 9 / s, { font: `500 10.5px ${BODY}`, size: 10, color: foreign ? '#7a2a1a' : '#3b2c1c', hw: 2.5 });
+      }
+    }
     // 郡の印
     for (const m of marks) {
       const col = D.COUNTRIES[m.o]?.mapc || '#777', fill = col === '#3a3a44' ? '#2b2b33' : col;
@@ -13376,7 +13960,20 @@ UI.map = {
     cv.onpointerup = up; cv.onpointercancel = up;
     cv.onwheel = (e) => { e.preventDefault(); const [x, y] = pos(e); const [wx, wy] = this.s2w(x, y); this.cam.s *= Math.exp(-e.deltaY * 0.0015); this.clamp(); this.cam.x = wx - (x - this.vw / 2) / this.cam.s; this.cam.y = wy - (y - this.vh / 2) / this.cam.s; this.clamp(); this.req(); };
   },
+  // 拠点の印を描くか（奪われた拠点は早めに、自国の拠点は選んだ郡か十分に寄ったときだけ）
+  holdVis(h, z) {
+    if (h.o !== G.prov[h.pid].o) return z >= 1.5;
+    return z >= 4.5 || (z >= 2.2 && this.sel === h.pid);
+  },
   tap(x, y) {
+    // 拠点の印（寄っているとき）
+    const z = this.cam.s / this.fitS();
+    this.selHold = null;
+    if (G.hold && MAP.ready && z >= 1.5) {
+      let hb = null, hd = 14;
+      for (const h of S.holdAll()) { if (!this.holdVis(h, z)) continue; const [sx, sy] = this.w2s(h.x, h.y); const d = Math.hypot(sx - x, sy - y); if (d < hd) { hd = d; hb = h; } }
+      if (hb) { this.selHold = hb.id; this.selCounty = null; this.select(hb.pid); return; }
+    }
     let best = null, bd = 28;
     for (const P of D.PROVINCES) { const [sx, sy] = this.w2s(P.x, P.y); const d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = P.id; } }
     this.selCounty = null;
@@ -13392,9 +13989,11 @@ UI.map = {
     this.sel = pid; this.draw();
     const sh = U.$('#map-sheet'); if (!sh) return;
     sh.hidden = false;
-    sh.innerHTML = UI.provSheet(pid, this.selCounty);
-    U.$('#sh-x', sh).onclick = () => { this.sel = null; sh.hidden = true; this.draw(); };
+    sh.innerHTML = UI.provSheet(pid, this.selCounty, this.selHold);
+    U.$('#sh-x', sh).onclick = () => { this.sel = null; this.selHold = null; sh.hidden = true; this.draw(); };
     for (const b of U.$$('[data-act]', sh)) b.onclick = () => UI.runAct(b.dataset.act, pid);
+    for (const b of U.$$('[data-hold]', sh)) b.onclick = () => { A._preHold = b.dataset.hold; UI.runAct('kyoten', pid); };
+    const hs = U.$('.hrow.sel', sh); if (hs) setTimeout(() => { try { hs.scrollIntoView({ block: 'nearest' }); } catch (e) { /* */ } }, 30);
   },
 };
 // 郡の風土（全体マップから）
@@ -13429,14 +14028,33 @@ UI.provInfoKnown = (pid) => {
   if (G.me.flags.scouted && G.me.flags.scouted[pid] && G.turn - G.me.flags.scouted[pid] < 4) return true;
   return false;
 };
-UI.provSheet = (pid, countyId) => {
+// 郡の拠点の一覧（支配の割合と、攻め取れる拠点の「攻略」）
+UI.holdSection = (pid, selHold, known, approx) => {
+  const p = G.prov[pid], myC = S.myOff().c, hs = G.hold ? S.holdsIn(pid) : [];
+  if (!hs.length) return '';
+  const shares = {}; shares[p.o] = 1 - S.foreignShare(p);
+  for (const h of hs) if (h.o !== p.o) shares[h.o] = (shares[h.o] || 0) + h.sh;
+  const col = (c) => { const x = D.COUNTRIES[c]?.mapc || '#777'; return x === '#3a3a44' ? '#55555f' : x; };
+  const bar = Object.entries(shares).filter(([, v]) => v > 0).map(([c, v]) => `<i style="flex:${v.toFixed(3)};background:${col(c)}" title="${S.cname(c)}"></i>`).join('');
+  const legend = Object.entries(shares).filter(([, v]) => v > 0).map(([c, v]) => `${S.cname(c)}${Math.round(v * 100)}%`).join('・');
+  const kyo = A.list.find(a => a.id === 'kyoten'), canK = kyo && A.status(kyo).ok;
+  const tg = new Set(canK ? W.playerHoldTargets().map(h => h.id) : []);
+  const defStr = (h) => (h.o === myC || known) ? U.fmt(S.holdDef(h)) : approx(S.holdDef(h));
+  const row = (h) => `<div class="hrow${h.o !== p.o ? ' fx' : ''}${h.id === selHold ? ' sel' : ''}">${UI.cseal(h.o, 22)}<div class="hr-m"><b>${U.esc(h.n)}</b><small>${D.HOLDK[h.k].n}${h.w ? `・城壁${h.w}` : ''}${h.o !== p.o ? `・${S.cname(h.o)}が占領` : ''}</small></div><span class="num hr-d">守り${defStr(h)}</span>${tg.has(h.id) ? `<button class="btn sm pri" data-hold="${h.id}">攻略</button>` : '<span></span>'}</div>`;
+  return `<div class="sec-h sm">拠点 <small class="note">${legend}</small></div><div class="hbar" aria-hidden="true">${bar}</div>
+    <div class="hrows">
+      <div class="hrow big">${UI.cseal(p.o, 22)}<div class="hr-m"><b>${U.esc(S.bigName(pid))}</b><small>大都市（郡の都）・城壁${known || p.o === myC ? Math.round(p.wall) : '？'}・遠征でしか取れない</small></div><span class="num hr-d">守り${(p.o === myC || known) ? U.fmt(p.troops) : approx(p.troops)}</span><span></span></div>
+      ${hs.map(row).join('')}
+    </div>`;
+};
+UI.provSheet = (pid, countyId, selHold) => {
   const P = S.P[pid], p = G.prov[pid], myC = S.myOff().c;
   const cts = GEO.built ? (GEO.byProv[pid] || []) : [];
   const selC = countyId ? GEO.county(countyId) : null;
   const known = UI.provInfoKnown(pid);
   const gov = G.off[p.gov];
   const gens = S.officersOf(p.o, x => x.loc === pid && ['dais', 'shog', 'goz'].includes(x.r)).slice(0, 4);
-  const approx = n => known ? U.fmt(n) : '約' + U.fmt(Math.round(n / 10000) * 10000 || Math.round(n / 1000) * 1000);
+  const approx = n => known ? U.fmt(n) : '約' + U.fmt(n >= 10000 ? Math.round(n / 10000) * 10000 : n >= 1000 ? Math.round(n / 1000) * 1000 : n >= 100 ? Math.round(n / 100) * 100 : Math.max(10, Math.round(n / 10) * 10));
   const own = p.o === myC;
   const d = own ? null : S.dip(myC, p.o);
   const rel = d ? `<span class="pill ${d.st === 'war' ? 'war' : d.st === 'ally' ? 'good' : ''}">${{ war: '交戦中', peace: '平時', ally: '同盟', truce: '停戦' }[d.st]}</span>` : '<span class="pill good">自国</span>';
@@ -13446,8 +14064,8 @@ UI.provSheet = (pid, countyId) => {
   if (own && pid !== G.me.loc && st('idou').ok) acts.push(['idou', 'ここへ移動']);
   if (adjEnemy && st('teisatsu').ok) acts.push(['teisatsu', '偵察']);
   if (adjEnemy && st('shutsugeki').ok && d.st !== 'ally' && d.st !== 'truce') acts.push(['shutsugeki', '出撃（小規模）']);
-  if (!own && st('jousou').ok && D.RANKS[G.me.rank].tier >= 7 && S.ownedProvs(myC).some(q => S.adj(q.id).includes(pid))) acts.push(['jousou', '攻略を上奏']);
-  if (!own && st('shuppei').ok && S.atWar(myC, p.o) && S.ownedProvs(myC).some(q => S.adj(q.id).includes(pid))) acts.push(['shuppei', '出兵']);
+  if (!own && st('jousou').ok && D.RANKS[G.me.rank].tier >= 7 && S.ownedProvs(myC).some(q => S.adj(q.id).includes(pid))) acts.push(['jousou', '遠征を上奏']);
+  if (!own && st('shuppei').ok && S.atWar(myC, p.o) && S.ownedProvs(myC).some(q => S.adj(q.id).includes(pid))) acts.push(['shuppei', '遠征']);
   if (pid === G.me.loc && G.offers.length && st('offers').ok) acts.push(['offers', `戦場へ（${G.offers.length}）`]);
   return `<div class="sheet-h">${UI.cseal(p.o, 34)}<h3>${P.name}</h3>${rel}<button class="btn sm sheet-x" id="sh-x">閉じる</button></div>
     ${P.desc ? `<p class="note" style="margin:0 0 8px">${P.desc}</p>` : ''}
@@ -13465,6 +14083,7 @@ UI.provSheet = (pid, countyId) => {
     ${gens.length && (own || known) ? `<p class="note" style="margin:8px 0 0">駐屯：${gens.map(x => `${U.esc(x.n)}（${D.RANKS[x.r].name}）`).join('、')}</p>` : ''}
     ${GEO.built ? (() => { const gg = UI.provGeo(pid); return gg.desc ? `<p class="note" style="margin:6px 0 0">風土：${gg.desc}（${gg.counties}県・${gg.villages}郷）</p>` : ''; })() : ''}
     ${cts.length ? `<p class="note" style="margin:6px 0 0">県：${cts.map(c => c.id === countyId ? `<b style="color:var(--fg)">${U.esc(c.n)}</b>` : U.esc(c.n)).join('・')}${selC ? `　<span style="color:var(--bronze)">${U.esc(selC.n)}県の郷：${selC.vil.slice(0, 8).map(v => U.esc(v.n)).join('・')}${selC.vil.length > 8 ? ' ほか' : ''}</span>` : ''}</p>` : ''}
+    ${UI.holdSection(pid, selHold, known, approx)}
     <p class="note" style="margin:6px 0 0">隣接：${S.adj(pid).map(q => S.P[q].name).join('・')}</p>
     ${G.me.loc === pid ? '<p class="note" style="color:var(--bronze);margin:6px 0 0">★ 主人公の所在</p>' : ''}
     ${acts.length ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">${acts.map(([k, n]) => `<button class="btn sm pri" data-act="${k}">${n}</button>`).join('')}</div>` : ''}`;
@@ -13516,6 +14135,10 @@ UI.armyTab = (c) => {
     for (const w of A2.wu) html += `<div class="card wucard ${w.alive ? '' : 'dead'}"><div class="face">${U.esc(w.n.slice(0, 1))}</div><div style="min-width:0"><b>${U.esc(w.n)}${w.fresh ? ' <span class="pill">新兵</span>' : ''}</b><div class="note">武${w.bu}　体${Math.round(w.hp)}　絆${Math.round(w.bond)}${w.tr ? '　' + D.TRAITS[w.tr].n : ''}</div>${UI.bar(w.hp, 100, w.hp < 50 ? 'rd' : '')}</div></div>`;
     html += `</div>`;
   }
+  if (tot >= 600) {
+    const cur = A2.sortieAsk === false ? (A2.sortiePre || 'auto') : 'ask';
+    html += `<div class="card sortie-pref"><b>合戦に出る部隊</b><div class="seg sm" role="group" aria-label="合戦に出る部隊の選び方">${[['ask', '毎回選ぶ'], ['auto', '敵の倍まで'], ['direct', '直属だけ'], ['all', '全軍']].map(([k, n]) => `<button data-sortie="${k}" class="${cur === k ? 'on' : ''}" aria-pressed="${cur === k}">${n}</button>`).join('')}</div><p class="note" style="margin:6px 0 0">${cur === 'ask' ? '合戦の前に、出撃する部隊と人数を選ぶ。' : cur === 'auto' ? '敵の兵の倍ほどになるまで、直属の隊と練度の高い隊から出す。' : cur === 'direct' ? '部下に任せた兵は留守を守り、直属の兵だけで出る。' : 'いつも全軍で出る。'}</p></div>`;
+  }
   html += A2.sq.length || A2.subs.length ? UI.allotHtml() : `<div class="sec-h">部隊</div><p class="empty">兵はいない。</p>`;
   const tsm = me.tac.length > 10;
   html += `<div class="sec-h">会得した戦術 <small class="note">${me.tac.length}</small></div><div class="chipgrid">${me.tac.map(t => `<span class="tchip${tsm ? ' sm' : ''}" title="${U.esc(D.TACTICS[t].d)}"><b>${D.TACTICS[t].n}</b>${tsm ? '' : `<small>${D.TACTICS[t].d}</small>`}</span>`).join('') || '<p class="empty">まだない。「戦術研究」で会得できる。</p>'}</div>`;
@@ -13561,7 +14184,7 @@ UI.allotHtml = () => {
       if (mode !== 'self') html += `<p class="note ${S.canLead(x) ? '' : 'warn'}" style="margin:0">${S.canLead(x) ? `開戦と同時に${U.esc(g.name)}が${S.ORDER_DESC[mode]}。` : '未熟なため、任せても持ち場を守るだけ（統率60か知力65以上で自ら判断する）。'}</p>`;
     }
     html += `<div class="ag-sqs">${g.sq.map(s => UI.sqRow(s, gs)).join('') || `<p class="empty sm">${me ? '直属の兵はいない。' : 'まだ兵を任せていない。'}</p>`}</div>`;
-    if (!me && g.role !== '副官') html += `<div class="ag-f"><button class="btn sm ghost" data-dep="${g.id}">副官にする</button></div>`;
+    if (!me) html += `<div class="ag-f">${g.role !== '副官' ? `<button class="btn sm ghost" data-dep="${g.id}">副官にする</button>` : ''}<button class="btn sm ghost" data-fire="${g.id}">解任する</button></div>`;
     html += `</div>`;
   }
   const canMerge = (() => { const k = new Set(); for (const s of A2.sq) { const key = [s.t, s.pv ? 1 : 0, s.ld || ''].join('|'); if (k.has(key)) return true; k.add(key); } return false; })();
@@ -13606,6 +14229,16 @@ UI.allotBind = (c) => {
   for (const b of U.$$('[data-mv]', c)) b.onclick = () => { UI.allotOpen = UI.allotOpen === b.dataset.mv ? null : b.dataset.mv; redraw(); };
   for (const b of U.$$('[data-om]', c)) b.onclick = () => { S.setOrder(b.dataset.om, b.dataset.mode); redraw(); };
   for (const b of U.$$('[data-dep]', c)) b.onclick = () => { A2.dep = b.dataset.dep; UI.toast(`${G.off[A2.dep].n}を副官にした`); redraw(); };
+  // 部下の解任（二度押しで）
+  for (const b of U.$$('[data-fire]', c)) b.onclick = () => {
+    const id = b.dataset.fire, x = G.off[id]; if (!x) return;
+    if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = `${x.n}を解任する（もう一度押す）`; b.classList.add('warn'); return; }
+    const n = U.sum(A2.sq.filter(s => s.ld === id), s => s.n);
+    if (S.dismissSub(id)) { UI.toast(`${x.n}を解任した${n ? `。兵${U.num(n)}人は直属に戻った` : ''}`); S.log(`部下の${x.n}を解任した。`); }
+    redraw();
+  };
+  // 合戦に出る部隊の選び方
+  for (const b of U.$$('[data-sortie]', c)) b.onclick = () => { const v = b.dataset.sortie; if (v === 'ask') A2.sortieAsk = true; else { A2.sortieAsk = false; A2.sortiePre = v; } redraw(); };
   const mg = U.$('[data-merge]', c); if (mg) mg.onclick = () => { const k = S.mergeSquads(); UI.toast(k ? `${k}隊をまとめた` : 'まとめられる隊はない'); redraw(); };
   const ed = U.$('.mv-ed', c); if (!ed) return;
   const s = A2.sq.find(x => x.id === ed.dataset.for); if (!s) return;
@@ -14201,9 +14834,12 @@ const SAVE = {
     const r = await SAVE.read(slot);
     if (!r) throw new Error('セーブが見つかりません');
     const json = await SAVE.unpack(r.data);
+    await SAVE.waitMap();
     S.load(json);
     return true;
   },
+  // 古いセーブの郡を拠点に分けるには地図（県・郷）が要る
+  async waitMap() { if (typeof GEO !== 'undefined' && !GEO.built) { UI.toast('天下の地図を描いています…'); await Promise.race([MAP.init(), U.sleep(30000)]); } },
   auto() { return SAVE.save('auto'); },
 };
 
@@ -14230,7 +14866,7 @@ UI.loadMenu = async (withImport) => {
     if (k === 'import') {
       const code = await UI.copyBox({ title: 'セーブを読み込む', body: '書き出した文字列を貼り付ける。', text: '' });
       if (!code) return;
-      S.load(await SAVE.unpack(code));
+      const json = await SAVE.unpack(code); await SAVE.waitMap(); S.load(json);
     } else await SAVE.load(k);
     UI.map.cam = null;
     UI.main('map');
@@ -14240,6 +14876,12 @@ UI.loadMenu = async (withImport) => {
 
 /* ---------- 合戦との接続 ---------- */
 HOOK.battle = async (spec) => {
+  // 出撃する部隊を選ぶ（大きな軍のとき）
+  if (UI.wantSortie(spec)) {
+    const A2 = G.me.army;
+    const pick = A2.sortieAsk === false ? W.sortiePick(spec, A2.sortiePre || 'auto') : await UI.sortie(spec);
+    if (pick) spec = W.rebuildSpec(spec, pick);
+  }
   const res = await V.run(spec);
   if (G) { UI.show('main'); UI.refresh(); }
   return res;
