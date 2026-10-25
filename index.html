@@ -462,6 +462,30 @@ table.tbl th{color:var(--fg2);font-weight:500;font-size:12px}
 .dep-role{font-size:13px;margin:6px 0 10px;line-height:1.6}
 .dep-btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .dep-btns .btn.sm{background:#efe2b9;color:var(--ink);border-color:#9c8350}
+/* 布陣のターン：地図を広く見せるため、上下に細い帯だけ */
+.bt-place{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between}
+.pl-top{pointer-events:auto;display:flex;align-items:center;gap:8px;padding:calc(8px + env(safe-area-inset-top,0px)) var(--gut-r) 10px var(--gut-l);background:linear-gradient(180deg,rgba(10,16,14,.94) 55%,rgba(10,16,14,0))}
+.pl-ttl{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.pl-ttl b{font-family:var(--font-head);font-weight:400;font-size:17px;color:var(--bronze);letter-spacing:.08em}
+.pl-ttl span{font-size:11.5px;color:var(--fg2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pl-top .btn.sm{flex:none;min-height:36px;padding:4px 10px;background:rgba(21,33,29,.92)}
+.pl-bot{pointer-events:auto;display:flex;flex-direction:column;gap:6px;padding:8px var(--gut-r) calc(8px + env(safe-area-inset-bottom,0px)) var(--gut-l);background:linear-gradient(0deg,rgba(10,16,14,.96) 70%,rgba(10,16,14,.7));border-top:1px solid var(--line)}
+.pl-units{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.pl-units::-webkit-scrollbar{display:none}
+.pl-units .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px}
+.pl-units .chip i{width:8px;height:8px;border-radius:2px;display:inline-block;flex:none}
+.pl-units .chip small{font-size:11px;color:var(--fg2)}
+.pl-units .chip.on small{color:#0d1d18}
+.pl-row{display:flex;gap:8px;align-items:stretch}
+.pl-acts{flex:1;min-width:0;display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+.pl-acts::-webkit-scrollbar{display:none}
+.pl-acts .cmd{min-width:52px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:3px 6px}
+.pl-acts .cmd small{font-size:10.5px;color:var(--bronze);line-height:1.1}
+.pl-note{align-self:center;font-size:12px;color:var(--fg2);padding:0 4px}
+.pl-row .btn.seal{flex:none;min-height:42px;padding:6px 18px}
+#scr-battle.briefing .bt-panel{display:none!important}
+#scr-battle.placing .bt-top,#scr-battle.placing .bt-panel,#scr-battle.placing #bt-mini,#scr-battle.placing .bt-3dtools,#scr-battle.placing .bt-deploy{display:none!important}
+#scr-battle.placing .bt-hint{bottom:calc(var(--place-h,124px) + 12px)}
 @media (min-width:900px){
   .bt-panel{left:auto;right:12px;bottom:12px;width:420px;border:1px solid var(--line);border-radius:12px;max-height:60%}
   .bt-hint{bottom:24px}
@@ -8416,7 +8440,7 @@ if (typeof A !== 'undefined' && A.def) A.def({ id: 'karita', cat: 'ops', n: '刈
    - 恩と怨：将同士の関係 G.rel（a→b の感情、-100〜100）。主人公への感情は従来どおり o.bond
    - 派閥：王族派・丞相派・将軍派。昇進の横槍、讒言の出どころ、弾劾
    - 部下の人生：合戦で育ち、負傷し、引き抜かれ、裏切り、巣立つ。死ねば墓に残る
-   - 将の個性（用兵）：猛進・堅実・智謀・騎将・攻城・守城。合戦と遠征の AI に効く
+   - 将の個性（用兵）：猪突・堅実・智謀・騎将・攻城・守城。合戦と遠征の AI に効く
    - 難易度：敵 AI の判断と国力に差をつける
    ========================================================= */
 const PPL = {};
@@ -8431,7 +8455,7 @@ PPL.diff = () => D.DIFF[(typeof G !== 'undefined' && G && G.diff != null) ? U.cl
 
 /* ---------- 将の個性（用兵） ---------- */
 PPL.PERS = {
-  bold:    { n: '猛進', d: '勢いで押す将。早くから攻勢に出て、劣勢でもなかなか退かない。', plan: { holdBelow: 0.5, advAbove: 1.2, early: 0.2, pref: ['advance', 'breakthrough'], aggr: 1.25 } },
+  bold:    { n: '猪突', d: '猪突猛進の将。早くから攻勢に出て、劣勢でもなかなか退かない。一騎打ちは相手の武力を問わず挑む。', plan: { holdBelow: 0.5, advAbove: 1.2, early: 0.2, pref: ['advance', 'breakthrough'], aggr: 1.25 } },
   steady:  { n: '堅実', d: '備えを固めてから進む将。無理押しはせず、兵を失わない。', plan: { holdBelow: 0.85, advAbove: 1.6, early: 0.5, pref: ['advance', 'hold'], aggr: 0.85 } },
   cunning: { n: '智謀', d: '伏兵・包囲・陣取りを好む将。正面から当たってこない。', plan: { holdBelow: 0.7, advAbove: 1.6, early: 0.4, pref: ['envelop', 'lure', 'seize'], aggr: 1.0 } },
   cavalry: { n: '騎将', d: '騎兵の機動で側面を突く将。守りに回っても騎兵は遊ばせない。', plan: { holdBelow: 0.6, advAbove: 1.4, early: 0.3, pref: ['envelop', 'advance'], aggr: 1.1, cavFlank: true } },
@@ -9055,6 +9079,7 @@ B.split = (bt, u) => {
   v.hitSide = { F: -9, L: -9, Rt: -9, R: -9 }; v.vis = [true, true]; v.wu = null; v.delegate = null; v.courier = null; v._gone = false;
   v.ld = { n: (u.ld ? u.ld.sei || u.ld.n.slice(0, 1) : '') + '別動隊', sei: '別', bu: Math.round((u.ld?.bu || 45) * 0.8), tou: Math.round((u.ld?.tou || 45) * 0.85), chi: 40, mi: 40, tr: [], st: 'bal' };
   v.ldSnap = null; v.ldFate = 'ok';
+  v.splitFrom = u.id;   // 結合の相手を覚える（sq はそのまま：損害は同じ隊に集計される）
   u.cells = cells.slice(0, half); u.n -= nMove; u.n0 = Math.max(u.n, u.n0 - v.n0);
   B.layoutCells(u); B.layoutCells(v);
   const [rx, ry] = [Math.cos(u.a), Math.sin(u.a)];
@@ -9063,6 +9088,42 @@ B.split = (bt, u) => {
   B.unstick(bt, v);
   bt.units.push(v);
   return v;
+};
+// 分けた隊の元をたどる（別動隊の別動隊でも本隊に戻る）
+B.splitRoot = (bt, u) => { let r = u, g = 0; while (r && r.splitFrom != null && g++ < 20) r = bt.units[r.splitFrom]; return r || u; };
+// 結合できる相手：同じ本隊から分かれた（または本隊そのものの）隊で、近くにいるもの
+B.mergeTargets = (bt, u) => {
+  if (!B.canCommand(bt, u) || u.wu || u.ut.fixed || u.onwall != null || u.state === 'rout') return [];
+  const root = B.splitRoot(bt, u);
+  return bt.units.filter(v => v !== u && B.canCommand(bt, v) && !v.wu && v.onwall == null && v.state !== 'rout' && v.t === u.t && B.splitRoot(bt, v) === root && B.edgeDist(u, v) < 40 * bt.p);
+};
+B.canMerge = (bt, u) => B.mergeTargets(bt, u).length > 0;
+// u と v を一つの隊に戻す。本隊（分ける前の隊）が残り、別動隊は消える
+B.merge = (bt, u, v) => {
+  if (!u || !v || u === v || !B.mergeTargets(bt, u).includes(v)) return null;
+  // 残す方：本隊（splitFrom を持たない）＞主人公の隊＞番号の小さい方
+  let keep = u, gone = v;
+  const rank = (x) => (x.splitFrom == null ? 4 : 0) + (x.me ? 2 : 0) + (x.ld && x.ldSnap ? 1 : 0);
+  if (rank(v) > rank(u) || (rank(v) === rank(u) && v.id < u.id)) { keep = v; gone = u; }
+  const nk = Math.max(1, keep.n), ng = Math.max(1, gone.n);
+  // 位置は兵数の重みで寄せる（本隊が大きく動かないように）
+  keep.x = (keep.x * nk + gone.x * ng) / (nk + ng); keep.y = (keep.y * nk + gone.y * ng) / (nk + ng);
+  for (const c of gone.cells) { c.hit = -9; keep.cells.push(c); }
+  keep.n += gone.n; keep.n0 += gone.n0; keep.kills += gone.kills || 0; keep.routed += gone.routed || 0; keep.dead += gone.dead || 0;
+  keep.fat = (keep.fat * nk + (gone.fat || 0) * ng) / (nk + ng);
+  if (keep.ut.range || keep.horseArch) keep.ammo = Math.round((keep.ammo * nk + (gone.ammo || 0) * ng) / (nk + ng));
+  B.layoutCells(keep);
+  B.unstick(bt, keep);
+  keep.home = { x: keep.x, y: keep.y, a: keep.a };
+  if (keep.hidden && !B.canHide(bt, keep)) keep.hidden = false;
+  keep.order = null; keep.path = null; keep.state = keep.eng.length ? keep.state : 'idle';
+  // 消える隊：兵も損害も本隊へ移したので、結果には数えない
+  gone.n = 0; gone.n0 = 0; gone.kills = 0; gone.routed = 0; gone.dead = 0; gone.cells = []; gone.out = true; gone._gone = true; gone.merged = keep.id;
+  gone.order = null; gone.eng = []; gone.hidden = false; gone.zone = null;
+  B.unitGone(bt, gone);
+  for (const w of bt.units) if (w.order && (w.order.target === gone.id) && w !== gone) w.order = Object.assign({}, w.order, { target: keep.id });
+  B.text(bt, keep.x, keep.y, '合流', 'info');
+  return keep;
 };
 
 B.mkSides = (bt) => {
@@ -11025,28 +11086,46 @@ B.challenge = (bt, a, b) => {
   bt.duelPairs[B.duelKey(a, b)] = 1;
   const ldb = b.ld;
   const pride = ldb.st === 'ins' ? 0.3 : 0;
-  const pAcc = U.clamp(0.45 + pride + ((ldb.bu || 40) - (a.ld.bu || 40)) / 90, 0.08, 0.95);
+  let pAcc = 0.45 + pride + ((ldb.bu || 40) - (a.ld.bu || 40)) / 90;
+  // 猪突の将は武力差を顧みず受けて立つ。智謀の将は分の悪い勝負を避ける
+  if (ldb.pers === 'bold') pAcc = Math.max(pAcc, 0.9);
+  else if (ldb.pers === 'cunning' && (ldb.bu || 40) < (a.ld.bu || 40)) pAcc -= 0.15;
+  pAcc = U.clamp(pAcc, 0.08, 0.95);
   if (Math.random() < pAcc) { bt.duel = { a: a.id, b: b.id }; bt.paused = 'duel'; return 'accept'; }
   for (const c of b.cells) c.mor -= 14;
   for (const c of a.cells) c.mor = Math.min(100, c.mor + 8);
   B.text(bt, b.x, b.y, `${ldb.n}は逃げた！`, b.side === 0 ? 'bad' : 'good');
   return 'refuse';
 };
+// 相手の武力がこれ以上高いと、猪突でない将は自分から挑まない
+B.DUEL_GAP = 10;
+// 将 e が相手 u に自分から一騎打ちを挑む気があるか（0 なら挑まない）
+B.duelUrge = (bt, e, u) => {
+  if (!e.ld || !u.ld) return 0;
+  const bold = e.ld.pers === 'bold';
+  const bu = e.ld.bu || 40, fbu = u.ld.bu || 40;
+  if (bu < (bold ? 55 : 72)) return 0;
+  const gap = fbu - bu;
+  if (!bold && gap > B.DUEL_GAP) return 0;        // 分の悪い相手には挑まない
+  let base = (bu - 60) / 30;
+  if (bold) base = Math.max(0.6, base) * 1.8;        // 猪突：武力差は気にしない
+  else if (gap > 0) base *= 0.6;                     // 少し格上の相手には迷いが出る
+  return 0.025 * base * (e.ld.st === 'ins' ? 1.6 : 1) * (D.FORM[e.form].duel || 1);
+};
 B.aiDuels = (bt) => {
   if (bt.duel || bt.duelOffer) return;
   for (const e of bt.units) {
-    if (!B.active(e) || !e.ld || e.ldFate !== 'ok' || (e.ld.bu || 0) < 72) continue;
+    // 主人公は自分で「一騎打ち」を選ぶ。挑むのは敵将と味方の AI の将
+    if (!B.active(e) || !e.ld || e.ldFate !== 'ok' || e.me) continue;
     for (const id of e.eng) {
       const u = bt.units[id];
       if (!u || !u.ld || u.ldFate !== 'ok') continue;
       if (!B.canDuel(bt, e, u)) continue;
-      const pl = u.me || e.me;
-      const pr = 0.025 * ((e.ld.bu - 60) / 30) * (e.ld.st === 'ins' ? 1.6 : 1) * (D.FORM[e.form].duel || 1);
-      if (Math.random() > pr) continue;
+      const pr = B.duelUrge(bt, e, u);
+      if (pr <= 0 || Math.random() > pr) continue;
       bt.duelPairs[B.duelKey(e, u)] = 1;
-      if (pl) {
-        const mine = u.me ? u : e, foe = u.me ? e : u;
-        bt.duelOffer = { a: mine.id, b: foe.id }; bt.paused = 'duelOffer';
+      if (u.me) {
+        bt.duelOffer = { a: u.id, b: e.id, bold: e.ld.pers === 'bold' }; bt.paused = 'duelOffer';
         return;
       }
       B.autoDuel(bt, e, u);
@@ -11970,6 +12049,7 @@ V.run = (spec) => new Promise((resolve) => {
   if (me && (bt.spec.role === 'unit' || bt.W > 900)) V.centerOn(me, bt.spec.role === 'unit' ? 0.55 : 0.85);
   const canDeploy = bt.sides[0].player && bt.spec.role !== 'watch';
   V.ui.deploy = canDeploy;
+  V.dep0 = bt.units.filter(u => u.side === 0).map(u => ({ id: u.id, x: u.x, y: u.y, a: u.a }));
   V.ui.paused = true;
   V.showDeploy(canDeploy);
   if (me && canDeploy) V.select([me.id]);
@@ -12006,6 +12086,18 @@ V.mount = () => {
       <div class="bt-cmds" id="bt-cmds"></div>
     </div>
     <div class="bt-deploy" id="bt-deploy" hidden></div>
+    <div class="bt-place" id="bt-place" hidden>
+      <div class="pl-top">
+        <div class="pl-ttl"><b>布陣</b><span id="pl-hint"></span></div>
+        <button class="btn sm" id="pl-fit" title="布陣できる範囲全体を見る">全体</button>
+        <button class="btn sm" id="pl-reset" title="開戦前の自動配置に戻す">戻す</button>
+        <button class="btn sm" id="pl-back" title="軍議の札へ戻る">軍議</button>
+      </div>
+      <div class="pl-bot">
+        <div class="pl-units" id="pl-units"></div>
+        <div class="pl-row"><div class="pl-acts" id="pl-acts"></div><button class="btn seal" id="pl-go">開戦</button></div>
+      </div>
+    </div>
     <div class="bt-over" id="bt-over" hidden></div>`;
   UI.show('battle');
   V.cv = U.$('#bt-cv'); V.ctx = V.cv.getContext('2d');
@@ -12025,7 +12117,12 @@ V.mount = () => {
   const viewBtn = U.$('#bt-view');
   const updView = () => { viewBtn.textContent = V.ui.view3d ? '2D' : '3D'; viewBtn.title = V.ui.view3d ? '平面の地図にする' : '立体で見る'; for (const id of ['bt-rotl', 'bt-rotr', 'bt-eye']) U.$('#' + id).hidden = !V.ui.view3d; U.$('#bt-eye').classList.toggle('on', !!V3.follow); };
   V.setView3d = (on) => { V.ui.view3d = !!on; V3.savePref(V.ui.view3d); if (V.ui.view3d && !V3.cam) V3.fit(); else if (!V.ui.view3d) { V.cam.z = V.zBase || V.cam.z; V.clampCam(); V3.follow = false; } updView(); };
+  V.updViewBtn = updView;
   viewBtn.onclick = () => V.setView3d(!V.ui.view3d);
+  U.$('#pl-fit').onclick = () => V.fitPlace();
+  U.$('#pl-reset').onclick = () => V.resetDeploy();
+  U.$('#pl-back').onclick = () => { V.leavePlace(); V.showDeploy(true); };
+  U.$('#pl-go').onclick = () => V.beginBattle();
   U.$('#bt-rotl').onclick = () => V3.orbit(-Math.PI / 4, 0);
   U.$('#bt-rotr').onclick = () => V3.orbit(Math.PI / 4, 0);
   U.$('#bt-fit').onclick = () => { V3.follow = false; V.fitCamera(); };
@@ -12209,6 +12306,7 @@ V.render = () => {
   if (bt.city) V.drawCity();
   // 戦術地点
   for (const pt of bt.points) V.drawPoint(pt);
+  V.drawDeployZone();
   for (const tp of bt.traps) if (!tp.used && (tp.side === 0 || bt.spec.role === 'watch')) { const [x, y] = V.w2s(tp.x, tp.y); const r = Math.max(6, tp.r * V.cam.z); V.ctx.strokeStyle = 'rgba(90,60,30,0.75)'; V.ctx.setLineDash([3, 3]); V.ctx.lineWidth = 1.5; V.ctx.beginPath(); V.ctx.arc(x, y, r, 0, 6.28); V.ctx.stroke(); V.ctx.setLineDash([]); V.ctx.fillStyle = 'rgba(60,40,20,0.25)'; V.ctx.fill(); }
   // 射撃区域
   for (const u of bt.units) if (u.zone && u.side === 0 && B.alive(u) && (V.ui.sel.has(u.id) || u.ctrl === 'player' || u.mine)) V.drawZone(u);
@@ -12746,7 +12844,12 @@ V.tap = (sx, sy) => {
   if (mode === 'skillpt') { V.useSkillAt(wx, wy, u); return; }
   if (mode === 'attack') { if (u && u.side !== 0) { V.orderAttack(u); V.setMode(null); } else V.toast('敵の部隊をタップ'); return; }
   if (mode === 'move') { V.orderMove(wx, wy); V.setMode(null); return; }
-  if (V.ui.deploy) { if (u && u.side === 0) V.select([u.id]); else V.select([]); return; }
+  if (V.ui.deploy) {
+    if (u && u.side === 0) { if (V.ui.multi && B.canCommand(bt, u)) { V.ui.sel.has(u.id) ? V.ui.sel.delete(u.id) : V.ui.sel.add(u.id); V.renderPanel(); } else V.select([u.id]); return; }
+    // 布陣のターン：選んだ隊を、タップした所へ置く
+    if (V.ui.placing && !u) { const mv = V.selUnits().filter(x => V.canDeployMove(x)); if (mv.length) { V.placeAt(mv, wx, wy); return; } }
+    V.select([]); return;
+  }
   if (u && u.side === 0) {
     const now = performance.now();
     if (now - V.ui.lastTap < 320 && V.ui.lastTapId === u.id && B.canCommand(bt, u)) { V.selectSimilar(u); V.ui.lastTap = 0; return; }
@@ -12831,6 +12934,8 @@ V.canDeployMove = (u) => {
 V.deployZone = (u) => {
   const bt = V.bt;
   if (bt.city && bt.city.side === 0) return { x0: bt.city.x0, x1: bt.city.x1, y0: bt.city.y0, y1: bt.city.y1 };
+  // 攻城・関所：自動配置は城の手前まで寄っているので、範囲も城壁の少し手前まで
+  if (bt.city) { const wallY = bt.city.side === 1 ? bt.city.y1 : bt.city.y0; return { x0: 0, x1: bt.W, y0: Math.min(bt.H * 0.6, wallY + bt.H * 0.1), y1: bt.H }; }
   return { x0: 0, x1: bt.W, y0: bt.H * 0.6, y1: bt.H };
 };
 V.deployMove = (u, x, y) => {
@@ -12843,6 +12948,7 @@ V.deployMove = (u, x, y) => {
 V.showDeploy = (can) => {
   const bt = V.bt, el = U.$('#bt-deploy');
   el.hidden = false;
+  U.$('#scr-battle').classList.add('briefing');   // 軍議の札の間は下の板を隠して地図を見せる
   const sd = bt.sides[0], foe = bt.sides[1];
   const intel = [];
   const foeCmd = foe.cmd ? `${foe.cmd.n}（${{ ins: '本能型', chi: '知略型', bal: '均衡型' }[foe.cmd.st] || ''}${foe.cmd.pers && typeof PPL !== 'undefined' ? '・用兵は' + PPL.persName(foe.cmd.pers) : ''}）` : '不明';
@@ -12864,16 +12970,160 @@ V.showDeploy = (can) => {
       <div class="dep-h">${bt.spec.title}</div>
       <div class="dep-vs"><div class="dep-side">${cmdA}<div><b>${U.esc(sd.name)}</b><small>${U.esc(sd.cmd ? sd.cmd.n : '')}　${U.fmt(sd.start)}</small></div></div><span class="dep-x">対</span><div class="dep-side r"><div><b>${U.esc(foe.name)}</b><small>${U.esc(foe.cmd ? foe.cmd.n : '')}　約${U.fmt(foe.start)}</small></div>${cmdB}</div></div>
       <div class="dep-intel">${intel.map(s => `<span>${U.esc(s)}</span>`).join('')}</div>
-      <p class="dep-role">${roleMsg}${can && role !== 'unit' ? '<br>部隊をドラッグして布陣を変えられる。森の部隊は「伏兵」にできる。' : ''}</p>
+      <p class="dep-role">${roleMsg}${can && role !== 'unit' ? '<br>「布陣へ」で地図を広く出し、部隊を置き直せる。森の部隊は「伏兵」にできる。' : ''}</p>
       <div class="dep-btns">
-        ${can && role !== 'unit' && role !== 'watch' ? '<button class="btn sm" id="dep-gungi">軍議（戦術の準備）</button>' : ''}
-        <button class="btn seal" id="dep-go">開戦</button>
+        ${can && role !== 'unit' && role !== 'watch' ? '<button class="btn sm" id="dep-gungi" title="準備する戦術を選ぶ">軍議（戦術）</button>' : ''}
+        ${can && role !== 'unit' ? '<button class="btn seal" id="dep-place">布陣へ</button><button class="btn sm" id="dep-go">このまま開戦</button>' : '<button class="btn seal" id="dep-go">開戦</button>'}
       </div>
     </div>`;
   PORT.fill(el);
   const g = U.$('#dep-gungi'); if (g) g.onclick = V.gungi;
-  U.$('#dep-go').onclick = async () => {
-    el.hidden = true; V.ui.deploy = false;
+  const pl = U.$('#dep-place'); if (pl) pl.onclick = () => V.enterPlace();
+  U.$('#dep-go').onclick = () => V.beginBattle();
+  if (!can) { /* 観戦のみ */ }
+};
+/* ---------------- 布陣のターン ---------------- */
+// 平面の地図で布陣する（3D の設定は保存せず、開戦時に戻す）
+V.planView = (on) => {
+  if (on) {
+    if (V.ui.view3dPrev == null) V.ui.view3dPrev = V.ui.view3d;
+    if (V.ui.view3d) { V.ui.view3d = false; if (typeof V3 !== 'undefined') V3.follow = false; V.cam.z = V.zBase || V.cam.z; V.clampCam(); }
+  } else if (V.ui.view3dPrev != null) {
+    const back = V.ui.view3dPrev; V.ui.view3dPrev = null;
+    if (back && !V.ui.view3d) { V.ui.view3d = true; if (typeof V3 !== 'undefined') { try { V3.fit(); } catch (e) { console.warn(e); V.ui.view3d = false; } } }
+  }
+  if (V.updViewBtn) V.updViewBtn();
+};
+V.enterPlace = () => {
+  const bt = V.bt; if (!bt || !V.ui.deploy) return;
+  V.ui.placing = true; V.ui.placeKey = null;
+  U.$('#bt-deploy').hidden = true;
+  U.$('#scr-battle').classList.remove('briefing');
+  U.$('#scr-battle').classList.add('placing');
+  U.$('#bt-place').hidden = false;
+  V.setMode(null);
+  V.planView(true);
+  const me = bt.units.find(u => u.me && B.alive(u));
+  if (!V.ui.sel.size && me && B.canCommand(bt, me)) V.select([me.id]); else V.renderPanel();
+  V.fitPlace();   // 帯の高さが決まってから合わせる
+};
+V.leavePlace = () => {
+  if (!V.ui.placing) return;
+  V.ui.placing = false; V.ui.multi = false;
+  U.$('#scr-battle').classList.remove('placing');
+  U.$('#bt-place').hidden = true;
+  V.planView(false);
+  V.renderGroups();
+};
+// 布陣できる範囲が帯の間に収まるようにカメラを合わせる
+V.fitPlace = () => {
+  const bt = V.bt, root = U.$('#scr-battle');
+  const z = V.deployZone(bt.units.find(u => u.me) || bt.units[0]);
+  const topH = (U.$('.pl-top') || {}).offsetHeight || 64, botH = (U.$('.pl-bot') || {}).offsetHeight || 124;
+  root.style.setProperty('--place-h', botH + 'px');
+  const zh = z.y1 - z.y0;
+  const y0 = Math.max(0, z.y0 - zh * 0.35), y1 = z.y1;   // 敵の側も少し見せる
+  const freeW = Math.max(120, V.vw - 16), freeH = Math.max(120, V.vh - topH - botH - 16);
+  const zoom = U.clamp(Math.min(freeW / (z.x1 - z.x0), freeH / (y1 - y0)), V.zMin, V.zMax);
+  V.cam.z = zoom; V.cam.x = (z.x0 + z.x1) / 2;
+  // 範囲＋敵側の余白を帯の間の中央に。地図の下端が帯より上に来るなら、下端を帯に揃えて上の余りに地図を見せる
+  V.cam.y = (y0 + y1) / 2 - (topH - botH) / (2 * zoom);
+  const want = V.vh - botH - 8, bottomPx = (bt.H - V.cam.y) * zoom + V.vh / 2;
+  if (bottomPx < want) V.cam.y -= (want - bottomPx) / zoom;
+  V.ui.follow = false;
+  V.clampCam();
+};
+// 選んだ隊を、タップした所へ（複数なら並びを保って）
+V.placeAt = (us, wx, wy) => {
+  const bt = V.bt;
+  const cx = U.avg(us, u => u.x), cy = U.avg(us, u => u.y);
+  let moved = 0;
+  for (const u of us) {
+    const tx = us.length > 1 ? wx + (u.x - cx) : wx, ty = us.length > 1 ? wy + (u.y - cy) : wy;
+    const bx = u.x, by = u.y;
+    V.deployMove(u, U.clamp(tx, 2, bt.W - 2), U.clamp(ty, 2, bt.H - 2));
+    if (u.x !== bx || u.y !== by) moved++;
+  }
+  if (moved) { B.fx(bt, { k: 'clash', x: wx, y: wy }); V.ui.placeKey = null; V.renderPanel(); }
+  else V.toast('そこには置けない（範囲の外か、通れない地形）');
+};
+V.resetDeploy = () => {
+  const bt = V.bt; if (!bt || !V.dep0) return;
+  let n = 0;
+  for (const d of V.dep0) { const u = bt.units[d.id]; if (!u || !B.alive(u) || !V.canDeployMove(u)) continue; u.x = d.x; u.y = d.y; u.a = d.a; u.home = { x: d.x, y: d.y, a: d.a }; if (u.hidden && !B.canHide(bt, u)) u.hidden = false; n++; }
+  V.ui.placeKey = null; V.renderPanel();
+  V.toast(n ? '開戦前の配置に戻した' : '戻せる隊がない');
+};
+V.CLS_COLOR = { inf: '#c9c0a0', rng: '#8fc0a9', cav: '#e0ac4a', chr: '#d08a5a', sie: '#a08a5a' };
+V.renderPlace = (soft) => {
+  const bt = V.bt; if (!bt || !V.ui.placing) return;
+  const own = bt.units.filter(u => u.side === 0 && B.alive(u) && B.canCommand(bt, u) && !u.escort);
+  const sel = V.selUnits(), can = sel.filter(x => B.canCommand(bt, x));
+  const one = can.length === 1 ? can[0] : null;
+  const key = own.map(u => `${u.id}:${u.n}${u.hidden ? 'h' : ''}${u.form}${u.onwall != null ? 'w' : ''}`).join(',') + '|' + [...V.ui.sel].join(',') + '|' + (one && B.canMerge(bt, one) ? 'm' : '') + (V.ui.multi ? 'M' : '');
+  if (soft && key === V.ui.placeKey) return;
+  V.ui.placeKey = key;
+  // 上の帯：選んだ隊の要約か、やり方
+  const hint = U.$('#pl-hint');
+  if (one) hint.textContent = `${B.unitName(bt, one)}　${U.fmt(one.n)}人・${D.FORM[one.form].n}${one.hidden ? '・伏兵' : ''}${one.onwall != null ? '・城壁の上（動かせない）' : ''}　→ 置きたい所をタップ`;
+  else if (can.length > 1) hint.textContent = `${can.length}隊を選択　→ 置きたい所をタップ（並びを保って動く）`;
+  else hint.textContent = '部隊をタップして選び、置きたい所をタップ。指で引いても動く。長押しで複数選択';
+  // 自分の隊の札
+  const chips = U.$('#pl-units');
+  chips.innerHTML = own.map(u => `<button class="chip ${V.ui.sel.has(u.id) ? 'on' : ''}" data-id="${u.id}"><i style="background:${V.CLS_COLOR[u.cls] || '#ccc'}"></i>${U.esc(u.ld ? u.ld.n : D.UT[u.t].n)}<small>${U.fmt(u.n)}${u.hidden ? '・伏' : ''}${u.onwall != null ? '・壁' : ''}</small></button>`).join('') + `<button class="chip ${V.ui.multi ? 'on' : ''}" data-id="multi" title="タップで複数選択">複数</button>`;
+  for (const b of U.$$('.chip', chips)) b.onclick = () => {
+    if (b.dataset.id === 'multi') { V.ui.multi = !V.ui.multi; V.ui.placeKey = null; V.renderPanel(); return; }
+    const u = bt.units[+b.dataset.id]; if (!u) return;
+    if (V.ui.multi) { V.ui.sel.has(u.id) ? V.ui.sel.delete(u.id) : V.ui.sel.add(u.id); V.ui.placeKey = null; V.renderPanel(); return; }
+    V.select([u.id]);
+    // 画面の外なら寄せる
+    const [sx, sy] = V.w2s(u.x, u.y); if (sx < 0 || sy < 0 || sx > V.vw || sy > V.vh) { V.cam.x = u.x; V.cam.y = u.y; V.clampCam(); }
+  };
+  const on = U.$('.chip.on', chips); if (on && on.scrollIntoView) { try { on.scrollIntoView({ inline: 'nearest', block: 'nearest' }); } catch (e) {} }
+  // 命令（布陣中に意味のあるものだけ）
+  const acts = U.$('#pl-acts');
+  const btns = [];
+  const add = (k, label, sub, opt = {}) => btns.push(`<button class="cmd ${opt.cls || ''}" data-k="${k}" title="${U.esc(opt.tip || '')}">${label}${sub ? `<small>${U.esc(sub)}</small>` : ''}</button>`);
+  if (can.length) {
+    if (can.some(x => !x.ut.fixed)) add('form', '陣形', one ? D.FORM[one.form].n : '', { tip: '陣形を変える' });
+    if (can.some(x => B.canHide(bt, x)) && (bt.sides[0].tactics.includes('fukuhei') || can.some(x => B.F(x, 'ambush') > 0))) add('hide', '伏兵', '', { tip: '森や草地に潜ませる' });
+    if (one && !one.wu && one.n >= 10 && !one.ut.fixed) add('split', '分割', '', { tip: '隊を二つに分けて別動隊を作る' });
+    if ((one && B.canMerge(bt, one)) || (can.length === 2 && B.mergeTargets(bt, can[0]).includes(can[1]))) add('merge', '結合', '', { tip: '分けた隊を一つに戻す' });
+    if (bt.walls && bt.city && bt.city.side === 0 && can.some(x => x.cls === 'rng' && x.onwall == null)) add('wall', '城壁へ', '', { tip: '近くの城壁に上げる' });
+  }
+  acts.innerHTML = btns.join('') || `<span class="pl-note">${own.length ? '部隊を選ぶと陣形・伏兵・分割などを変えられる' : '動かせる部隊がない'}</span>`;
+  for (const b of U.$$('.cmd', acts)) b.onclick = () => V.cmd(b.dataset.k);
+};
+// 2D：布陣できる範囲（布陣中は範囲の外を少し暗くする）
+V.drawDeployZone = () => {
+  const bt = V.bt, ctx = V.ctx;
+  if (!V.ui.deploy || !bt.sides[0].player || bt.spec.role === 'unit') return;
+  const z = V.deployZone(bt.units.find(u => u.me) || bt.units[0]);
+  const [x0, y0] = V.w2s(z.x0, z.y0), [x1, y1] = V.w2s(z.x1, z.y1);
+  if (V.ui.placing) {
+    ctx.fillStyle = 'rgba(6,10,8,0.3)';
+    ctx.beginPath(); ctx.rect(0, 0, V.vw, V.vh); ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.fill('evenodd');
+  }
+  ctx.strokeStyle = 'rgba(98,179,155,.85)'; ctx.setLineDash([8, 6]); ctx.lineWidth = 2;
+  ctx.strokeRect(x0, y0, x1 - x0, y1 - y0); ctx.setLineDash([]);
+  if (V.ui.placing) {
+    ctx.fillStyle = 'rgba(98,179,155,.95)'; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText('布陣できる範囲', x0 + 8, Math.max(4, y0 + 6));
+    // 敵のいる向き
+    const foeY = bt.city && bt.city.side !== 0 ? (bt.city.side === 1 ? bt.city.y1 : bt.city.y0) : bt.H * 0.26;
+    const [, fy] = V.w2s(bt.W / 2, foeY);
+    if (fy < y0 - 16 && !(bt.city && bt.city.side === 0)) { ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(240,179,165,.9)'; ctx.fillText('▲ 敵陣はこちら', (x0 + x1) / 2, Math.max(4, y0 - 20)); }
+  }
+};
+// 開戦（軍議の札からも、布陣のターンからも）
+V.beginBattle = async () => {
+  const bt = V.bt, el = U.$('#bt-deploy');
+  if (!bt || bt.started || V.ui.starting) return;
+  V.ui.starting = true;
+  if (V.ui.placing) V.leavePlace();
+  el.hidden = true; V.ui.deploy = false;
+  U.$('#scr-battle').classList.remove('briefing');
+  {
     const sdA = bt.sides[0], sdB = bt.sides[1];
     if (UI.CUTIN_ON() && sdA.cmd && sdB.cmd && !sdB.bandit && !sdB.nomad) {
       V.ui.cutin = true;
@@ -12892,8 +13142,7 @@ V.showDeploy = (can) => {
     V.setSpeed(V.ui.speed);
     B.logMsg(bt, '開戦！');
     B.text(bt, bt.W / 2, bt.H / 2, '開戦', 'info');
-  };
-  if (!can) { /* 観戦のみ */ }
+  }
 };
 V.gungiSlots = () => B.slots(V.bt, 0);
 V.gungi = async () => {
@@ -12976,6 +13225,7 @@ V.stateName = (u) => {
 };
 V.renderPanel = (soft) => {
   const bt = V.bt; if (!bt) return;
+  if (V.ui.placing) V.renderPlace(soft);
   const sel = V.selUnits();
   const box = U.$('#bt-sel'), cmds = U.$('#bt-cmds');
   if (!sel.length) {
@@ -12988,7 +13238,7 @@ V.renderPanel = (soft) => {
   }
   const u = sel[0];
   const multi = sel.length > 1;
-  const key = sel.map(x => x.id).join(',') + '|' + (multi ? '' : u.state + u.form + (u.order ? u.order.type : '') + (u.delegate ? 'd' : '') + (u.hidden ? 'h' : '') + (u.zone ? 'z' : '') + Math.round(B.cpOf(bt, u) / 5));
+  const key = sel.map(x => x.id).join(',') + '|' + (multi ? '' : u.state + u.form + (u.order ? u.order.type : '') + (u.delegate ? 'd' : '') + (u.hidden ? 'h' : '') + (u.zone ? 'z' : '') + (u.side === 0 && B.canMerge(bt, u) ? 'm' : '') + Math.round(B.cpOf(bt, u) / 5));
   // 数値は毎回更新、ボタンはキー変化時のみ
   if (multi) {
     const n = U.sum(sel, x => x.n), mor = U.sum(sel, x => x.mor * x.n) / Math.max(1, n);
@@ -13041,6 +13291,7 @@ V.renderPanel = (soft) => {
     add('duel', '一騎打ち', { dis: !near.length, cls: 'em', tip: '近くの敵将に一騎打ちを挑む' });
   }
   if (one && !one.wu && one.n >= 10 && !one.ut.fixed) add('split', '分割', { tip: '隊を二つに分けて別動隊を作る' });
+  if ((one && B.canMerge(bt, one)) || (can.length === 2 && B.mergeTargets(bt, can[0]).includes(can[1]))) add('merge', '結合', { tip: '分けた隊を一つに戻す（近くの本隊・別動隊と合流）' });
   if (bt.walls) {
     if (can.some(x => x.cls === 'inf' && bt.city.side !== 0)) add('climb', '攀城');
     if (can.some(x => x.t === 'ram')) add('ram', '破城');
@@ -13114,7 +13365,18 @@ V.cmd = async (k) => {
       if (r === 'refuse') V.toast(`${e.ld.n}は一騎打ちを避けた`);
       break;
     }
-    case 'split': { const v = B.split(bt, us[0]); if (v) { V.select([us[0].id, v.id]); V.toast('隊を分けた'); } break; }
+    case 'split': { const v = B.split(bt, us[0]); if (v) { V.select([us[0].id, v.id]); V.toast('隊を分けた（近づけて「結合」で戻せる）'); } break; }
+    case 'merge': {
+      const a = us[0];
+      let tgts = B.mergeTargets(bt, a);
+      if (us.length >= 2 && tgts.includes(us[1])) tgts = [us[1]];
+      if (!tgts.length) { V.toast('近くに合流できる隊がいない'); break; }
+      const v = tgts.length === 1 ? tgts[0] : bt.units[await UI.choose({ title: '合流する隊', body: '同じ隊から分かれた隊とだけ一つに戻せる。', choices: tgts.map(t => ({ v: t.id, label: B.unitName(bt, t), sub: `${U.num(t.n)}人　士気${Math.round(t.mor)}` })).concat([{ v: null, label: 'やめる' }]) })];
+      if (!v) break;
+      const k = B.merge(bt, a, v);
+      if (k) { V.select([k.id]); V.toast(`隊を一つに戻した（${U.num(k.n)}人）`); }
+      break;
+    }
     case 'climb': {
       for (const u of us.filter(x => x.cls === 'inf')) {
         const w = U.minBy(bt.walls.filter(w => w.kind === 'wall' && w.side !== 0 && w.captured < 0), w => U.dist(w.x, w.y, u.x, u.y) * (w.tower ? 0.5 : 1));
@@ -13195,7 +13457,9 @@ V.handlePause = async () => {
   if (bt.paused === 'duelOffer') {
     V.ui.modal = true;
     const d = bt.duelOffer; const a = bt.units[d.a], e = bt.units[d.b];
-    const ok = await UI.choose({ title: '一騎打ちを挑まれた！', seal: '一騎打ち', body: `${e.ld.n}（武${e.ld.bu}）が「${a.ld.n}、勝負しろ！」と叫んでいる。`, choices: [{ v: 1, label: '受けて立つ' }, { v: 0, label: '取り合わない（士気が下がる）' }] });
+    const gap = (a.ld.bu || 40) - (e.ld.bu || 40);
+    const flavor = d.bold ? (gap >= B.DUEL_GAP ? `猪突の将は武力の差など顧みない。` : `猪突の将だ。退くことを知らぬ。`) : '';
+    const ok = await UI.choose({ title: '一騎打ちを挑まれた！', seal: '一騎打ち', body: `${e.ld.n}（武${e.ld.bu}${e.ld.pers && typeof PPL !== 'undefined' ? '・' + PPL.persName(e.ld.pers) : ''}）が「${a.ld.n}、勝負しろ！」と叫んでいる。${flavor}`, choices: [{ v: 1, label: '受けて立つ' }, { v: 0, label: '取り合わない（士気が下がる）' }] });
     if (ok) { bt.duel = d; bt.paused = 'duel'; V.ui.modal = false; return; }
     for (const c of a.cells) c.mor -= 12;
     bt.duelOffer = null; bt.paused = null; V.ui.modal = false;
@@ -14874,9 +15138,11 @@ UI.help = () => UI.info({
 3. 行動を終えたら「月を進める」。各国が動き、戦や事件が起きる。
 4. 合戦はリアルタイム。部隊をタップして選び、地面で移動、敵で攻撃。
    伍ごとの士気、挟撃、伏兵、射撃区域、攻城、一騎打ちを駆使せよ。
+   ・開戦前は「布陣のターン」。軍議の札から「布陣へ」を押すと、帯だけを残して地図が広く出る。部隊（下の札でも選べる）をタップして選び、置きたい所をタップ（引いても動く）。陣形・伏兵・分割もここで決められる。「このまま開戦」で飛ばせる。
+   ・「分割」で分けた別動隊は、本隊の近くに戻して「結合」で一つに戻せる。
    ・戦場は立体（3D）で見られる。一本指で動かし、二本指で回す・傾ける・近づける。右の「2D／3D」で切り替え。
    ・一騎打ちは立体の動画で、馬と武者が駆け違いざまに斬り結ぶ。相手の動きを読み、攻撃・強撃・受け・必殺を選ぶ。気迫が満ちると必殺が出せる。深手を負えば落馬し、徒歩の立ち合いになる。画面をタップすると動きを早送りできる。
-   ・敵将には「用兵」の個性がある（猛進・堅実・智謀・騎将・攻城・守城）。布陣の画面で敵将の用兵が分かる。猛進の将は早くから押してきて、智謀の将は伏兵や包囲を好む。
+   ・敵将には「用兵」の個性がある（猪突・堅実・智謀・騎将・攻城・守城）。布陣の画面で敵将の用兵が分かる。猪突の将は早くから押してきて、武力の差など構わず一騎打ちを挑んでくる。智謀の将は伏兵や包囲を好む。
    ・開戦・突撃・討ち取り・勝敗・落城などはカットインで知らせる（軍営の「演出」で切れる）。
 5. 功績を挙げると昇進する。官職は三等→二等→一等と一段ずつ進み、一段ごとに在任期間が要る。上の官職には名声や戦歴も要る。
    ・将軍・大将軍は功績に応じて率いる兵が増える（将軍は最大十万、大将軍は最大五十万）。
@@ -18479,7 +18745,7 @@ UI.intro = async () => {
   const pages = [
     { t: '物語の進め方', b: '毎月、「任務状」の数だけ行動できる。「令」タブで行動を選び、使い切ったら右下の「月を進める」。\n各国が動き、戦や事件が起き、三か月ごとに評定で任務を受ける。' },
     { t: '功績と出世', b: '合戦・任務・内政で功績が溜まると昇進する。官職は三等→二等→一等と進み、爵も上がる。\n大きな戦で活躍すれば武名が上がり、異名で呼ばれる。実績を解くと称号も得られる。' },
-    { t: '合戦と人の縁', b: '合戦はリアルタイム。部隊をタップして動かし、敵将が近づけば一騎打ち。立体の戦場も見られる。\n将たちには用兵の個性と恩怨があり、国には派閥がある。部下を育て、友を得て、天下へ。' },
+    { t: '合戦と人の縁', b: '合戦は、開戦前の「布陣のターン」で陣を組んでから始まる。部隊をタップして動かし、敵将が近づけば一騎打ち。立体の戦場も見られる。\n将たちには用兵の個性と恩怨があり、国には派閥がある。部下を育て、友を得て、天下へ。' },
   ];
   for (let i = 0; i < pages.length; i++) {
     const p = pages[i];
