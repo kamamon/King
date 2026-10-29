@@ -475,6 +475,7 @@ table.tbl th{color:var(--fg2);font-weight:500;font-size:12px}
 .pl-units .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px}
 .pl-units .chip i{width:8px;height:8px;border-radius:2px;display:inline-block;flex:none}
 .pl-units .chip small{font-size:11px;color:var(--fg2)}
+.pl-units .chip em.ty{font-style:normal;font-size:11px;font-weight:700;color:#1d150b;border-radius:3px;padding:1px 4px;line-height:1.35;flex:none;box-shadow:inset 0 0 0 1px rgba(25,20,12,.35)}
 .pl-units .chip.on small{color:#0d1d18}
 .pl-row{display:flex;gap:8px;align-items:stretch}
 .pl-acts{flex:1;min-width:0;display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
@@ -1121,6 +1122,9 @@ D.UT = {
   shield: { n: '盾兵',     s: '盾', cls: 'inf', atk: 9,  def: 15, spd: 1.4, chg: 2.6, mass: 1.2, dens: 1.4, cost: 1.4, arrowRes: 0.45, desc: '大盾を並べ、矢と突撃を防ぐ。' },
   cata:   { n: '投石機',   s: '石', cls: 'sie', atk: 2,  def: 14, spd: 0.45, chg: 0.5, mass: 8,  dens: 30,  cost: 7, range: 230, rof: 10, mdmg: 0.02, ammo: 40, fixed: [12, 10], arrowRes: 0.7, moraleMod: 15, desc: '石を投げて城門や城壁を打ち崩す攻城兵器。' },
 };
+// 地図の札や部隊の一覧に出す、二文字の兵種名（軽騎と重騎、重歩と歩兵を見分けられるように）
+D.UT_AB = { inf: '歩兵', spear: '戟兵', heavy: '重歩', arch: '弓兵', xbow: '弩兵', lcav: '軽騎', hcav: '重騎', harch: '騎射', chariot: '戦車', mount: '山岳', ladder: '雲梯', ram: '衝車', tower: '井闌', militia: '民兵', guard: '近衛', shield: '盾兵', cata: '投石' };
+D.utAb = (t) => D.UT_AB[t] || (D.UT[t] ? D.UT[t].n.slice(0, 2) : '');
 D.UT_TRAINABLE = ['inf', 'spear', 'heavy', 'shield', 'arch', 'xbow', 'lcav', 'hcav', 'harch', 'chariot', 'mount', 'ladder'];
 // 兵種の編成条件（施設）
 D.UT_REQ = {
@@ -5342,6 +5346,9 @@ W.playerGroups = () => {
   }
   return [...groups.values()].map(g => { g.n = U.sum(g.sqs, s => s.n); g.tr = Math.round(U.sum(g.sqs, s => s.tr * s.n) / Math.max(1, g.n)); return g; });
 };
+// 出撃する部隊を選べるか：部隊が二つ以上あれば兵の多少にかかわらず、一つだけなら三百人から
+// （伍長・什長の伍は選ばずに出る）
+W.canPickSortie = () => { const gs = W.playerGroups(), tot = U.sum(gs, g => g.n); return gs.length >= 2 ? tot >= 20 : tot >= 300; };
 // 出撃する部隊のおまかせ（all 全軍・auto 敵の倍まで・direct 直属だけ）
 W.sortiePick = (spec, preset) => {
   const gs = W.playerGroups(), pick = {};
@@ -12595,6 +12602,8 @@ V.drawBanner = (u) => {
   else if (u.courier) tag = '伝';
   else if (u.delegate) tag = '任';
   if (tag) { ctx.fillStyle = tag === '潰' ? V.colors.seal : 'rgba(25,20,12,0.85)'; ctx.fillRect(sx + s + 1, sy - pole - s, s * 0.8, s * 0.8); ctx.fillStyle = '#f6efdc'; ctx.font = `${Math.round(s * 0.6)}px ${V.fontBody()}`; ctx.fillText(tag, sx + s + 1 + s * 0.4, sy - pole - s + s * 0.42); }
+  // 兵種の札（旗の下に下げる）：布陣の間はすべての隊、合戦中は選んだ隊と寄ったとき
+  if (V.showTypeTab(u)) V.drawTypeTab(ctx, D.utAb(u.t), u.cls, sx + 1, sy - pole, s);
   // 兵数（選択中・拡大時）
   const showNum = V.ui.sel.has(u.id) || u.me || (V.cam.z * u.w > 70);
   if (showNum) {
@@ -12608,6 +12617,23 @@ V.drawBanner = (u) => {
     ctx.fillStyle = V.morColor(u.mor); ctx.fillRect(sx - tw / 2, sy + 18, tw * U.clamp(u.mor / 100, 0, 1), 4);
   }
   ctx.globalAlpha = 1;
+};
+V.showTypeTab = (u) => !!(V.ui.deploy || V.ui.placing || V.ui.sel.has(u.id) || V.cam.z * u.w > 70);
+// 兵種の札：兵科の色の地に二文字（x, y は札の左上。s は旗の大きさ）
+V.drawTypeTab = (ctx, ab, cls, x, y, s) => {
+  if (!ab) return;
+  ctx.save();
+  const fs = Math.max(9, Math.round(s * 0.62));
+  ctx.font = `700 ${fs}px ${V.fontBody()}`;
+  const tw = Math.ceil(ctx.measureText(ab).width) + 5, th = fs + 4;
+  ctx.globalAlpha = Math.max(ctx.globalAlpha, 0.85);
+  ctx.fillStyle = V.CLS_COLOR[cls] || '#cfc6ae';
+  ctx.fillRect(x, y, tw, th);
+  ctx.strokeStyle = 'rgba(25,20,12,0.9)'; ctx.lineWidth = 1;
+  ctx.strokeRect(x + 0.5, y + 0.5, tw - 1, th - 1);
+  ctx.fillStyle = '#1d150b'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(ab, x + 2.5, y + th / 2 + 0.5);
+  ctx.restore();
 };
 V.drawOrder = (u) => {
   const bt = V.bt, ctx = V.ctx; const o = u.order;
@@ -13070,7 +13096,7 @@ V.renderPlace = (soft) => {
   else hint.textContent = '部隊をタップして選び、置きたい所をタップ。指で引いても動く。長押しで複数選択';
   // 自分の隊の札
   const chips = U.$('#pl-units');
-  chips.innerHTML = own.map(u => `<button class="chip ${V.ui.sel.has(u.id) ? 'on' : ''}" data-id="${u.id}"><i style="background:${V.CLS_COLOR[u.cls] || '#ccc'}"></i>${U.esc(u.ld ? u.ld.n : D.UT[u.t].n)}<small>${U.fmt(u.n)}${u.hidden ? '・伏' : ''}${u.onwall != null ? '・壁' : ''}</small></button>`).join('') + `<button class="chip ${V.ui.multi ? 'on' : ''}" data-id="multi" title="タップで複数選択">複数</button>`;
+  chips.innerHTML = own.map(u => `<button class="chip ${V.ui.sel.has(u.id) ? 'on' : ''}" data-id="${u.id}" title="${U.esc(D.UT[u.t].n)}"><em class="ty" style="background:${V.CLS_COLOR[u.cls] || '#cfc6ae'}">${D.utAb(u.t)}</em>${U.esc(u.ld ? u.ld.n : D.UT[u.t].n)}<small>${U.fmt(u.n)}${u.hidden ? '・伏' : ''}${u.onwall != null ? '・壁' : ''}</small></button>`).join('') + `<button class="chip ${V.ui.multi ? 'on' : ''}" data-id="multi" title="タップで複数選択">複数</button>`;
   for (const b of U.$$('.chip', chips)) b.onclick = () => {
     if (b.dataset.id === 'multi') { V.ui.multi = !V.ui.multi; V.ui.placeKey = null; V.renderPanel(); return; }
     const u = bt.units[+b.dataset.id]; if (!u) return;
@@ -14909,8 +14935,7 @@ UI.fame = (o) => UI.modal((box, close) => {
 // 出撃する部隊と人数を選ぶ（合戦の前）
 UI.wantSortie = (spec) => {
   if (!G || !spec || !spec.args || spec.role === 'watch' || !spec.sides[0] || !spec.sides[0].player) return false;
-  const gs = W.playerGroups(), tot = U.sum(gs, g => g.n);
-  return tot >= 600 && (gs.length >= 2 || tot >= 3000);
+  return W.canPickSortie();
 };
 UI.sortie = (spec) => UI.modal((box, close) => {
   const A2 = G.me.army, gs = W.playerGroups();
@@ -15138,7 +15163,7 @@ UI.help = () => UI.info({
 3. 行動を終えたら「月を進める」。各国が動き、戦や事件が起きる。
 4. 合戦はリアルタイム。部隊をタップして選び、地面で移動、敵で攻撃。
    伍ごとの士気、挟撃、伏兵、射撃区域、攻城、一騎打ちを駆使せよ。
-   ・開戦前は「布陣のターン」。軍議の札から「布陣へ」を押すと、帯だけを残して地図が広く出る。部隊（下の札でも選べる）をタップして選び、置きたい所をタップ（引いても動く）。陣形・伏兵・分割もここで決められる。「このまま開戦」で飛ばせる。
+   ・開戦前は「布陣のターン」。軍議の札から「布陣へ」を押すと、帯だけを残して地図が広く出る。部隊（下の札でも選べる）をタップして選び、置きたい所をタップ（引いても動く）。旗の下の札と下の札に兵種（歩兵・戟兵・弓兵・弩兵・軽騎・重騎・戦車など）が出る。札の色は兵科（歩兵は生成り、弓・弩は青緑、騎兵は金、戦車は朱、攻城兵器は茶）。陣形・伏兵・分割もここで決められる。「このまま開戦」で飛ばせる。
    ・「分割」で分けた別動隊は、本隊の近くに戻して「結合」で一つに戻せる。
    ・戦場は立体（3D）で見られる。一本指で動かし、二本指で回す・傾ける・近づける。右の「2D／3D」で切り替え。
    ・一騎打ちは立体の動画で、馬と武者が駆け違いざまに斬り結ぶ。相手の動きを読み、攻撃・強撃・受け・必殺を選ぶ。気迫が満ちると必殺が出せる。深手を負えば落馬し、徒歩の立ち合いになる。画面をタップすると動きを早送りできる。
@@ -16825,7 +16850,7 @@ UI.armyTab = (c) => {
     for (const w of A2.wu) html += `<div class="card wucard ${w.alive ? '' : 'dead'}"><div class="face">${U.esc(w.n.slice(0, 1))}</div><div style="min-width:0"><b>${U.esc(w.n)}${w.fresh ? ' <span class="pill">新兵</span>' : ''}</b><div class="note">武${w.bu}　体${Math.round(w.hp)}　絆${Math.round(w.bond)}${w.tr ? '　' + D.TRAITS[w.tr].n : ''}</div>${UI.bar(w.hp, 100, w.hp < 50 ? 'rd' : '')}</div></div>`;
     html += `</div>`;
   }
-  if (tot >= 600) {
+  if (W.canPickSortie()) {
     const cur = A2.sortieAsk === false ? (A2.sortiePre || 'auto') : 'ask';
     html += `<div class="card sortie-pref"><b>合戦に出る部隊</b><div class="seg sm" role="group" aria-label="合戦に出る部隊の選び方">${[['ask', '毎回選ぶ'], ['auto', '敵の倍まで'], ['direct', '直属だけ'], ['all', '全軍']].map(([k, n]) => `<button data-sortie="${k}" class="${cur === k ? 'on' : ''}" aria-pressed="${cur === k}">${n}</button>`).join('')}</div><p class="note" style="margin:6px 0 0">${cur === 'ask' ? '合戦の前に、出撃する部隊と人数を選ぶ。' : cur === 'auto' ? '敵の兵の倍ほどになるまで、直属の隊と練度の高い隊から出す。' : cur === 'direct' ? '部下に任せた兵は留守を守り、直属の兵だけで出る。' : 'いつも全軍で出る。'}</p></div>`;
   }

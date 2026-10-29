@@ -1,5 +1,5 @@
 /* 七雄覇道 — service worker（オフラインでも遊べるように、ページと絵を保存する） */
-const VERSION = '65b358545f';
+const VERSION = '6fe1bb9178';
 const CACHE = 'shichiyu-' + VERSION;
 const CORE = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', (e) => {
